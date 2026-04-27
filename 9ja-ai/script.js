@@ -3,7 +3,7 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const suggestionButtons = document.getElementById('suggestionButtons');
 
-// ←←← CHANGE THIS TO YOUR RENDER URL ←←←
+// ←←← CHANGE THIS TO YOUR ACTUAL RENDER URL ←←←
 const BACKEND_URL = 'https://nineja-ai-backend-1.onrender.com/api/chat';
 
 const suggestions = [
@@ -64,12 +64,12 @@ async function sendToAI(message) {
     if (data.error) {
       addMessage(data.error, "incoming");
     } else {
-      addMessage(data.reply, "incoming");
+      addMessage(data.reply || "No reply received", "incoming");
     }
   } catch (error) {
     loadingElement.remove();
-    addMessage("Network wahala! Check your connection or try again later.", "incoming");
-    console.error(error);
+    console.error("Full Fetch Error:", error);
+    addMessage("Network wahala! Check console (F12) for details or try again.", "incoming");
   }
 }
 
@@ -83,6 +83,7 @@ async function handleSend() {
   await sendToAI(message);
 }
 
+// Event listeners
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
@@ -93,4 +94,4 @@ userInput.addEventListener('keypress', (e) => {
 
 // Initialize
 addSuggestionButtons();
-addMessage("Hello boss! How far? Ask me anything about Naija, tech, jollof, or life. 🇳🇬", "incoming");
+addMessage("Hello boss! How far? Ask me anything. 🇳🇬", "incoming");
