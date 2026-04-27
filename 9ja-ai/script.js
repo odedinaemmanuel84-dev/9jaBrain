@@ -2,7 +2,7 @@ const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 
-let API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // ← Put your key here
+let API_KEY = "AIzaSyA_lCYdv5mroIReT3GUiyo9I2fx7kLV4Q0"; // ← Put your key here
 
 // Function to add message to chat
 function addMessage(text, type) {
