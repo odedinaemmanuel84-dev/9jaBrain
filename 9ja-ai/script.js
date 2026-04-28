@@ -4,7 +4,7 @@ const sendBtn = document.getElementById('sendBtn');
 const suggestionButtons = document.getElementById('suggestionButtons');
 
 // ←←← CHANGE THIS TO YOUR ACTUAL RENDER URL ←←←
-const BACKEND_URL = 'https://nineja-ai-backend-1.onrender.com/api/chat';
+const BACKEND_URL = 'https://nineja-ai-backend-2.onrender.com/api/chat';
 
 const suggestions = [
   "How to make perfect Jollof rice?",
