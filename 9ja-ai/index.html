@@ -12,15 +12,17 @@
     <header>
       <div class="header-left">
         <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
-        <div class="logo"><i class="fas fa-robot"></i> <span>9JA AI</span></div>
+        <div class="logo">
+          <span class="flag">🇳🇬</span>
+          <span>9JA AI</span>
+        </div>
       </div>
       <button id="newChatBtn" class="icon-btn" title="New Chat"><i class="fas fa-plus"></i></button>
     </header>
 
-    <div class="chat-box" id="chatBox">
-      <!-- Welcome message added by script -->
-    </div>
+    <div class="chat-box" id="chatBox"></div>
 
+    <!-- Suggestions - only show when chat is empty -->
     <div class="suggestions" id="suggestions">
       <button onclick="sendSuggestion(this)">Best Jollof recipe</button>
       <button onclick="sendSuggestion(this)">Business ideas in Lagos</button>
@@ -31,7 +33,7 @@
     <div class="input-area">
       <button id="voiceInputBtn" class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
       <button id="cameraBtn" class="icon-btn" title="Upload Image"><i class="fas fa-camera"></i></button>
-      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+      <input type="file" id="imageUpload" accept="image/*" style="display:none">
       <textarea id="userInput" placeholder="Ask me anything..." rows="1"></textarea>
       <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
@@ -42,8 +44,7 @@
     <button id="closeMenu" class="close-btn">✕</button>
     <ul>
       <li onclick="newChat()">New Chat</li>
-      <li onclick="saveChatHistory()">Save Chat History</li>
-      <li onclick="clearAllHistory()">Clear All History</li>
+      <li onclick="clearAllHistory()">Clear History</li>
     </ul>
   </div>
 
