@@ -10,17 +10,18 @@ const voiceInputBtn = document.getElementById('voiceInputBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 const imageUpload = document.getElementById('imageUpload');
 
-const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR RENDER URL
+const BACKEND_URL = "https://ninja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR ACTUAL RENDER URL
 
 let currentChatId = 'chat_' + Date.now();
+let currentVoiceGender = 'female'; // default
 
 // Auto resize textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
-  userInput.style.height = Math.min(userInput.scrollHeight, 140) + 'px';
+  userInput.style.height = Math.min(userInput.scrollHeight, 130) + 'px';
 });
 
-// Load or show welcome
+// Load chat or show welcome
 function loadChat() {
   const saved = localStorage.getItem(currentChatId);
   if (saved) {
@@ -33,14 +34,14 @@ function loadChat() {
 
 function showWelcome() {
   chatBox.innerHTML = `
-    <div class="message incoming">
-      <strong>9JA AI:</strong> How far my person! 👋 I'm 9JA AI, 
+    <div class="message incoming welcome-msg">
+      How far my person! 👋<br><br>
+      I'm 9JA AI, created by Emmanuel Odedina.<br>
       Wetin you wan know today? Ask me anything — I get time! 😄
     </div>`;
   suggestionsDiv.style.display = 'flex';
 }
 
-// Auto save chat
 function saveCurrentChat() {
   localStorage.setItem(currentChatId, chatBox.innerHTML);
 }
@@ -48,35 +49,68 @@ function saveCurrentChat() {
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.classList.add('message', type);
-  div.innerHTML = `<strong>${type === 'outgoing' ? 'You' : '9JA AI'}:</strong> ${text}`;
+  div.textContent = text;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
   saveCurrentChat();
-
-  // Hide suggestions after user sends first message
   if (type === 'outgoing') suggestionsDiv.style.display = 'none';
 }
 
 function showLoading() {
   const loading = document.createElement('div');
   loading.classList.add('message', 'loading');
-  loading.id = 'loadingMsg';
-  loading.innerHTML = `<strong>9JA AI:</strong> <span class="spinner"></span> Thinking...`;
+  loading.innerHTML = `<span class="spinner"></span> Thinking...`;
   chatBox.appendChild(loading);
   chatBox.scrollTop = chatBox.scrollHeight;
   return loading;
 }
 
-// Text-to-Speech (Natural ChatGPT style)
+function showSpeaking() {
+  const speaking = document.createElement('div');
+  speaking.classList.add('message', 'speaking');
+  speaking.innerHTML = `<span class="speaking-dot"></span> 9JA AI is speaking...`;
+  chatBox.appendChild(speaking);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return speaking;
+}
+
+// Text-to-Speech with Male/Female selection
 function speak(text) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.93;
-    utterance.pitch = 1.05;
-    utterance.volume = 0.95;
-    window.speechSynthesis.speak(utterance);
+  if (!('speechSynthesis' in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.94;
+  utterance.pitch = currentVoiceGender === 'male' ? 0.9 : 1.1;
+  utterance.volume = 0.97;
+
+  const voices = speechSynthesis.getVoices();
+  let selectedVoice = null;
+
+  if (currentVoiceGender === 'male') {
+    selectedVoice = voices.find(v => 
+      v.name.toLowerCase().includes('daniel') || 
+      v.name.toLowerCase().includes('guy') || 
+      v.name.toLowerCase().includes('male')
+    );
+  } else {
+    selectedVoice = voices.find(v => 
+      v.name.toLowerCase().includes('samantha') || 
+      v.name.toLowerCase().includes('karen') || 
+      v.name.toLowerCase().includes('female')
+    );
   }
+
+  if (selectedVoice) utterance.voice = selectedVoice;
+
+  const speakingIndicator = showSpeaking();
+
+  utterance.onend = () => {
+    speakingIndicator.remove();
+  };
+
+  window.speechSynthesis.speak(utterance);
 }
 
 async function sendToBackend(message) {
@@ -92,12 +126,10 @@ async function sendToBackend(message) {
     const data = await res.json();
     loadingMsg.remove();
     addMessage(data.reply, "incoming");
-    speak(data.reply);                    // Auto voice reply
+    speak(data.reply);           // Auto voice reply
   } catch (err) {
     loadingMsg.remove();
-    addMessage(navigator.onLine ? 
-      "Network wahala! Try again." : 
-      "No internet connection. Check your network.", "incoming");
+    addMessage(navigator.onLine ? "Network wahala, try again." : "No internet connection.", "incoming");
   }
 }
 
@@ -112,7 +144,7 @@ async function handleSend() {
   await sendToBackend(message);
 }
 
-// Voice Input (Speech-to-Text)
+// Voice Input
 let recognition = null;
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -127,36 +159,49 @@ voiceInputBtn.addEventListener('click', () => {
   if (recognition) recognition.start();
 });
 
-// Image Upload Button
+// Image Upload
 cameraBtn.addEventListener('click', () => imageUpload.click());
-imageUpload.addEventListener('change', (e) => {
-  if (e.target.files[0]) {
-    addMessage("📸 Image received. Vision analysis dey come soon!", "outgoing");
-  }
+imageUpload.addEventListener('change', () => {
+  addMessage("📸 Image received. Vision analysis dey come soon!", "outgoing");
 });
 
-// Hamburger Menu
+// Menu Controls
 menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
 closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
 
-// New Chat
 function newChat() {
-  if (confirm("Start new chat? Current one go clear.")) {
+  if (confirm("Start new chat?")) {
     currentChatId = 'chat_' + Date.now();
     chatBox.innerHTML = '';
     showWelcome();
     sideMenu.classList.remove('open');
   }
 }
-newChatBtn.addEventListener('click', newChat);
 
-// Clear History
 function clearAllHistory() {
-  if (confirm("Clear all saved chats?")) {
+  if (confirm("Clear all history?")) {
     localStorage.clear();
     newChat();
   }
 }
+
+// Voice Gender Selector (Added to Menu)
+function addVoiceSelector() {
+  const voiceDiv = document.createElement('div');
+  voiceDiv.style.marginTop = '20px';
+  voiceDiv.innerHTML = `
+    <p style="margin-bottom:8px; color:#aaa;">Choose Voice:</p>
+    <button onclick="setVoice('female')" style="margin:5px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='female'?'#00cc88':'#334444'}">Female</button>
+    <button onclick="setVoice('male')" style="margin:5px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='male'?'#00cc88':'#334444'}">Male</button>
+  `;
+  sideMenu.appendChild(voiceDiv);
+}
+
+window.setVoice = function(gender) {
+  currentVoiceGender = gender;
+  sideMenu.classList.remove('open');
+  alert(`Voice changed to ${gender === 'male' ? 'Male' : 'Female'}`);
+};
 
 // Quick Suggestions
 window.sendSuggestion = function(btn) {
@@ -165,8 +210,9 @@ window.sendSuggestion = function(btn) {
   sendToBackend(msg);
 };
 
-// Initialize App
+// Initialize
 loadChat();
+addVoiceSelector();   // Add voice selector in menu
 
 // Event Listeners
 sendBtn.addEventListener('click', handleSend);
