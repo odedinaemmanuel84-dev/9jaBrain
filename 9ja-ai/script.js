@@ -1,32 +1,18 @@
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
-const suggestionButtons = document.getElementById('suggestionButtons');
+const newChatBtn = document.getElementById('newChatBtn');
+const darkModeBtn = document.getElementById('darkModeBtn');
 
-// ←←← CHANGE THIS TO YOUR ACTUAL RENDER URL ←←←
-const BACKEND_URL = 'https://nineja-ai-backend-2.onrender.com/api/chat';
+const BACKEND_URL = "https://your-render-app-name.onrender.com";   // ← UPDATE THIS
 
-const suggestions = [
-  "How to make perfect Jollof rice?",
-  "Best tech opportunities in Nigeria right now",
-  "How to start a small business in Lagos?",
-  "Latest Naija football updates",
-  "Tell me some funny Naija pidgin jokes"
-];
+let isDarkMode = false;
 
-function addSuggestionButtons() {
-  suggestionButtons.innerHTML = '';
-  suggestions.forEach(text => {
-    const btn = document.createElement('button');
-    btn.classList.add('suggestion-btn');
-    btn.textContent = text;
-    btn.addEventListener('click', () => {
-      userInput.value = text;
-      handleSend();
-    });
-    suggestionButtons.appendChild(btn);
-  });
-}
+// Auto resize textarea
+userInput.addEventListener('input', () => {
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 130) + 'px';
+});
 
 function addMessage(text, type) {
   const msgDiv = document.createElement('div');
@@ -37,39 +23,31 @@ function addMessage(text, type) {
 }
 
 function showLoading() {
-  const loadingDiv = document.createElement('div');
-  loadingDiv.classList.add('message', 'incoming', 'loading-message');
-  loadingDiv.innerHTML = `
-    <div class="spinner"></div>
-    <span>9JA AI dey think... hold small</span>
-  `;
-  chatBox.appendChild(loadingDiv);
+  const loading = document.createElement('div');
+  loading.classList.add('message', 'loading');
+  loading.id = 'loadingMsg';
+  loading.innerHTML = `<strong>9JA AI:</strong> <span class="dots">Groq dey calculate sharp sharp</span>`;
+  chatBox.appendChild(loading);
   chatBox.scrollTop = chatBox.scrollHeight;
-  return loadingDiv;
+  return loading;
 }
 
-async function sendToAI(message) {
-  const loadingElement = showLoading();
+async function sendToBackend(message) {
+  const loadingMsg = showLoading();
 
   try {
-    const response = await fetch(BACKEND_URL, {
+    const res = await fetch(`${BACKEND_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message })
     });
 
-    const data = await response.json();
-    loadingElement.remove();
-
-    if (data.error) {
-      addMessage(data.error, "incoming");
-    } else {
-      addMessage(data.reply || "No reply received", "incoming");
-    }
-  } catch (error) {
-    loadingElement.remove();
-    console.error("Full Fetch Error:", error);
-    addMessage("Network wahala! Check console (F12) for details or try again.", "incoming");
+    const data = await res.json();
+    loadingMsg.remove();
+    addMessage(data.reply, "incoming");
+  } catch (err) {
+    loadingMsg.remove();
+    addMessage("Network wahala! Check connection or try again.", "incoming");
   }
 }
 
@@ -79,9 +57,32 @@ async function handleSend() {
 
   addMessage(message, "outgoing");
   userInput.value = "";
+  userInput.style.height = 'auto';
 
-  await sendToAI(message);
+  await sendToBackend(message);
 }
+
+// Quick suggestions
+window.sendSuggestion = function(btn) {
+  const message = btn.textContent;
+  addMessage(message, "outgoing");
+  sendToBackend(message);
+};
+
+// New Chat
+newChatBtn.addEventListener('click', async () => {
+  if (confirm("Start new chat? Previous conversation go clear.")) {
+    chatBox.innerHTML = `<div class="message incoming"><strong>9JA AI:</strong> Fresh start! How far?</div>`;
+    await fetch(`${BACKEND_URL}/clear`, { method: "POST" });
+  }
+});
+
+// Dark Mode
+darkModeBtn.addEventListener('click', () => {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  darkModeBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+});
 
 // Event listeners
 sendBtn.addEventListener('click', handleSend);
@@ -91,7 +92,3 @@ userInput.addEventListener('keypress', (e) => {
     handleSend();
   }
 });
-
-// Initialize
-addSuggestionButtons();
-addMessage("Hello boss! How far? Ask me anything. 🇳🇬", "incoming");
