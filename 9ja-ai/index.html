@@ -3,42 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>9JA AI - Naija's Smartest AI</title>
+  <title>9JA AI</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <div class="chat-container">
+  <div class="app">
     <header>
-      <div class="logo">
-        <i class="fas fa-robot"></i>
-        <h1>9JA AI</h1>
+      <div class="header-left">
+        <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
+        <div class="logo"><i class="fas fa-robot"></i> <span>9JA AI</span></div>
       </div>
-      <p>Oya, wetin you wan know today? 🇳🇬</p>
-      
-      <div class="header-controls">
-        <button id="newChatBtn" title="New Chat"><i class="fas fa-plus"></i></button>
-        <button id="darkModeBtn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-      </div>
+      <button id="newChatBtn" class="icon-btn" title="New Chat"><i class="fas fa-plus"></i></button>
     </header>
 
     <div class="chat-box" id="chatBox">
-      <div class="message incoming">
-        <strong>9JA AI:</strong> How far bros! I be your personal 9JA AI powered by Groq. Ask me anything — from perfect Jollof to business ideas or life advice.
-      </div>
+      <!-- Welcome message added by script -->
     </div>
 
     <div class="suggestions" id="suggestions">
       <button onclick="sendSuggestion(this)">Best Jollof recipe</button>
-      <button onclick="sendSuggestion(this)">Business ideas for Lagos</button>
-      <button onclick="sendSuggestion(this)">Tech career in Naija</button>
-      <button onclick="sendSuggestion(this)">Tell me funny Naija joke</button>
+      <button onclick="sendSuggestion(this)">Business ideas in Lagos</button>
+      <button onclick="sendSuggestion(this)">Tech opportunities in Naija</button>
+      <button onclick="sendSuggestion(this)">Tell me a joke</button>
     </div>
 
     <div class="input-area">
-      <textarea id="userInput" placeholder="Type your message... (e.g. Wetin dey happen?)" rows="1"></textarea>
-      <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+      <button id="voiceInputBtn" class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
+      <button id="cameraBtn" class="icon-btn" title="Upload Image"><i class="fas fa-camera"></i></button>
+      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+      <textarea id="userInput" placeholder="Ask me anything..." rows="1"></textarea>
+      <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
+  </div>
+
+  <!-- Side Menu -->
+  <div id="sideMenu" class="side-menu">
+    <button id="closeMenu" class="close-btn">✕</button>
+    <ul>
+      <li onclick="newChat()">New Chat</li>
+      <li onclick="saveChatHistory()">Save Chat History</li>
+      <li onclick="clearAllHistory()">Clear All History</li>
+    </ul>
   </div>
 
   <script src="script.js"></script>
