@@ -1,6 +1,7 @@
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
+const suggestionsDiv = document.getElementById('suggestions');
 const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeMenu = document.getElementById('closeMenu');
@@ -9,30 +10,52 @@ const voiceInputBtn = document.getElementById('voiceInputBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 const imageUpload = document.getElementById('imageUpload');
 
-const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE THIS
+const BACKEND_URL = "https://your-render-app.onrender.com";   // ← UPDATE THIS
 
-// Auto-resize textarea
+let currentChatId = 'chat_' + Date.now();
+
+// Auto resize textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
   userInput.style.height = Math.min(userInput.scrollHeight, 140) + 'px';
 });
 
-// Add welcome message
-function addWelcome() {
-  chatBox.innerHTML = `<div class="message incoming"><strong>9JA AI:</strong> Hello! I'm 9JA AI, created by Emmanuel Odedina. How can I help you today?</div>`;
+// Load saved chat or show welcome
+function loadChat() {
+  const saved = localStorage.getItem(currentChatId);
+  if (saved) {
+    chatBox.innerHTML = saved;
+    suggestionsDiv.style.display = 'none';
+  } else {
+    showWelcome();
+  }
 }
-addWelcome();
 
-// Add message
+function showWelcome() {
+  chatBox.innerHTML = `
+    <div class="message incoming">
+      <strong>9JA AI:</strong> Hello! I'm 9JA AI, created by Emmanuel Odedina. How can I help you today?
+    </div>`;
+  suggestionsDiv.style.display = 'flex';
+}
+
+// Save chat automatically
+function saveCurrentChat() {
+  localStorage.setItem(currentChatId, chatBox.innerHTML);
+}
+
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.classList.add('message', type);
   div.innerHTML = `<strong>${type === 'outgoing' ? 'You' : '9JA AI'}:</strong> ${text}`;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
+  saveCurrentChat();
+
+  // Hide suggestions after first message
+  if (type === 'outgoing') suggestionsDiv.style.display = 'none';
 }
 
-// Loading spinner
 function showLoading() {
   const loading = document.createElement('div');
   loading.classList.add('message', 'loading');
@@ -43,17 +66,18 @@ function showLoading() {
   return loading;
 }
 
-// Text-to-Speech
+// Text-to-Speech (ChatGPT style)
 function speak(text) {
   if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel(); // Stop previous speech
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
+    utterance.rate = 0.92;
     utterance.pitch = 1.05;
-    speechSynthesis.speak(utterance);
+    utterance.volume = 0.95;
+    window.speechSynthesis.speak(utterance);
   }
 }
 
-// Send message
 async function sendToBackend(message) {
   const loadingMsg = showLoading();
 
@@ -67,14 +91,10 @@ async function sendToBackend(message) {
     const data = await res.json();
     loadingMsg.remove();
     addMessage(data.reply, "incoming");
-    speak(data.reply);                    // Auto voice reply
+    speak(data.reply);           // Voice reply
   } catch (err) {
     loadingMsg.remove();
-    if (!navigator.onLine) {
-      addMessage("No internet connection. Please check your network.", "incoming");
-    } else {
-      addMessage("Something went wrong. Please try again.", "incoming");
-    }
+    addMessage(navigator.onLine ? "Something went wrong. Please try again." : "No internet connection.", "incoming");
   }
 }
 
@@ -89,73 +109,57 @@ async function handleSend() {
   await sendToBackend(message);
 }
 
-// Voice Input (Speech-to-Text)
-let recognition;
+// Voice Input
+let recognition = null;
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = 'en-NG';
-  recognition.onresult = (event) => {
-    userInput.value = event.results[0][0].transcript;
+  recognition.onresult = (e) => {
+    userInput.value = e.results[0][0].transcript;
     handleSend();
   };
 }
 
-voiceInputBtn.addEventListener('click', () => {
-  if (recognition) recognition.start();
-});
+voiceInputBtn.addEventListener('click', () => recognition && recognition.start());
 
-// Image Upload (Basic - Text only for now)
+// Image Upload (Vision ready - basic for now)
 cameraBtn.addEventListener('click', () => imageUpload.click());
 imageUpload.addEventListener('change', (e) => {
-  if (e.target.files.length > 0) {
-    addMessage("Image uploaded. (Vision support coming soon)", "outgoing");
-    // Future: Send base64 to backend with vision model
+  if (e.target.files[0]) {
+    addMessage("📸 Image received. Vision analysis coming soon...", "outgoing");
+    // TODO: Send base64 to backend with vision model
   }
 });
 
-// Hamburger Menu
+// Menu Controls
 menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
 closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
 
-// New Chat
 function newChat() {
-  if (confirm("Start a new chat?")) {
+  if (confirm("Start a new conversation?")) {
+    currentChatId = 'chat_' + Date.now();
     chatBox.innerHTML = '';
-    addWelcome();
-    fetch(`${BACKEND_URL}/clear`, { method: "POST" });
+    showWelcome();
     sideMenu.classList.remove('open');
   }
 }
-newChatBtn.addEventListener('click', newChat);
 
-// Save Chat History
-function saveChatHistory() {
-  const messages = Array.from(chatBox.children).map(msg => msg.textContent);
-  const blob = new Blob([messages.join('\n\n')], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `9JA_AI_Chat_${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
-  sideMenu.classList.remove('open');
-}
-
-// Clear History
 function clearAllHistory() {
-  if (confirm("Clear all chat history?")) {
-    chatBox.innerHTML = '';
-    addWelcome();
-    fetch(`${BACKEND_URL}/clear`, { method: "POST" });
-    sideMenu.classList.remove('open');
+  if (confirm("Clear all saved chats?")) {
+    localStorage.clear();
+    newChat();
   }
 }
 
-// Quick suggestions
+// Quick Suggestions
 window.sendSuggestion = function(btn) {
   const msg = btn.textContent;
   addMessage(msg, "outgoing");
   sendToBackend(msg);
 };
+
+// Initialize
+loadChat();
 
 // Event Listeners
 sendBtn.addEventListener('click', handleSend);
