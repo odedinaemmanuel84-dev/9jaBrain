@@ -4,143 +4,162 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #008751, #fff, #008751);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  transition: background 0.3s;
-}
-
-.dark-mode body {
-  background: linear-gradient(135deg, #003d24, #121212, #003d24);
-}
-
-.chat-container {
-  width: 100%;
-  max-width: 540px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  background: #0a0a0a;
+  color: #fff;
+  height: 100vh;
   overflow: hidden;
-  border: 5px solid #008751;
-  transition: all 0.3s;
 }
 
-.dark-mode .chat-container {
-  background: #1e1e1e;
-  border-color: #00cc66;
-  box-shadow: 0 10px 40px rgba(0, 204, 102, 0.2);
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0f0f0f;
 }
 
 header {
-  background: #008751;
-  color: white;
-  padding: 15px 18px;
+  background: linear-gradient(90deg, #00ff9d, #00ccff);
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #000;
+  font-weight: 600;
 }
 
-.logo { display: flex; align-items: center; gap: 10px; font-size: 1.9rem; }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+}
 
-.header-controls button {
+.icon-btn {
   background: none;
   border: none;
-  color: white;
-  font-size: 1.3rem;
-  margin-left: 10px;
+  color: #000;
+  font-size: 1.5rem;
   cursor: pointer;
+  padding: 8px;
 }
 
 .chat-box {
-  height: 420px;
+  flex: 1;
   overflow-y: auto;
-  padding: 15px;
-  background: #f8f9fa;
+  padding: 20px;
+  background: #1a1a1a;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
 }
-
-.dark-mode .chat-box { background: #2a2a2a; }
 
 .message {
   max-width: 85%;
-  padding: 13px 16px;
-  border-radius: 18px;
-  line-height: 1.45;
+  padding: 14px 18px;
+  border-radius: 20px;
+  line-height: 1.5;
 }
 
-.incoming { align-self: flex-start; background: #e9ecef; border-bottom-left-radius: 5px; }
-.dark-mode .incoming { background: #3a3a3a; color: #eee; }
+.incoming {
+  align-self: flex-start;
+  background: #2a2a2a;
+}
 
-.outgoing { align-self: flex-end; background: #008751; color: white; border-bottom-right-radius: 5px; }
+.outgoing {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #00ff9d, #00ccff);
+  color: #000;
+}
 
 .loading {
   align-self: flex-start;
-  background: #e9ecef;
-  padding: 12px 16px;
-  border-radius: 18px;
+  background: #2a2a2a;
+  padding: 14px 18px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
 }
 
-.dark-mode .loading { background: #3a3a3a; }
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #00ff9d;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .suggestions {
-  padding: 10px 12px;
-  background: #f1f3f5;
+  padding: 12px 15px;
+  background: #1f1f1f;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  border-top: 1px solid #ddd;
+  gap: 10px;
+  border-top: 1px solid #333;
 }
 
-.dark-mode .suggestions { background: #252525; }
-
 .suggestions button {
-  background: #008751;
-  color: white;
+  background: #00cc66;
+  color: #000;
   border: none;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 0.88rem;
+  padding: 10px 16px;
+  border-radius: 25px;
+  font-size: 0.95rem;
   cursor: pointer;
 }
 
 .input-area {
   display: flex;
-  padding: 12px;
-  background: white;
-  border-top: 1px solid #ddd;
+  padding: 12px 15px;
+  background: #1a1a1a;
   gap: 8px;
+  align-items: flex-end;
 }
-
-.dark-mode .input-area { background: #1e1e1e; }
 
 #userInput {
   flex: 1;
-  padding: 14px 18px;
-  border: 2px solid #ddd;
+  background: #2a2a2a;
+  color: #fff;
+  border: none;
   border-radius: 25px;
+  padding: 14px 20px;
   font-size: 16px;
   resize: none;
-  max-height: 130px;
+  max-height: 140px;
   overflow-y: auto;
 }
 
-.dark-mode #userInput { background: #333; color: #eee; border-color: #555; }
-
-#sendBtn {
-  background: #008751;
-  color: white;
-  border: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.3rem;
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100%;
+  background: #1f1f1f;
+  transition: left 0.4s ease;
+  padding: 20px;
+  z-index: 100;
 }
+
+.side-menu.open { left: 0; }
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  float: right;
+  cursor: pointer;
+}
+
+.side-menu ul li {
+  padding: 15px 10px;
+  list-style: none;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+}
+
+.side-menu ul li:hover { color: #00ff9d; }
