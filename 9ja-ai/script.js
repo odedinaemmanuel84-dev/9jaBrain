@@ -4,7 +4,7 @@ const sendBtn = document.getElementById('sendBtn');
 const newChatBtn = document.getElementById('newChatBtn');
 const darkModeBtn = document.getElementById('darkModeBtn');
 
-const BACKEND_URL = "https://your-render-app-name.onrender.com";   // ← UPDATE THIS
+const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← UPDATE THIS
 
 let isDarkMode = false;
 
