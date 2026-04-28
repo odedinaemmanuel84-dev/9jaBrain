@@ -36,8 +36,8 @@ function showWelcome() {
   chatBox.innerHTML = `
     <div class="message incoming welcome-msg">
       How far my person! 👋<br><br>
-      I'm 9JA AI, created by Emmanuel Odedina.<br>
-      Wetin you wan know today? Ask me anything — I get time! 😄
+      I'm 9JA AI,<br>
+      Wetin you wan know today? Ask me anything — I get time! 
     </div>`;
   suggestionsDiv.style.display = 'flex';
 }
