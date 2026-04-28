@@ -15,17 +15,28 @@
         <h1>9JA AI</h1>
       </div>
       <p>Oya, wetin you wan know today? 🇳🇬</p>
+      
+      <div class="header-controls">
+        <button id="newChatBtn" title="New Chat"><i class="fas fa-plus"></i></button>
+        <button id="darkModeBtn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+      </div>
     </header>
 
-    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-box" id="chatBox">
+      <div class="message incoming">
+        <strong>9JA AI:</strong> How far bros! I be your personal 9JA AI powered by Groq. Ask me anything — from perfect Jollof to business ideas or life advice.
+      </div>
+    </div>
 
-    <div class="suggestions">
-      <p class="suggestions-title">Quick questions:</p>
-      <div class="suggestion-buttons" id="suggestionButtons"></div>
+    <div class="suggestions" id="suggestions">
+      <button onclick="sendSuggestion(this)">Best Jollof recipe</button>
+      <button onclick="sendSuggestion(this)">Business ideas for Lagos</button>
+      <button onclick="sendSuggestion(this)">Tech career in Naija</button>
+      <button onclick="sendSuggestion(this)">Tell me funny Naija joke</button>
     </div>
 
     <div class="input-area">
-      <textarea id="userInput" placeholder="Type your message... e.g. 'How to make good jollof?'" rows="1"></textarea>
+      <textarea id="userInput" placeholder="Type your message... (e.g. Wetin dey happen?)" rows="1"></textarea>
       <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
