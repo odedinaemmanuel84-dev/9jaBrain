@@ -10,7 +10,7 @@ const voiceInputBtn = document.getElementById('voiceInputBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 const imageUpload = document.getElementById('imageUpload');
 
-const BACKEND_URL = "https://your-render-app.onrender.com";   // ← UPDATE THIS
+const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR RENDER URL
 
 let currentChatId = 'chat_' + Date.now();
 
@@ -20,7 +20,7 @@ userInput.addEventListener('input', () => {
   userInput.style.height = Math.min(userInput.scrollHeight, 140) + 'px';
 });
 
-// Load saved chat or show welcome
+// Load or show welcome
 function loadChat() {
   const saved = localStorage.getItem(currentChatId);
   if (saved) {
@@ -34,12 +34,13 @@ function loadChat() {
 function showWelcome() {
   chatBox.innerHTML = `
     <div class="message incoming">
-      <strong>9JA AI:</strong> Hello! I'm 9JA AI, created by Emmanuel Odedina. How can I help you today?
+      <strong>9JA AI:</strong> How far my person! 👋 I'm 9JA AI, 
+      Wetin you wan know today? Ask me anything — I get time! 😄
     </div>`;
   suggestionsDiv.style.display = 'flex';
 }
 
-// Save chat automatically
+// Auto save chat
 function saveCurrentChat() {
   localStorage.setItem(currentChatId, chatBox.innerHTML);
 }
@@ -52,7 +53,7 @@ function addMessage(text, type) {
   chatBox.scrollTop = chatBox.scrollHeight;
   saveCurrentChat();
 
-  // Hide suggestions after first message
+  // Hide suggestions after user sends first message
   if (type === 'outgoing') suggestionsDiv.style.display = 'none';
 }
 
@@ -66,12 +67,12 @@ function showLoading() {
   return loading;
 }
 
-// Text-to-Speech (ChatGPT style)
+// Text-to-Speech (Natural ChatGPT style)
 function speak(text) {
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); // Stop previous speech
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.92;
+    utterance.rate = 0.93;
     utterance.pitch = 1.05;
     utterance.volume = 0.95;
     window.speechSynthesis.speak(utterance);
@@ -91,10 +92,12 @@ async function sendToBackend(message) {
     const data = await res.json();
     loadingMsg.remove();
     addMessage(data.reply, "incoming");
-    speak(data.reply);           // Voice reply
+    speak(data.reply);                    // Auto voice reply
   } catch (err) {
     loadingMsg.remove();
-    addMessage(navigator.onLine ? "Something went wrong. Please try again." : "No internet connection.", "incoming");
+    addMessage(navigator.onLine ? 
+      "Network wahala! Try again." : 
+      "No internet connection. Check your network.", "incoming");
   }
 }
 
@@ -109,7 +112,7 @@ async function handleSend() {
   await sendToBackend(message);
 }
 
-// Voice Input
+// Voice Input (Speech-to-Text)
 let recognition = null;
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -120,30 +123,34 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   };
 }
 
-voiceInputBtn.addEventListener('click', () => recognition && recognition.start());
+voiceInputBtn.addEventListener('click', () => {
+  if (recognition) recognition.start();
+});
 
-// Image Upload (Vision ready - basic for now)
+// Image Upload Button
 cameraBtn.addEventListener('click', () => imageUpload.click());
 imageUpload.addEventListener('change', (e) => {
   if (e.target.files[0]) {
-    addMessage("📸 Image received. Vision analysis coming soon...", "outgoing");
-    // TODO: Send base64 to backend with vision model
+    addMessage("📸 Image received. Vision analysis dey come soon!", "outgoing");
   }
 });
 
-// Menu Controls
+// Hamburger Menu
 menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
 closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
 
+// New Chat
 function newChat() {
-  if (confirm("Start a new conversation?")) {
+  if (confirm("Start new chat? Current one go clear.")) {
     currentChatId = 'chat_' + Date.now();
     chatBox.innerHTML = '';
     showWelcome();
     sideMenu.classList.remove('open');
   }
 }
+newChatBtn.addEventListener('click', newChat);
 
+// Clear History
 function clearAllHistory() {
   if (confirm("Clear all saved chats?")) {
     localStorage.clear();
@@ -158,7 +165,7 @@ window.sendSuggestion = function(btn) {
   sendToBackend(msg);
 };
 
-// Initialize
+// Initialize App
 loadChat();
 
 // Event Listeners
