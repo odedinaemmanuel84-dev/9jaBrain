@@ -27,36 +27,28 @@
       <button onclick="sendSuggestion(this)">Tell me a joke</button>
     </div>
 
-    <!-- Quick Action Buttons (like Grok) -->
+    <!-- Quick Action Buttons -->
     <div class="quick-actions">
       <button onclick="createImage()" class="action-btn">
-        <i class="fas fa-image"></i><br>
-        <small>Create Image</small>
+        <i class="fas fa-image"></i><br><small>Create Image</small>
       </button>
-      <button onclick="editImage()" class="action-btn">
-        <i class="fas fa-edit"></i><br>
-        <small>Edit Image</small>
-      </button>
-      <button onclick="tryVoiceMode()" class="action-btn">
-        <i class="fas fa-microphone"></i><br>
-        <small>Voice Mode</small>
+      <button onclick="uploadImage()" class="action-btn">
+        <i class="fas fa-camera"></i><br><small>Upload Image</small>
       </button>
     </div>
 
     <!-- Input Area -->
     <div class="input-area">
       <button id="voiceInputBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
-      <button id="cameraBtn" class="icon-btn"><i class="fas fa-camera"></i></button>
       <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
       <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-    <!-- Side Menu with Circular Chat History -->
+  <!-- Side Menu with Circular Chat History -->
   <div id="sideMenu" class="side-menu">
     <button id="closeMenu" class="close-btn">✕</button>
-    
-    <h3 style="margin-bottom: 20px;">Chat History</h3>
+    <h3>Chat History</h3>
     <div id="previousChats" class="history-list"></div>
 
     <div style="margin-top: 30px;">
@@ -66,6 +58,6 @@
     </div>
   </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
