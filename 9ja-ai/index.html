@@ -13,7 +13,7 @@
       <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
       <div class="logo">
         <span class="flag">🇳🇬</span>
-        <span style="color: #00ff9d;">9JA AI</span>
+        <span style="color: #00ff9d; font-weight: 600;">9JA AI</span>
       </div>
       <button id="newChatBtn" class="icon-btn"><i class="fas fa-plus"></i></button>
     </header>
@@ -27,41 +27,45 @@
       <button onclick="sendSuggestion(this)">Tell me a joke</button>
     </div>
 
+    <!-- Quick Action Buttons (like Grok) -->
+    <div class="quick-actions">
+      <button onclick="createImage()" class="action-btn">
+        <i class="fas fa-image"></i><br>
+        <small>Create Image</small>
+      </button>
+      <button onclick="editImage()" class="action-btn">
+        <i class="fas fa-edit"></i><br>
+        <small>Edit Image</small>
+      </button>
+      <button onclick="tryVoiceMode()" class="action-btn">
+        <i class="fas fa-microphone"></i><br>
+        <small>Voice Mode</small>
+      </button>
+    </div>
+
+    <!-- Input Area -->
     <div class="input-area">
-      <button id="voiceInputBtn" class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
-      <button id="cameraBtn" class="icon-btn" title="Upload Photo"><i class="fas fa-camera"></i></button>
+      <button id="voiceInputBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
+      <button id="cameraBtn" class="icon-btn"><i class="fas fa-camera"></i></button>
       <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
       <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Side Menu -->
+    <!-- Side Menu with Circular Chat History -->
   <div id="sideMenu" class="side-menu">
     <button id="closeMenu" class="close-btn">✕</button>
     
-    <h3>Previous Chats</h3>
-    <div id="previousChats"></div>
+    <h3 style="margin-bottom: 20px;">Chat History</h3>
+    <div id="previousChats" class="history-list"></div>
 
-    <div class="menu-section">
-      <h4>Voice Settings</h4>
-      <button onclick="setVoice('female')" class="voice-btn">Female Voice</button>
-      <button onclick="setVoice('male')" class="voice-btn">Male Voice</button>
-    </div>
-
-    <div class="menu-section" style="margin-top: auto;">
-      <div class="account-section">
-        <i class="fas fa-user-circle" style="font-size: 2.5rem; color: #00ff9d;"></i>
-        <div>
-          <strong>Emmanuel Odedina</strong><br>
-          <small>Free Plan</small>
-        </div>
-      </div>
-      <button onclick="alert('New account feature coming soon!')" style="width:100%; padding:10px; margin-top:10px; background:#333; color:white; border:none; border-radius:8px;">
-        Add Another Account
+    <div style="margin-top: 30px;">
+      <button onclick="newChat()" style="width:100%; padding:14px; background:#00cc88; color:black; border:none; border-radius:12px; font-weight:600;">
+        <i class="fas fa-plus"></i> New Chat
       </button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
