@@ -9,7 +9,6 @@
 </head>
 <body>
   <div class="app">
-    <!-- Header -->
     <header>
       <div class="header-left">
         <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
@@ -21,10 +20,8 @@
       <button id="newChatBtn" class="icon-btn" title="New Chat"><i class="fas fa-plus"></i></button>
     </header>
 
-    <!-- Chat Area -->
     <div class="chat-box" id="chatBox"></div>
 
-    <!-- Suggestion Buttons (shown only at start) -->
     <div class="suggestions" id="suggestions">
       <button onclick="sendSuggestion(this)">Best Jollof recipe</button>
       <button onclick="sendSuggestion(this)">Business ideas in Lagos</button>
@@ -32,33 +29,31 @@
       <button onclick="sendSuggestion(this)">Tell me a joke</button>
     </div>
 
-    <!-- Input Area -->
     <div class="input-area">
-      <button id="voiceInputBtn" class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
-      <button id="cameraBtn" class="icon-btn" title="Upload Image"><i class="fas fa-camera"></i></button>
-      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+      <button id="voiceInputBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
+      <button id="cameraBtn" class="icon-btn"><i class="fas fa-camera"></i></button>
+      <input type="file" id="imageUpload" accept="image/*" style="display:none">
       <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
       <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Side Menu (Hamburger Menu) -->
+  <!-- Side Menu -->
   <div id="sideMenu" class="side-menu">
     <button id="closeMenu" class="close-btn">✕</button>
-    
-    <h3 style="margin-bottom: 15px; color: #00cc88;">Previous Chats</h3>
-    <div id="previousChats" style="max-height: 60vh; overflow-y: auto;"></div>
+    <h3>Previous Chats</h3>
+    <div id="previousChats"></div>
 
     <div style="margin-top: 30px;">
-      <button onclick="newChat()" style="width: 100%; padding: 14px; background: #00cc88; color: black; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem;">
+      <button onclick="newChat()" style="width:100%; padding:12px; background:#00cc88; color:black; border:none; border-radius:12px; font-weight:600;">
         <i class="fas fa-plus"></i> New Chat
       </button>
     </div>
 
     <div style="margin-top: 25px;">
-      <p style="margin-bottom: 8px; color: #aaa; font-size: 0.95rem;">Voice Gender</p>
-      <button onclick="setVoice('female')" style="margin: 4px; padding: 10px 18px; border-radius: 20px; background: #333;">Female</button>
-      <button onclick="setVoice('male')" style="margin: 4px; padding: 10px 18px; border-radius: 20px; background: #333;">Male</button>
+      <p style="margin-bottom:8px; color:#aaa;">Voice</p>
+      <button onclick="setVoice('female')" style="margin:5px; padding:10px 16px; border-radius:20px;">Female</button>
+      <button onclick="setVoice('male')" style="margin:5px; padding:10px 16px; border-radius:20px;">Male</button>
     </div>
   </div>
 
