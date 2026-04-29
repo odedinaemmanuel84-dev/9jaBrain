@@ -1,5 +1,3 @@
-// FINAL FIXED VERSION - Clean & Working
-
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -9,11 +7,12 @@ const sideMenu = document.getElementById('sideMenu');
 const closeMenu = document.getElementById('closeMenu');
 const newChatBtn = document.getElementById('newChatBtn');
 const voiceInputBtn = document.getElementById('voiceInputBtn');
-const cameraBtn = document.getElementById('cameraBtn');
 
-const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE THIS TO YOUR ACTUAL RENDER URL IF DIFFERENT
+const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR REAL URL
 
-// Show Welcome
+let currentChatId = 'chat_' + Date.now();
+
+// Welcome
 function showWelcome() {
   chatBox.innerHTML = `
     <div class="message incoming welcome-msg">
@@ -30,13 +29,56 @@ function addMessage(text, type) {
   div.textContent = text;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
+  saveCurrentChat();
 }
 
-// Hide welcome and suggestions after first message
-function hideWelcomeAndSuggestions() {
-  const welcome = document.querySelector('.welcome-msg');
-  if (welcome) welcome.remove();
-  suggestionsDiv.style.display = 'none';
+function saveCurrentChat() {
+  localStorage.setItem(currentChatId, chatBox.innerHTML);
+}
+
+function loadChat() {
+  const saved = localStorage.getItem(currentChatId);
+  if (saved) {
+    chatBox.innerHTML = saved;
+    suggestionsDiv.style.display = 'none';
+  } else {
+    showWelcome();
+  }
+}
+
+// Load Circular Chat History
+function loadPreviousChats() {
+  const container = document.getElementById('previousChats');
+  container.innerHTML = '';
+
+  const chats = Object.keys(localStorage).filter(key => key.startsWith('chat_'));
+
+  if (chats.length === 0) {
+    container.innerHTML = '<p style="color:#666; padding:10px;">No previous chats yet</p>';
+    return;
+  }
+
+  chats.forEach(id => {
+    const preview = (localStorage.getItem(id) || "").replace(/<[^>]+>/g, '').substring(0, 45) || "New Chat";
+
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+      <div class="history-circle">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="history-preview">
+        <div class="title">${preview}...</div>
+        <div class="date">${new Date(parseInt(id.split('_')[1])).toLocaleDateString()}</div>
+      </div>
+    `;
+    item.onclick = () => {
+      currentChatId = id;
+      loadChat();
+      sideMenu.classList.remove('open');
+    };
+    container.appendChild(item);
+  });
 }
 
 // Send Message
@@ -47,7 +89,6 @@ async function handleSend() {
   addMessage(message, "outgoing");
   userInput.value = "";
 
-  // Show loading
   const loading = document.createElement('div');
   loading.classList.add('message', 'loading');
   loading.textContent = "Thinking...";
@@ -61,67 +102,54 @@ async function handleSend() {
       body: JSON.stringify({ message })
     });
 
-    if (!res.ok) throw new Error("Server error");
-
     const data = await res.json();
     loading.remove();
     addMessage(data.reply, "incoming");
-    speak(data.reply);
-    hideWelcomeAndSuggestions();   // Fix: hide after reply
   } catch (err) {
     loading.remove();
-    addMessage("Network wahala. Check your internet and try again.", "incoming");
+    addMessage("Network wahala. Try again.", "incoming");
   }
 }
 
-// Simple natural voice
-function speak(text) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.95;
-  utterance.pitch = 1.05;
-  window.speechSynthesis.speak(utterance);
+// Image Generation (Simulated)
+function createImage() {
+  addMessage("Generating image for you...", "outgoing");
+  setTimeout(() => {
+    addMessage("🎨 Image generated! (Feature coming soon with real AI image generation)", "incoming");
+  }, 1500);
 }
 
-// Voice Input (Mic)
+// Image Upload
+function uploadImage() {
+  addMessage("📸 Image uploaded successfully. Vision analysis coming soon!", "outgoing");
+}
+
+// Voice Input
 voiceInputBtn.addEventListener('click', () => {
-  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-NG';
-    recognition.onresult = (e) => {
-      userInput.value = e.results[0][0].transcript;
-      handleSend();
-    };
-    recognition.start();
-  } else {
-    alert("Voice input not supported on this browser");
-  }
+  alert("Voice Mode: Press and speak (Coming with full integration soon)");
 });
-
-// Camera
-cameraBtn.addEventListener('click', () => alert("Photo upload coming soon 📸"));
 
 // New Chat
 function newChat() {
+  currentChatId = 'chat_' + Date.now();
   chatBox.innerHTML = '';
   showWelcome();
+  sideMenu.classList.remove('open');
 }
 
 // Event Listeners
 sendBtn.addEventListener('click', handleSend);
-
 userInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleSend();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) handleSend();
 });
 
-newChatBtn.addEventListener('click', newChat);
-menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
+menuBtn.addEventListener('click', () => {
+  loadPreviousChats();
+  sideMenu.classList.add('open');
+});
+
 closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
+newChatBtn.addEventListener('click', newChat);
 
 // Initialize
 showWelcome();
