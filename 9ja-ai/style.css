@@ -284,3 +284,81 @@ header {
   background: rgba(255, 85, 85, 0.2);
   opacity: 1;
 }
+
+/* Quick Action Buttons */
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #0a0a0a;
+  border-top: 1px solid #222;
+}
+
+.action-btn {
+  background: #1f1f1f;
+  color: #ddd;
+  border: 1px solid #333;
+  padding: 10px 16px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  width: 110px;
+}
+
+.action-btn:hover {
+  background: #2a2a2a;
+  transform: translateY(-2px);
+}
+
+/* Circular Chat History */
+.history-list {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  margin: 8px 0;
+  background: #1f1f1f;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #2a2a2a;
+}
+
+.history-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00cc88, #00ffaa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.history-preview {
+  flex: 1;
+  overflow: hidden;
+}
+
+.history-preview .title {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-preview .date {
+  font-size: 0.8rem;
+  color: #888;
+}
