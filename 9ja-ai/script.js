@@ -1,22 +1,19 @@
+// ==================== CLEAN & FIXED VERSION ====================
+
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const suggestionsDiv = document.getElementById('suggestions');
+const menuBtn = document.getElementById('menuBtn');
+const sideMenu = document.getElementById('sideMenu');
+const closeMenu = document.getElementById('closeMenu');
+const newChatBtn = document.getElementById('newChatBtn');
 const voiceInputBtn = document.getElementById('voiceInputBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 
-const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← PUT YOUR REAL RENDER URL HERE
+const BACKEND_URL = "https://nineja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR ACTUAL RENDER URL
 
-let currentVoiceGender = 'female';
-
-// Add Message to Chat
-function addMessage(text, type) {
-  const div = document.createElement('div');
-  div.classList.add('message', type);
-  div.textContent = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+let currentVoiceGender = 'male';
 
 // Show Welcome
 function showWelcome() {
@@ -28,51 +25,49 @@ function showWelcome() {
   suggestionsDiv.style.display = 'flex';
 }
 
-// Show Modern Speaking Animation Screen
-function showSpeakingScreen(text) {
-  // Hide chat temporarily and show speaking animation
-  chatBox.style.display = 'none';
+// Add normal message to chat
+function addMessage(text, type) {
+  const div = document.createElement('div');
+  div.classList.add('message', type);
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-  const speakingScreen = document.createElement('div');
-  speakingScreen.id = 'speakingScreen';
-  speakingScreen.style.cssText = `
+// Show Animated Brain Page (Only when Mic is pressed)
+function showAnimatedBrain(text) {
+  const brainScreen = document.createElement('div');
+  brainScreen.id = 'brainScreen';
+  brainScreen.style.cssText = `
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: #0a0a0a; display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; z-index: 100; color: white;
+    background: #0a0a0a; z-index: 200; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; color: white;
   `;
 
-  speakingScreen.innerHTML = `
-    <div style="margin-bottom: 30px;">
-      <div class="ai-brain">
-        <i class="fas fa-brain" style="font-size: 90px; color: #00ff9d; animation: pulse 2s infinite;"></i>
-      </div>
+  brainScreen.innerHTML = `
+    <div style="margin-bottom: 40px;">
+      <i class="fas fa-brain" style="font-size: 100px; color: #00ff9d; animation: pulse 1.5s infinite;"></i>
     </div>
-    <h2 style="margin-bottom: 10px;">9JA AI is speaking...</h2>
-    <p style="color: #888; max-width: 280px; text-align: center;">Listening to the vibes...</p>
+    <h2>9JA AI is speaking...</h2>
+    <p style="color:#888; margin-top:10px;">Listening to the Naija vibes...</p>
   `;
 
-  document.body.appendChild(speakingScreen);
+  document.body.appendChild(brainScreen);
 
-  // Speak the text with better natural voice
+  // Speak with natural voice
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.94;
-  utterance.pitch = currentVoiceGender === 'male' ? 0.9 : 1.1;
-  utterance.volume = 0.96;
-
-  const voices = speechSynthesis.getVoices();
-  const goodVoice = voices.find(v => v.lang.includes('en'));
-  if (goodVoice) utterance.voice = goodVoice;
+  utterance.rate = 0.93;
+  utterance.pitch = currentVoiceGender === 'male' ? 0.9 : 1.08;
+  utterance.volume = 0.95;
 
   utterance.onend = () => {
-    speakingScreen.remove();
-    chatBox.style.display = 'flex';
-    chatBox.scrollTop = chatBox.scrollHeight;
+    brainScreen.remove();
   };
 
   window.speechSynthesis.speak(utterance);
 }
 
-// Send Message
+// Send normal text message
 async function handleSend() {
   const message = userInput.value.trim();
   if (!message) return;
@@ -96,38 +91,71 @@ async function handleSend() {
     const data = await res.json();
     loading.remove();
     addMessage(data.reply, "incoming");
-
-    // Show nice speaking animation + natural voice
-    showSpeakingScreen(data.reply);
-
+    speak(data.reply);   // Normal voice reply in background
   } catch (err) {
     loading.remove();
     addMessage("Network wahala, try again.", "incoming");
   }
 }
 
-// Voice Input (Mic Button)
+// Normal background voice reply
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.94;
+  utterance.pitch = currentVoiceGender === 'male' ? 0.9 : 1.08;
+  window.speechSynthesis.speak(utterance);
+}
+
+// Mic Button - Opens Animated Brain Page
 voiceInputBtn.addEventListener('click', () => {
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'en-NG';
+
     recognition.onresult = (e) => {
-      userInput.value = e.results[0][0].transcript;
-      handleSend();
+      const spokenText = e.results[0][0].transcript;
+      addMessage(spokenText, "outgoing");
+
+      // Show animated brain while processing
+      const loading = document.createElement('div');
+      loading.classList.add('message', 'loading');
+      loading.textContent = "Thinking...";
+      chatBox.appendChild(loading);
+
+      fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: spokenText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        loading.remove();
+        addMessage(data.reply, "incoming");
+        showAnimatedBrain(data.reply);   // Show brain animation only on voice
+      })
+      .catch(() => {
+        loading.remove();
+        addMessage("Network wahala, try again.", "incoming");
+      });
     };
+
     recognition.start();
   } else {
-    alert("Voice not supported on this browser");
+    alert("Voice input not supported on this browser");
   }
 });
 
 // Camera
-cameraBtn.addEventListener('click', () => {
-  alert("Photo upload coming soon 📸");
-});
+cameraBtn.addEventListener('click', () => alert("Photo upload coming soon 📸"));
 
-// Initialize
-showWelcome();
+// New Chat
+function newChat() {
+  chatBox.innerHTML = '';
+  showWelcome();
+}
 
 // Event Listeners
 sendBtn.addEventListener('click', handleSend);
@@ -138,3 +166,10 @@ userInput.addEventListener('keypress', (e) => {
     handleSend();
   }
 });
+
+newChatBtn.addEventListener('click', newChat);
+menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
+closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
+
+// Initialize
+showWelcome();
