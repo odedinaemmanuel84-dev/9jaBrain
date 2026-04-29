@@ -10,14 +10,12 @@
 <body>
   <div class="app">
     <header>
-      <div class="header-left">
-        <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
-        <div class="logo">
-          <span class="flag">🇳🇬</span>
-          <span>9JA AI</span>
-        </div>
+      <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
+      <div class="logo">
+        <span class="flag">🇳🇬</span>
+        <span>9JA AI</span>
       </div>
-      <button id="newChatBtn" class="icon-btn" title="New Chat"><i class="fas fa-plus"></i></button>
+      <button id="newChatBtn" class="icon-btn"><i class="fas fa-plus"></i></button>
     </header>
 
     <div class="chat-box" id="chatBox"></div>
@@ -32,7 +30,6 @@
     <div class="input-area">
       <button id="voiceInputBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
       <button id="cameraBtn" class="icon-btn"><i class="fas fa-camera"></i></button>
-      <input type="file" id="imageUpload" accept="image/*" style="display:none">
       <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
       <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
@@ -43,17 +40,11 @@
     <button id="closeMenu" class="close-btn">✕</button>
     <h3>Previous Chats</h3>
     <div id="previousChats"></div>
-
-    <div style="margin-top: 30px;">
-      <button onclick="newChat()" style="width:100%; padding:12px; background:#00cc88; color:black; border:none; border-radius:12px; font-weight:600;">
-        <i class="fas fa-plus"></i> New Chat
+    
+    <div style="margin-top:30px;">
+      <button onclick="newChat()" style="width:100%; padding:12px; background:#00cc88; color:black; border:none; border-radius:12px;">
+        New Chat
       </button>
-    </div>
-
-    <div style="margin-top: 25px;">
-      <p style="margin-bottom:8px; color:#aaa;">Voice</p>
-      <button onclick="setVoice('female')" style="margin:5px; padding:10px 16px; border-radius:20px;">Female</button>
-      <button onclick="setVoice('male')" style="margin:5px; padding:10px 16px; border-radius:20px;">Male</button>
     </div>
   </div>
 
