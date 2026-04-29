@@ -10,18 +10,18 @@ const voiceInputBtn = document.getElementById('voiceInputBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 const imageUpload = document.getElementById('imageUpload');
 
-const BACKEND_URL = "https://ninja-ai-backend-3.onrender.com";   // ← CHANGE TO YOUR ACTUAL RENDER URL
+const BACKEND_URL = "https://ninja-ai-backend-3.onrender.com";   // ← UPDATE THIS
 
 let currentChatId = 'chat_' + Date.now();
-let currentVoiceGender = 'female'; // default
+let currentVoiceGender = 'female';
 
 // Auto resize textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
-  userInput.style.height = Math.min(userInput.scrollHeight, 130) + 'px';
+  userInput.style.height = Math.min(userInput.scrollHeight, 140) + 'px';
 });
 
-// Load chat or show welcome
+// Load or show welcome
 function loadChat() {
   const saved = localStorage.getItem(currentChatId);
   if (saved) {
@@ -35,17 +35,17 @@ function loadChat() {
 function showWelcome() {
   chatBox.innerHTML = `
     <div class="message incoming welcome-msg">
-      How far my person! 👋<br><br>
-      I'm 9JA AI,<br>
-      Wetin you wan know today? Ask me anything — I get time! 
+      Where should we begin?
     </div>`;
   suggestionsDiv.style.display = 'flex';
 }
 
+// Save current chat
 function saveCurrentChat() {
   localStorage.setItem(currentChatId, chatBox.innerHTML);
 }
 
+// Add message (clean style)
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.classList.add('message', type);
@@ -74,74 +74,53 @@ function showSpeaking() {
   return speaking;
 }
 
-// Text-to-Speech with Male/Female selection
+// Text-to-Speech with Male/Female
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
-
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.94;
-  utterance.pitch = currentVoiceGender === 'male' ? 0.9 : 1.1;
-  utterance.volume = 0.97;
+  utterance.rate = 0.95;
+  utterance.pitch = currentVoiceGender === 'male' ? 0.85 : 1.08;
 
   const voices = speechSynthesis.getVoices();
-  let selectedVoice = null;
+  let voice = voices.find(v => currentVoiceGender === 'male' 
+    ? v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('guy')
+    : v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'));
 
-  if (currentVoiceGender === 'male') {
-    selectedVoice = voices.find(v => 
-      v.name.toLowerCase().includes('daniel') || 
-      v.name.toLowerCase().includes('guy') || 
-      v.name.toLowerCase().includes('male')
-    );
-  } else {
-    selectedVoice = voices.find(v => 
-      v.name.toLowerCase().includes('samantha') || 
-      v.name.toLowerCase().includes('karen') || 
-      v.name.toLowerCase().includes('female')
-    );
-  }
+  if (voice) utterance.voice = voice;
 
-  if (selectedVoice) utterance.voice = selectedVoice;
-
-  const speakingIndicator = showSpeaking();
-
-  utterance.onend = () => {
-    speakingIndicator.remove();
-  };
+  const indicator = showSpeaking();
+  utterance.onend = () => indicator.remove();
 
   window.speechSynthesis.speak(utterance);
 }
 
 async function sendToBackend(message) {
-  const loadingMsg = showLoading();
-
+  const loading = showLoading();
   try {
     const res = await fetch(`${BACKEND_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message })
     });
-
     const data = await res.json();
-    loadingMsg.remove();
+    loading.remove();
     addMessage(data.reply, "incoming");
-    speak(data.reply);           // Auto voice reply
-  } catch (err) {
-    loadingMsg.remove();
-    addMessage(navigator.onLine ? "Network wahala, try again." : "No internet connection.", "incoming");
+    speak(data.reply);
+  } catch (e) {
+    loading.remove();
+    addMessage("Network wahala, try again.", "incoming");
   }
 }
 
 async function handleSend() {
-  const message = userInput.value.trim();
-  if (!message) return;
-
-  addMessage(message, "outgoing");
+  const msg = userInput.value.trim();
+  if (!msg) return;
+  addMessage(msg, "outgoing");
   userInput.value = "";
   userInput.style.height = 'auto';
-
-  await sendToBackend(message);
+  await sendToBackend(msg);
 }
 
 // Voice Input
@@ -154,23 +133,63 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
     handleSend();
   };
 }
-
-voiceInputBtn.addEventListener('click', () => {
-  if (recognition) recognition.start();
-});
+voiceInputBtn.addEventListener('click', () => recognition && recognition.start());
 
 // Image Upload
 cameraBtn.addEventListener('click', () => imageUpload.click());
 imageUpload.addEventListener('change', () => {
-  addMessage("📸 Image received. Vision analysis dey come soon!", "outgoing");
+  addMessage("📸 Image received (Vision coming soon)", "outgoing");
 });
 
+// ==================== PREVIOUS CHATS ====================
+function getAllChatIds() {
+  return Object.keys(localStorage).filter(key => key.startsWith('chat_'));
+}
+
+function loadPreviousChats() {
+  const container = document.getElementById('previousChats');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const chatIds = getAllChatIds();
+
+  if (chatIds.length === 0) {
+    container.innerHTML = '<p style="color:#666; font-size:0.9rem; padding:10px;">No previous chats yet</p>';
+    return;
+  }
+
+  chatIds.forEach(id => {
+    const preview = localStorage.getItem(id) || '';
+    const firstLine = preview.replace(/<[^>]+>/g, '').substring(0, 60) || "New Chat";
+
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `
+      <i class="fas fa-comment"></i>
+      <div style="flex:1; overflow:hidden;">
+        <div style="font-size:0.95rem;">${firstLine}</div>
+        <small style="color:#888;">${new Date(parseInt(id.split('_')[1])).toLocaleDateString()}</small>
+      </div>
+    `;
+    div.onclick = () => {
+      currentChatId = id;
+      loadChat();
+      sideMenu.classList.remove('open');
+    };
+    container.appendChild(div);
+  });
+}
+
 // Menu Controls
-menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
+menuBtn.addEventListener('click', () => {
+  loadPreviousChats();
+  sideMenu.classList.add('open');
+});
+
 closeMenu.addEventListener('click', () => sideMenu.classList.remove('open'));
 
 function newChat() {
-  if (confirm("Start new chat?")) {
+  if (confirm("Start a new chat?")) {
     currentChatId = 'chat_' + Date.now();
     chatBox.innerHTML = '';
     showWelcome();
@@ -178,29 +197,22 @@ function newChat() {
   }
 }
 
-function clearAllHistory() {
-  if (confirm("Clear all history?")) {
-    localStorage.clear();
-    newChat();
-  }
-}
-
-// Voice Gender Selector (Added to Menu)
+// Voice Gender Selector
 function addVoiceSelector() {
-  const voiceDiv = document.createElement('div');
-  voiceDiv.style.marginTop = '20px';
-  voiceDiv.innerHTML = `
-    <p style="margin-bottom:8px; color:#aaa;">Choose Voice:</p>
-    <button onclick="setVoice('female')" style="margin:5px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='female'?'#00cc88':'#334444'}">Female</button>
-    <button onclick="setVoice('male')" style="margin:5px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='male'?'#00cc88':'#334444'}">Male</button>
+  const voiceSection = document.createElement('div');
+  voiceSection.style.margin = '25px 0 15px';
+  voiceSection.innerHTML = `
+    <p style="margin-bottom:8px; color:#aaa; font-size:0.95rem;">Voice Gender</p>
+    <button onclick="setVoice('female')" style="margin:4px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='female' ? '#00b47a' : '#333'}">Female</button>
+    <button onclick="setVoice('male')" style="margin:4px; padding:8px 16px; border-radius:20px; background:${currentVoiceGender==='male' ? '#00b47a' : '#333'}">Male</button>
   `;
-  sideMenu.appendChild(voiceDiv);
+  sideMenu.appendChild(voiceSection);
 }
 
 window.setVoice = function(gender) {
   currentVoiceGender = gender;
+  alert(`Voice changed to ${gender}`);
   sideMenu.classList.remove('open');
-  alert(`Voice changed to ${gender === 'male' ? 'Male' : 'Female'}`);
 };
 
 // Quick Suggestions
@@ -212,7 +224,7 @@ window.sendSuggestion = function(btn) {
 
 // Initialize
 loadChat();
-addVoiceSelector();   // Add voice selector in menu
+addVoiceSelector();
 
 // Event Listeners
 sendBtn.addEventListener('click', handleSend);
