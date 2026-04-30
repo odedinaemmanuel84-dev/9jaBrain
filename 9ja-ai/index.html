@@ -1,63 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>9JA AI</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Naija AI | Fast. Free. Local.</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header>
-      <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
-      <div class="logo">
-        <span class="flag">🇳🇬</span>
-        <span style="color: #00ff9d; font-weight: 600;">9JA AI</span>
-      </div>
-      <button id="newChatBtn" class="icon-btn"><i class="fas fa-plus"></i></button>
-    </header>
 
-    <div class="chat-box" id="chatBox"></div>
+    <div class="main-wrapper">
+        <header>
+            <div class="logo">
+                <span class="flag">🇳🇬</span>
+                <div class="title-stack">
+                    <h1>Naija AI</h1>
+                    <p class="subtitle">Whisper & Gemini 1.5</p>
+                </div>
+            </div>
+            <span class="status-dot"></span>
+        </header>
 
-    <div class="suggestions" id="suggestions">
-      <button onclick="sendSuggestion(this)">Best Jollof recipe</button>
-      <button onclick="sendSuggestion(this)">Business ideas in Lagos</button>
-      <button onclick="sendSuggestion(this)">Tech opportunities in Naija</button>
-      <button onclick="sendSuggestion(this)">Tell me a joke</button>
+        <!-- The Glowing Container -->
+        <div class="chat-glow-container">
+            <div id="chat-box" class="chat-box">
+                <!-- Welcome Message -->
+                <div class="msg ai">
+                    Howfar? I be Naija AI. Toss me a question, a photo, or a voice note, and I'm ready to help you.
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="action-buttons">
+                <input type="file" id="image-input" accept="image/*" hidden>
+                <button class="icon-btn" onclick="document.getElementById('image-input').click()" title="Upload Image">
+                    📷
+                </button>
+                <button class="icon-btn" id="mic-btn" title="Record Voice">
+                    🎤
+                </button>
+            </div>
+            <input type="text" id="user-input" placeholder="Wetin dey sup? Ask me...">
+            <button id="send-btn" class="send-btn">
+                Send
+            </button>
+        </div>
     </div>
 
-    <!-- Quick Action Buttons -->
-    <div class="quick-actions">
-      <button onclick="createImage()" class="action-btn">
-        <i class="fas fa-image"></i><br><small>Create Image</small>
-      </button>
-      <button onclick="uploadImage()" class="action-btn">
-        <i class="fas fa-camera"></i><br><small>Upload Image</small>
-      </button>
-    </div>
-
-    <!-- Input Area -->
-    <div class="input-area">
-      <button id="voiceInputBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
-      <textarea id="userInput" placeholder="Ask anything..." rows="1"></textarea>
-      <button id="sendBtn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
-    </div>
-  </div>
-
-  <!-- Side Menu with Circular Chat History -->
-  <div id="sideMenu" class="side-menu">
-    <button id="closeMenu" class="close-btn">✕</button>
-    <h3>Chat History</h3>
-    <div id="previousChats" class="history-list"></div>
-
-    <div style="margin-top: 30px;">
-      <button onclick="newChat()" style="width:100%; padding:14px; background:#00cc88; color:black; border:none; border-radius:12px; font-weight:600;">
-        <i class="fas fa-plus"></i> New Chat
-      </button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
