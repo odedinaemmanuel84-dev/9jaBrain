@@ -7,7 +7,7 @@ const imageInput = document.getElementById('image-input');
 const micBtn = document.getElementById('mic-btn');
 
 // IMPORTANT: Replace this with your actual Render URL (e.g., https://naija-ai.onrender.com)
-const BACKEND_URL = "https://nineja-ai-backend-4.onrender.com"; 
+const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com"; 
 
 // Helper function to show messages in the UI
 function addMessage(text, sender) {
