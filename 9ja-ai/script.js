@@ -2,7 +2,7 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const imageInput = document.getElementById('image-input');
-const BACKEND_URL = "https://your-render-url.com"; // Change this after deploying to Render
+const BACKEND_URL = "https://nineja-ai-backend-4.onrender.com"; // Change this after deploying to Render
 
 function addMessage(text, sender) {
     const div = document.createElement('div');
