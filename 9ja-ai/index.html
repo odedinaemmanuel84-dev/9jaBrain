@@ -2,51 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Naija AI | Fast. Free. Local.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naija AI | Premium</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
-    <div class="main-wrapper">
+    <div class="app-container">
+        <!-- Top Header -->
         <header>
-            <div class="logo">
-                <span class="flag">🇳🇬</span>
-                <div class="title-stack">
-                    <h1>Naija AI</h1>
-                    <p class="subtitle">Whisper & Gemini 1.5</p>
-                </div>
+            <div class="profile-pic"></div>
+            <div class="header-icons">
+                <i class="fas fa-history"></i>
             </div>
-            <span class="status-dot"></span>
         </header>
 
-        <!-- The Glowing Container -->
-        <div class="chat-glow-container">
-            <div id="chat-box" class="chat-box">
-                <!-- Welcome Message -->
-                <div class="msg ai">
-                    Howfar? I be Naija AI. Toss me a question, a photo, or a voice note, and I'm ready to help you.
-                </div>
+        <!-- Main Chat Area -->
+        <main id="chat-window">
+            <div class="welcome-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_of_the_African_Union.svg/1024px-Logo_of_the_African_Union.svg.png" alt="Logo">
+            </div>
+        </main>
+
+        <!-- Action Cards -->
+        <div class="action-cards">
+            <div class="card" onclick="document.getElementById('imageInput').click()">
+                <i class="fas fa-image"></i>
+                <span>Analyze Image</span>
+            </div>
+            <div class="card">
+                <i class="fas fa-microphone"></i>
+                <span>Voice Mode</span>
             </div>
         </div>
 
-        <div class="input-area">
-            <div class="action-buttons">
-                <input type="file" id="image-input" accept="image/*" hidden>
-                <button class="icon-btn" onclick="document.getElementById('image-input').click()" title="Upload Image">
-                    📷
+        <!-- Glowing Input Box -->
+        <div class="input-wrapper">
+            <div class="glowing-border"></div>
+            <div class="input-container">
+                <input type="file" id="imageInput" accept="image/*" hidden onchange="handleImageSelect()">
+                <button class="icon-btn" onclick="document.getElementById('imageInput').click()">
+                    <i class="fas fa-paperclip"></i>
                 </button>
-                <button class="icon-btn" id="mic-btn" title="Record Voice">
-                    🎤
+                <input type="text" id="userInput" placeholder="Ask anything..." onkeypress="handleKey(event)">
+                <button class="speak-btn" id="sendBtn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Speak
                 </button>
             </div>
-            <input type="text" id="user-input" placeholder="Wetin dey sup? Ask me...">
-            <button id="send-btn" class="send-btn">
-                Send
-            </button>
         </div>
+
+        <!-- Navigation Bar -->
+        <nav>
+            <i class="fas fa-home active"></i>
+            <i class="fas fa-search"></i>
+            <div class="nav-logo"></div>
+            <i class="fas fa-bell"><span>2</span></i>
+            <i class="fas fa-comment"></i>
+        </nav>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
