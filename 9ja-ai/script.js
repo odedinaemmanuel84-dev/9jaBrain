@@ -21,7 +21,7 @@ function appendMessage(sender, text, imgUrl = null) {
 }
 
 let chatHistory = [];
-const API_URL = "https://your-render-app.onrender.com"; // Change to your actual URL
+const API_URL = "https://nineja-ai-backend-5.onrender.com"; // Change to your actual URL
 
 function handleKey(e) {
     if (e.key === 'Enter') sendMessage();
