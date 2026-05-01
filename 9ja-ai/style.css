@@ -1,172 +1,38 @@
 :root {
-    --bg-black: #050505;
-    --card-gray: #1a1a1a;
-    --glow-color: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-    --accent-blue: #4facfe;
+    --bg-black: #0e0e0e;
+    --accent-blue: #00d2ff;
+    --glass: rgba(255, 255, 255, 0.05);
 }
 
-body {
-    background-color: var(--bg-black);
-    color: white;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    overflow: hidden;
+body { background: var(--bg-black); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+
+/* Thinking Line */
+.ai-loader { display: flex; flex-direction: column; align-items: center; padding: 10px; }
+.spinning-line {
+    width: 80%; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    background-size: 200% 100%;
+    animation: glow-scan 1.5s linear infinite;
+    box-shadow: 0 0 10px var(--accent-blue);
 }
 
-.app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding: 15px;
+@keyframes glow-scan { 0% { background-position: 100%; } 100% { background-position: -100%; } }
+
+/* Profile & Suggestions */
+.profile-menu {
+    display: none; position: absolute; top: 60px; right: 20px;
+    background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 12px; z-index: 100;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 20px;
+.suggestions-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;
 }
 
-.profile-pic {
-    width: 40px;
-    height: 40px;
-    background: url('your-profile.jpg') center/cover;
-    border-radius: 50%;
+.suggestion-chip {
+    background: var(--glass); border: 1px solid #333; padding: 15px; border-radius: 10px; cursor: pointer;
 }
 
-#chat-window {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+.suggestion-chip:hover { border-color: var(--accent-blue); background: #222; }
 
-.welcome-logo img {
-    width: 100px;
-    opacity: 0.3;
-    margin-top: 100px;
-}
-
-/* Action Cards */
-.action-cards {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.card {
-    background: var(--card-gray);
-    padding: 15px;
-    border-radius: 15px;
-    flex: 1;
-    text-align: center;
-    cursor: pointer;
-}
-
-/* THE GLOWING INPUT BOX */
-.input-wrapper {
-    position: relative;
-    padding: 3px; /* Space for the border */
-    border-radius: 30px;
-    background: var(--card-gray);
-    margin-bottom: 80px;
-    overflow: hidden;
-}
-
-/* The moving animation */
-.glowing-border {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(transparent, #4facfe, #00f2fe, transparent 30%);
-    animation: rotate 4s linear infinite;
-    z-index: 1;
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.input-container {
-    position: relative;
-    z-index: 2;
-    background: #0f0f0f;
-    border-radius: 28px;
-    display: flex;
-    align-items: center;
-    padding: 8px 15px;
-}
-
-#userInput {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 10px;
-    outline: none;
-}
-
-.speak-btn {
-    background: white;
-    color: black;
-    border-radius: 20px;
-    padding: 8px 18px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-}
-
-/* Navigation */
-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    padding: 20px 0;
-    background: var(--bg-black);
-}
-
-.bubble {
-    padding: 12px 18px;
-    border-radius: 20px;
-    max-width: 80%;
-    line-height: 1.5;
-    font-size: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.ai-msg .bubble {
-    background: #1a1a1a;
-    color: #e0e0e0;
-    border-bottom-left-radius: 2px;
-    border: 1px solid #333;
-}
-
-.user-msg .bubble {
-    background: var(--accent-blue);
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 2px;
-}
-
-.chat-img {
-    max-width: 250px;
-    border-radius: 15px;
-    border: 2px solid var(--accent-blue);
-    box-shadow: 0 0 15px var(--accent-blue);
-    margin: 10px 0;
-}
-
-/* Make the "Speak" button glow when hovered */
-.speak-btn:hover {
-    box-shadow: 0 0 20px #ffffff;
-    transform: scale(1.05);
-    transition: 0.3s;
-}
+/* Hide/Show Logic */
+.hidden { display: none !important; }
