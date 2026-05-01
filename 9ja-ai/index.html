@@ -3,80 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naija AI | Emmanuel Odedina</title>
+    <title>Naija AI | Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- VAD Library for Voice Mode -->
-    <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.js"></script>
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
     <div class="app-container">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">New Chat</div>
-            <ul class="nav-links">
-                <li><i class="fas fa-message"></i> Recent Chats</li>
-                <li onclick="openSettings()"><i class="fas fa-cog"></i> Settings</li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <header>
-                <i class="fas fa-bars menu-icon" onclick="toggleSidebar()"></i>
+        <header>
+            <div class="header-left">
+                <i class="fas fa-bars menu-icon"></i>
                 <div class="app-name">Naija AI</div>
-                <div class="header-right">
-                    <i class="fas fa-pen-to-square new-chat-icon" onclick="clearChat()"></i>
-                    <div class="profile-container" onclick="toggleProfileMenu()">
-                        <img id="userProfilePic" src="https://ui-avatars.com/api/?name=User" alt="Profile">
-                        <div id="profileMenu" class="profile-menu">
-                            <div class="menu-user-info">
-                                <p id="menuUserName">Loading...</p>
-                                <p id="menuUserEmail"></p>
-                            </div>
-                            <hr>
-                            <button onclick="window.location.href='voice.html'"><i class="fas fa-microphone"></i> Live Voice Mode</button>
-                            <button onclick="handleLogout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            
+            <div class="header-right">
+                <i class="fas fa-pen-to-square new-chat-icon" onclick="resetChat()"></i>
+                <div class="profile-container" onclick="toggleProfileMenu()">
+                    <img id="userProfilePic" src="" alt="User">
+                    <div id="profileMenu" class="profile-menu">
+                        <div class="menu-user-info">
+                            <p id="menuUserName">User</p>
+                            <p id="menuUserEmail"></p>
                         </div>
+                        <hr>
+                        <button onclick="window.location.href='voice.html'"><i class="fas fa-microphone"></i> Live Call</button>
+                        <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </div>
                 </div>
-            </header>
+            </div>
+        </header>
 
+        <main id="chat-window">
+            <div id="start-screen" class="start-screen">
+                <div class="big-logo">N</div>
+                <h2>How can I help you, Oga?</h2>
+                <div class="suggestions-grid">
+                    <div class="chip" onclick="quickAction('Tell me a funny joke')">Tell a joke</div>
+                    <div class="chip" onclick="quickAction('Who made you?')">Who created you?</div>
+                    <div class="chip" onclick="quickAction('Analyze this idea')">Business gist</div>
+                </div>
+            </div>
+            <div id="messages"></div>
+            
+            <!-- Thinking Animation -->
             <div id="ai-loader" class="ai-loader" style="display: none;">
                 <div class="spinning-line"></div>
-                <span id="loader-text">Naija AI is thinking...</span>
+                <span>Naija AI dey think...</span>
             </div>
+        </main>
 
-            <main id="chat-window">
-                <!-- Welcome & Suggestions -->
-                <div id="start-screen" class="start-screen">
-                    <div class="logo-box">N</div>
-                    <h2>How can I help you today?</h2>
-                    <div class="suggestions-grid">
-                        <div class="suggestion-chip" onclick="useSuggestion('Tell me a funny Naija joke')">
-                            <i class="fas fa-face-laugh-beam"></i>
-                            <span>Tell me a joke</span>
-                        </div>
-                        <div class="suggestion-chip" onclick="useSuggestion('Who created you?')">
-                            <i class="fas fa-code"></i>
-                            <span>Who made you?</span>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <div class="input-area">
-                <div class="input-wrapper">
-                    <input type="text" id="userInput" placeholder="Ask Naija AI anything...">
-                    <button id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-                </div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Ask Naija AI anything...">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
