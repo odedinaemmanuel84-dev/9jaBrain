@@ -1,38 +1,41 @@
 :root {
-    --bg-black: #0e0e0e;
-    --accent-blue: #00d2ff;
-    --glass: rgba(255, 255, 255, 0.05);
+    --bg: #0a0a0a;
+    --card: #161616;
+    --accent: #00d2ff;
+    --text: #ffffff;
 }
 
-body { background: var(--bg-black); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+
+/* Auth Page Split */
+.auth-wrapper { display: flex; height: 100vh; }
+.visual-side { flex: 1; position: relative; overflow: hidden; background: #000; }
+.form-side { width: 450px; background: var(--card); display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+
+/* Fading Images */
+.image-slideshow li {
+    position: absolute; width: 100%; height: 100%; list-style: none;
+    background-size: cover; background-position: center; opacity: 0;
+    animation: fadeImg 12s infinite;
+}
+.image-slideshow li:nth-child(2) { animation-delay: 4s; }
+.image-slideshow li:nth-child(3) { animation-delay: 8s; }
+@keyframes fadeImg { 0% { opacity: 0; } 10% { opacity: 0.4; } 33% { opacity: 0.4; } 43% { opacity: 0; } }
 
 /* Thinking Line */
-.ai-loader { display: flex; flex-direction: column; align-items: center; padding: 10px; }
+.ai-loader { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 20px 0; }
 .spinning-line {
-    width: 80%; height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    width: 100px; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
     background-size: 200% 100%;
-    animation: glow-scan 1.5s linear infinite;
-    box-shadow: 0 0 10px var(--accent-blue);
+    animation: scan 1.5s linear infinite;
+    box-shadow: 0 0 10px var(--accent);
 }
+@keyframes scan { 0% { background-position: 100%; } 100% { background-position: -100%; } }
 
-@keyframes glow-scan { 0% { background-position: 100%; } 100% { background-position: -100%; } }
-
-/* Profile & Suggestions */
+/* Profile Menu */
 .profile-menu {
     display: none; position: absolute; top: 60px; right: 20px;
-    background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 12px; z-index: 100;
+    background: #222; border: 1px solid #333; border-radius: 12px; padding: 15px; width: 200px;
 }
-
-.suggestions-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;
-}
-
-.suggestion-chip {
-    background: var(--glass); border: 1px solid #333; padding: 15px; border-radius: 10px; cursor: pointer;
-}
-
-.suggestion-chip:hover { border-color: var(--accent-blue); background: #222; }
-
-/* Hide/Show Logic */
-.hidden { display: none !important; }
+.primary-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
