@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Naija AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <!-- Left Side: Moving Background -->
+        <div class="visual-side">
+            <ul class="image-slideshow">
+                <li style="background-image: url('assets/images/image1.jpg');"></li>
+                <li style="background-image: url('assets/images/image2.jpg');"></li>
+                <li style="background-image: url('assets/images/image3.jpg');"></li>
+            </ul>
+            <div class="features-overlay">
+                <h1 id="feature-text">Real-Time Naija Voice Chat</h1>
+            </div>
+        </div>
 
+        <!-- Right Side: The Form -->
+        <div class="form-side">
+            <div class="auth-header">
+                <div class="naija-logo">
+                    <span class="logo-icon">N</span>
+                    <span class="logo-text">Naija AI</span>
+                </div>
+                <p>By Emmanuel Odedina</p>
+            </div>
+
+            <div id="auth-form" class="form-container">
+                <h3 id="form-title">Welcome Back</h3>
+                <input type="email" id="email" placeholder="Email address">
+                <input type="password" id="password" placeholder="Password">
+                <button class="primary-btn" onclick="handleAuth()">Continue</button>
+                <p class="switch-auth">
+                    <span id="toggle-text">New here?</span> 
+                    <button onclick="toggleAuthMode()" id="toggle-btn">Register now</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+</body>
+</html>
