@@ -1,131 +1,85 @@
-// client/script.js
+// At the top of your script.js
+window.onload = () => {
+    appendMessage('ai', "Abeg, welcome! I be Naija AI, the smartest pikin of **Emmanuel Odedina**. How we go take run am today? Send me photo or chat me up!");
+};
 
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-const imageInput = document.getElementById('image-input');
-const micBtn = document.getElementById('mic-btn');
-
-// IMPORTANT: Replace this with your actual Render URL (e.g., https://naija-ai.onrender.com)
-const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com"; 
-
-// Helper function to show messages in the UI
-function addMessage(text, sender) {
-    const div = document.createElement('div');
-    div.className = `msg ${sender}`;
-    div.innerText = text;
-    chatBox.appendChild(div);
+function appendMessage(sender, text, imgUrl = null) {
+    const win = document.getElementById('chat-window');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}-msg`;
     
-    // Auto-scroll to the bottom
-    chatBox.scrollTop = chatBox.scrollHeight;
+    // Formatting the text to look clean
+    let content = `<div class="bubble">${text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}</div>`;
+    
+    if (imgUrl) {
+        content = `<img src="${imgUrl}" class="chat-img"><br>` + content;
+    }
+    
+    msgDiv.innerHTML = content;
+    win.appendChild(msgDiv);
+    win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
 }
 
-// 1. HANDLE TEXT CHAT
-async function handleChat() {
-    const text = userInput.value.trim();
-    if (!text) return;
+let chatHistory = [];
+const API_URL = "https://your-render-app.onrender.com"; // Change to your actual URL
 
-    addMessage(text, 'user');
-    userInput.value = '';
+function handleKey(e) {
+    if (e.key === 'Enter') sendMessage();
+}
 
-    try {
-        const response = await fetch(`${BACKEND_URL}/chat`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: text })
-        });
-
-        const data = await response.json();
-
-        if (data.reply) {
-            addMessage(data.reply, 'ai');
-        } else if (data.error) {
-            addMessage(`Error: ${data.error}`, 'ai');
-        } else {
-            addMessage("Oga, the server sent back an empty response. Check your Groq Key.", 'ai');
-        }
-    } catch (error) {
-        console.error("Chat Error:", error);
-        addMessage("Server is waking up or connection failed. Please try again in 20 seconds.", 'ai');
+function handleImageSelect() {
+    const file = document.getElementById('imageInput').files[0];
+    if (file) {
+        const url = URL.createObjectURL(file);
+        appendMessage('user', 'Sent a photo:', url);
     }
 }
 
-// 2. HANDLE IMAGE UPLOAD (GEMINI VISION)
-imageInput.onchange = async () => {
-    const file = imageInput.files[0];
-    if (!file) return;
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const fileInput = document.getElementById('imageInput');
+    const prompt = input.value;
+    const file = fileInput.files[0];
 
-    addMessage("Sending image to Naija AI...", 'user');
+    if (!prompt && !file) return;
 
+    // Show User Message
+    if (prompt) appendMessage('user', prompt);
+    input.value = "";
+
+    // Prepare Data
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('prompt', "Explain what is in this photo like a Nigerian friend.");
+    formData.append('prompt', prompt);
+    if (file) formData.append('image', file);
+    formData.append('history', JSON.stringify(chatHistory));
 
     try {
-        const response = await fetch(`${BACKEND_URL}/vision`, {
+        const res = await fetch(`${API_URL}/vision`, {
             method: 'POST',
             body: formData
         });
+        const data = await res.json();
 
-        const data = await response.json();
-        
-        if (data.reply) {
-            addMessage(data.reply, 'ai');
-        } else {
-            addMessage("Could not read the image. Check your Gemini API key.", 'ai');
-        }
-    } catch (error) {
-        console.error("Vision Error:", error);
-        addMessage("Image upload failed. Make sure your Render server is running.", 'ai');
+        // Add to history for memory
+        chatHistory.push({ role: 'user', parts: [{ text: prompt }] });
+        chatHistory.push({ role: 'model', parts: [{ text: data.reply }] });
+
+        appendMessage('ai', data.reply);
+        fileInput.value = ""; // Clear file
+    } catch (err) {
+        appendMessage('ai', "Oga, something went wrong with the connection.");
     }
-};
+}
 
-// 3. HANDLE VOICE (WHISPER)
-let mediaRecorder;
-let audioChunks = [];
-
-micBtn.onclick = async () => {
-    if (!mediaRecorder || mediaRecorder.state === "inactive") {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
-
-        mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
-        
-        mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            addMessage("Transcribing your voice note...", 'user');
-
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.wav');
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/voice`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                
-                if (data.text) {
-                    userInput.value = data.text; // Put transcribed text into input
-                    handleChat(); // Automatically send it
-                }
-            } catch (error) {
-                addMessage("Voice transcription failed.", 'ai');
-            }
-        };
-
-        mediaRecorder.start();
-        micBtn.style.backgroundColor = "red"; // Visual cue recording is on
-    } else {
-        mediaRecorder.stop();
-        micBtn.style.backgroundColor = ""; // Reset color
-    }
-};
-
-// Event Listeners
-sendBtn.addEventListener('click', handleChat);
-
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleChat();
-});
+function appendMessage(sender, text, imgUrl = null) {
+    const win = document.getElementById('chat-window');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}-msg`;
+    
+    let content = `<p>${text}</p>`;
+    if (imgUrl) content = `<img src="${imgUrl}" style="max-width:200px; border-radius:10px;"><br>` + content;
+    
+    msgDiv.innerHTML = content;
+    win.appendChild(msgDiv);
+    win.scrollTop = win.scrollHeight;
+}
