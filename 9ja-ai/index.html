@@ -3,81 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naija AI | Oga, Wetin Dey?</title>
+    <title>Naija AI | Home</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Top Navigation Bar -->
         <header class="top-bar">
-            <div class="menu-left">
-                <button id="menuBtn" class="icon-btn" title="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
+            <div class="nav-left">
+                <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
+                <span class="logo-brand">Naija AI</span>
             </div>
             <div class="nav-right">
-                <button id="newChatBtn" class="icon-btn" title="New Chat">
-                    <i class="far fa-edit"></i> <!-- Pen inside a square icon -->
-                </button>
-                <div class="profile-area">
-                    <img src="your-photo.jpg" alt="Profile" class="user-avatar" id="userProfile">
-                </div>
+                <button id="newChatBtn" class="icon-btn"><i class="far fa-edit"></i></button>
+                <div class="profile-area"><img id="userImg" src="default-avatar.png" class="user-avatar"></div>
             </div>
         </header>
 
-        <!-- Main Chat Area -->
         <main id="chatDisplay" class="chat-content">
-            <div class="welcome-screen">
-                <div class="logo-placeholder">
-                    <!-- Your AI Logo can go here -->
+            <!-- Personalized Welcome Screen -->
+            <div class="welcome-section" id="welcomeUI">
+                <h2 id="welcomeGreeting">Oga, I dey listen. Wetin you want make we gist about today?</h2>
+                <div class="suggestion-grid">
+                    <div class="suggest-card" onclick="setPrompt('Tell me a Nigerian joke')"><i class="fas fa-laugh"></i><p>Joke</p></div>
+                    <div class="suggest-card" onclick="setPrompt('How to cook Jollof?')"><i class="fas fa-utensils"></i><p>Cooking</p></div>
+                    <div class="suggest-card" onclick="setPrompt('Wetin dey sup?')"><i class="fas fa-comment"></i><p>Gist</p></div>
                 </div>
-                <h2>Naija AI</h2>
-                <p>Oga, I dey listen. Wetin you want make we gist about today?</p>
             </div>
         </main>
 
-        <!-- The Glowing Rainbow Input Section -->
         <footer class="input-section">
             <div class="rainbow-border-box">
                 <div class="input-container">
-                    <label for="imageUpload" class="attach-btn">
+                    <label for="imageUpload" class="action-btn">
                         <i class="fas fa-paperclip"></i>
                         <input type="file" id="imageUpload" hidden accept="image/*">
                     </label>
-                    
-                    <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off">
-                    
+                    <input type="text" id="userInput" placeholder="Ask anything...">
                     <div class="input-actions">
-                        <!-- Default Speak Button -->
-                        <button id="voiceBtn" class="speak-btn">
-                            <i class="fas fa-microphone"></i> <span>Speak</span>
-                        </button>
-                        <!-- Hidden Send Arrow (Appears when typing) -->
-                        <button id="sendBtn" class="send-btn" style="display: none;">
-                            <i class="fas fa-arrow-up"></i>
-                        </button>
+                        <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
+                        <button id="sendBtn" class="send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
                     </div>
                 </div>
             </div>
             <p class="bot-disclaimer">Naija AI fit make mistakes. Check your gist well.</p>
         </footer>
-
-        <!-- Sidebar (Hidden by default) -->
-        <div id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <h3>Features</h3>
-                <button id="closeSidebar" class="icon-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <ul class="feature-list">
-                <li><i class="fas fa-image"></i> Create Images</li>
-                <li><i class="fas fa-magic"></i> Edit Image</li>
-                <li onclick="window.location.href='voice.html'"><i class="fas fa-microphone-alt"></i> Try Voice Mode</li>
-            </ul>
-        </div>
     </div>
 
-    <!-- External Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
