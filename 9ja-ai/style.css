@@ -36,3 +36,69 @@ body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif;
 .suggestion-grid { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
 .suggest-card { background: #1e1e1e; padding: 15px; border-radius: 12px; cursor: pointer; border: 1px solid #333; transition: 0.3s; width: 100px; text-align: center; }
 .suggest-card:hover { background: #222; border-color: var(--accent); }
+
+/* Voice Mode Specifics */
+.voice-body {
+    background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+.voice-container { width: 100%; max-width: 500px; height: 90vh; display: flex; flex-direction: column; justify-content: space-between; }
+
+.pulse-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 50px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pulse-circle {
+    width: 100px;
+    height: 100px;
+    background: var(--accent); /* Glowing Green */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    color: black;
+    z-index: 2;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: pulseAnim 2s infinite;
+}
+
+.pulse-ring:nth-child(2) { animation-delay: 1s; }
+
+@keyframes pulseAnim {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+.mic-main-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.listening .pulse-ring { animation-play-state: running; }
+.idle .pulse-ring { animation: none; opacity: 0.2; }
