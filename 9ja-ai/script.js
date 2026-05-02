@@ -1,116 +1,113 @@
-// --- CONFIGURATION ---
-const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com";
-const SUPABASE_URL = " https://fkizxpuzwuerryoguyyu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXp4cHV6d3VlcnJ5b2d1eXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTM4NjIsImV4cCI6MjA5MzIyOTg2Mn0.P7plmQphMbXqvF84qIE4iJNJO51wvSUuhWnbXL-frTA";
+// --- 1. CONFIGURATION & INITIALIZATION ---
+// Replace with your actual Render URL (No trailing slash!)
+const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com"; 
+const SUPABASE_URL = "https://fkizxpuzwuerryoguyyu.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXp4cHV6d3VlcnJ5b2d1eXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTM4NjIsImV4cCI6MjA5MzIyOTg2Mn0.P7plmQphMbXqvF84qIE4iJNJO51wvSUuhWnbXL-frTA"; // Publicly safe to put here
 
-// Initialize Supabase
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// DOM Elements
+// --- 2. DOM ELEMENTS ---
 const userInput = document.getElementById('userInput');
 const voiceBtn = document.getElementById('voiceBtn');
 const sendBtn = document.getElementById('sendBtn');
+const chatDisplay = document.getElementById('chatDisplay');
+const fileInput = document.getElementById('imageUpload');
 const sidebar = document.getElementById('sidebar');
 const menuBtn = document.getElementById('menuBtn');
 const closeSidebar = document.getElementById('closeSidebar');
 
-// --- BUTTON SWITCHING LOGIC ---
+// --- 3. BUTTON SWITCHING LOGIC ---
+// Switches from "Speak" to "Send Arrow" when you start typing
 userInput.addEventListener('input', () => {
-    if (userInput.value.trim() !== "") {
-        voiceBtn.style.display = "none";
-        sendBtn.style.display = "flex";
-    } else {
-        voiceBtn.style.display = "flex";
-        sendBtn.style.display = "none";
-    }
+    const isTyping = userInput.value.trim() !== "";
+    voiceBtn.style.display = isTyping ? "none" : "flex";
+    sendBtn.style.display = isTyping ? "flex" : "none";
 });
 
-// --- SIDEBAR LOGIC ---
-menuBtn.onclick = () => sidebar.classList.add('active');
-closeSidebar.onclick = () => sidebar.classList.remove('active');
+// --- 4. SIDEBAR NAVIGATION ---
+if (menuBtn) menuBtn.onclick = () => sidebar.classList.add('active');
+if (closeSidebar) closeSidebar.onclick = () => sidebar.classList.remove('active');
 
-// --- SEND LOGIC ---
+// --- 5. CHAT LOGIC ---
 async function sendMessage() {
     const text = userInput.value.trim();
-    const display = document.getElementById('chatDisplay');
+    const hasFile = fileInput.files && fileInput.files[0];
+
+    // Don't send if both are empty
+    if (!text && !hasFile) return;
+
+    // Display user message immediately
+    appendMessage('user', text);
     
-    if (!text) return;
-
-    // 1. Show user message immediately
-    display.innerHTML += `<div class="user-msg"><b>You:</b> ${text}</div>`;
-    userInput.value = "";
-    
-    try {
-        const response = await fetch(`${BACKEND_URL}/api/chat`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}` 
-            },
-            body: JSON.stringify({ prompt: text })
-        });
-
-        const data = await response.json();
-
-        // 2. The FIX: Check if 'reply' actually exists before showing it
-        if (data && data.reply) {
-            display.innerHTML += `<div class="ai-msg"><b>Naija AI:</b> ${data.reply}</div>`;
-        } else {
-            // This catches if the server sent an error instead of a reply
-            display.innerHTML += `<div class="ai-msg">Omo, I no understand wetin happen. Check your Render logs!</div>`;
-            console.error("Server Response:", data);
-        }
-    } catch (err) {
-        display.innerHTML += `<div class="ai-msg">Network wahala: I no fit reach the server.</div>`;
-    }
-}
-
-    if (!text && !fileInput.files[0]) return;
-
-    // Add user message to screen
-    display.innerHTML += `<div class="user-msg-bubble">${text}</div>`;
-    
-    // Clear Input and Reset Buttons
+    // Reset UI state
     userInput.value = "";
     voiceBtn.style.display = "flex";
     sendBtn.style.display = "none";
 
     try {
         let response;
-        if (fileInput.files[0]) {
-            // Use Image Analysis Logic
+        
+        if (hasFile) {
+            // Handle Image Gist (Gemini Logic)
             const formData = new FormData();
             formData.append('image', fileInput.files[0]);
-            formData.append('prompt', text);
-            
+            formData.append('prompt', text || "Wetin be this?"); // Default prompt if text is empty
+
             response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
                 body: formData
+                // Authorization headers can be added here if you're using Supabase Auth
             });
         } else {
-            // Standard Text Chat
+            // Handle Text Gist (Groq Logic)
             response = await fetch(`${BACKEND_URL}/api/chat`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}` 
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: text })
             });
         }
 
         const data = await response.json();
-        display.innerHTML += `<div class="ai-msg-bubble">${data.reply}</div>`;
-        fileInput.value = ""; // Clear file
-        
+
+        // THE FIX: Check if 'reply' exists to avoid "undefined"
+        if (data && data.reply) {
+            appendMessage('ai', data.reply);
+        } else if (data && data.error) {
+            appendMessage('ai', `Omo, backend error: ${data.error}`);
+        } else {
+            appendMessage('ai', "I get the message, but I no fit talk right now. Check Render logs!");
+        }
+
     } catch (err) {
-        display.innerHTML += `<div class="ai-msg-bubble">Omo, error dey: ${err.message}</div>`;
+        console.error("Connection Error:", err);
+        appendMessage('ai', "Network wahala! I no fit reach the server. Confirm say your Render link dey correct.");
+    } finally {
+        fileInput.value = ""; // Clear file after attempt
     }
 }
 
+// --- 6. HELPER FUNCTIONS ---
+function appendMessage(sender, message) {
+    const bubble = document.createElement('div');
+    bubble.className = sender === 'user' ? 'user-msg-bubble' : 'ai-msg-bubble';
+    
+    // Safety check: If message is somehow missing, don't show "undefined"
+    bubble.innerText = message || "Omo, something go wrong.";
+    
+    chatDisplay.appendChild(bubble);
+    
+    // Auto-scroll to bottom
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+}
+
+// Attach Events
 sendBtn.onclick = sendMessage;
+
+// Handle "Enter" key to send
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
 
 // Voice Mode Redirect
 voiceBtn.onclick = () => {
