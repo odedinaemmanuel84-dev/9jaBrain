@@ -1,8 +1,8 @@
-/* --- NAIJA AI MASTER STYLE --- */
+/* --- NAIJA AI MASTER STYLE (BOTTOM INPUT VERSION) --- */
 :root {
     --bg: #0d0d0d;
     --card: #1a1a1a;
-    --accent: #00ff88; /* The Glowing Green */
+    --accent: #00ff88; /* Glowing Green */
     --text: #ffffff;
     --text-dim: #b3b3b3;
 }
@@ -19,7 +19,7 @@ body {
     color: var(--text);
     height: 100vh;
     width: 100vw;
-    overflow: hidden; /* Prevents the whole page from scrolling, only the chat scrolls */
+    overflow: hidden; /* Only the chat area will scroll */
 }
 
 .app-container {
@@ -28,22 +28,18 @@ body {
     height: 100%;
 }
 
-/* --- HEADER & TOP INPUT SECTION --- */
+/* --- TOP NAVIGATION BAR --- */
 .main-interface {
     position: fixed;
     top: 0;
     width: 100%;
     background: var(--bg);
     z-index: 1000;
-    padding-bottom: 10px;
+    padding: 15px 20px;
     border-bottom: 1px solid #222;
-}
-
-.top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
 }
 
 .nav-left {
@@ -53,9 +49,8 @@ body {
 }
 
 .logo-brand {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
 }
 
 .nav-right {
@@ -64,20 +59,20 @@ body {
     gap: 15px;
 }
 
-/* Profile Picture Circle */
+/* THE FIX: Profile Picture Circle in Top Right */
 .profile-area {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid #333;
     cursor: pointer;
     transition: 0.3s;
+    background: #222;
 }
 
 .profile-area:hover {
     border-color: var(--accent);
-    transform: scale(1.05);
 }
 
 .user-avatar {
@@ -86,17 +81,78 @@ body {
     object-fit: cover;
 }
 
-/* --- RAINBOW INPUT BOX (TOP ALIGNED) --- */
+/* --- CHAT CONTENT (SCROLLABLE AREA) --- */
+.chat-content {
+    margin-top: 70px;    /* Space for Top Bar */
+    margin-bottom: 140px; /* THE FIX: Space for Bottom Input so messages aren't hidden */
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+}
+
+/* Message Bubbles */
+.user-msg-bubble {
+    align-self: flex-end;
+    background: #2a2a2a;
+    padding: 12px 18px;
+    border-radius: 20px 20px 0 20px;
+    max-width: 80%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.ai-msg-bubble {
+    align-self: flex-start;
+    background: transparent;
+    padding: 10px 0;
+    max-width: 90%;
+    line-height: 1.6;
+    font-size: 1.05rem;
+}
+
+/* --- THE THINKING SPINNER --- */
+.thinking-container {
+    display: none; /* Controlled by script.js */
+    align-self: flex-start;
+    padding: 10px 0;
+}
+
+.spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(0, 255, 136, 0.1);
+    border-top: 3px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- RAINBOW INPUT SECTION (FIXED TO BOTTOM) --- */
 .rainbow-input-section {
-    padding: 0 20px 10px 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 20px 30px 20px; /* Extra bottom padding for mobile gesture bars */
+    background: var(--bg);
+    z-index: 1000;
 }
 
 .rainbow-border-box {
-    padding: 2px; /* This creates the border thickness */
+    padding: 2px; /* Border thickness */
     border-radius: 30px;
     background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     background-size: 400%;
     animation: moveRainbow 8s linear infinite;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 @keyframes moveRainbow {
@@ -109,7 +165,7 @@ body {
     border-radius: 28px;
     display: flex;
     align-items: center;
-    padding: 8px 15px;
+    padding: 8px 12px;
     gap: 10px;
 }
 
@@ -119,97 +175,48 @@ body {
     border: none;
     color: white;
     font-size: 1rem;
-    padding: 10px 5px;
+    padding: 8px 5px;
     outline: none;
 }
 
-.icon-btn, .action-btn, .speak-btn, .send-btn {
+.icon-btn, .action-btn, .send-btn {
     background: none;
     border: none;
-    color: var(--text);
+    color: white;
     font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .speak-btn {
     background: #222;
+    border: none;
+    color: white;
     padding: 8px 15px;
     border-radius: 20px;
-    font-size: 0.9rem;
-    gap: 8px;
+    font-size: 0.85rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
 .send-btn {
     background: var(--accent);
     color: black;
-    width: 35px;
-    height: 35px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
+    justify-content: center;
 }
 
 .disclaimer {
     font-size: 0.7rem;
     color: var(--text-dim);
-    margin-top: 8px;
+    margin-top: 10px;
     text-align: center;
-}
-
-/* --- CHAT CONTENT AREA --- */
-.chat-content {
-    margin-top: 170px; /* Space for the fixed header */
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* Message Bubbles */
-.user-msg-bubble {
-    align-self: flex-end;
-    background: #2a2a2a;
-    padding: 12px 18px;
-    border-radius: 20px 20px 0 20px;
-    max-width: 80%;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.ai-msg-bubble {
-    align-self: flex-start;
-    background: transparent;
-    padding: 12px 5px;
-    max-width: 90%;
-    color: #e0e0e0;
-    font-size: 1.1rem;
-    line-height: 1.5;
-}
-
-/* --- THE THINKING SPINNER --- */
-.thinking-container {
-    display: none; /* Controlled by JS */
-    align-self: flex-start;
-    padding: 10px;
-}
-
-.spinner {
-    width: 25px;
-    height: 25px;
-    border: 3px solid rgba(0, 255, 136, 0.1);
-    border-top: 3px solid var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* --- SIDEBAR MENU --- */
@@ -230,33 +237,25 @@ body {
     left: 0;
 }
 
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
 .feature-list {
     list-style: none;
+    margin-top: 20px;
 }
 
 .feature-list li {
     padding: 15px 0;
     border-bottom: 1px solid #222;
     cursor: pointer;
-    color: var(--text-dim);
     display: flex;
     align-items: center;
     gap: 12px;
-    transition: 0.2s;
+    color: var(--text-dim);
 }
 
 .feature-list li:hover {
     color: var(--accent);
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+/* Better Scrollbar for Chat Area */
+.chat-content::-webkit-scrollbar { width: 4px; }
+.chat-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
