@@ -3,62 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naija AI | Dashboard</title>
+    <title>Naija AI | Oga, Wetin Dey?</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="app-container">
-        <header>
-            <div class="header-left">
-                <i class="fas fa-bars menu-icon"></i>
-                <div class="app-name">Naija AI</div>
+        <!-- Top Navigation Bar -->
+        <header class="top-bar">
+            <div class="menu-left">
+                <button id="menuBtn" class="icon-btn" title="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            
-            <div class="header-right">
-                <i class="fas fa-pen-to-square new-chat-icon" onclick="resetChat()"></i>
-                <div class="profile-container" onclick="toggleProfileMenu()">
-                    <img id="userProfilePic" src="" alt="User">
-                    <div id="profileMenu" class="profile-menu">
-                        <div class="menu-user-info">
-                            <p id="menuUserName">User</p>
-                            <p id="menuUserEmail"></p>
-                        </div>
-                        <hr>
-                        <button onclick="window.location.href='voice.html'"><i class="fas fa-microphone"></i> Live Call</button>
-                        <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </div>
+            <div class="nav-right">
+                <button id="newChatBtn" class="icon-btn" title="New Chat">
+                    <i class="far fa-edit"></i> <!-- Pen inside a square icon -->
+                </button>
+                <div class="profile-area">
+                    <img src="your-photo.jpg" alt="Profile" class="user-avatar" id="userProfile">
                 </div>
             </div>
         </header>
 
-        <main id="chat-window">
-            <div id="start-screen" class="start-screen">
-                <div class="big-logo">N</div>
-                <h2>How can I help you, Oga?</h2>
-                <div class="suggestions-grid">
-                    <div class="chip" onclick="quickAction('Tell me a funny joke')">Tell a joke</div>
-                    <div class="chip" onclick="quickAction('Who made you?')">Who created you?</div>
-                    <div class="chip" onclick="quickAction('Analyze this idea')">Business gist</div>
+        <!-- Main Chat Area -->
+        <main id="chatDisplay" class="chat-content">
+            <div class="welcome-screen">
+                <div class="logo-placeholder">
+                    <!-- Your AI Logo can go here -->
                 </div>
-            </div>
-            <div id="messages"></div>
-            
-            <!-- Thinking Animation -->
-            <div id="ai-loader" class="ai-loader" style="display: none;">
-                <div class="spinning-line"></div>
-                <span>Naija AI dey think...</span>
+                <h2>Naija AI</h2>
+                <p>Oga, I dey listen. Wetin you want make we gist about today?</p>
             </div>
         </main>
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="Ask Naija AI anything...">
-                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        <!-- The Glowing Rainbow Input Section -->
+        <footer class="input-section">
+            <div class="rainbow-border-box">
+                <div class="input-container">
+                    <label for="imageUpload" class="attach-btn">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" id="imageUpload" hidden accept="image/*">
+                    </label>
+                    
+                    <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off">
+                    
+                    <div class="input-actions">
+                        <!-- Default Speak Button -->
+                        <button id="voiceBtn" class="speak-btn">
+                            <i class="fas fa-microphone"></i> <span>Speak</span>
+                        </button>
+                        <!-- Hidden Send Arrow (Appears when typing) -->
+                        <button id="sendBtn" class="send-btn" style="display: none;">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
+            <p class="bot-disclaimer">Naija AI fit make mistakes. Check your gist well.</p>
+        </footer>
+
+        <!-- Sidebar (Hidden by default) -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Features</h3>
+                <button id="closeSidebar" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-image"></i> Create Images</li>
+                <li><i class="fas fa-magic"></i> Edit Image</li>
+                <li onclick="window.location.href='voice.html'"><i class="fas fa-microphone-alt"></i> Try Voice Mode</li>
+            </ul>
         </div>
     </div>
+
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>
