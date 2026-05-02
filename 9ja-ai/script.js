@@ -33,8 +33,38 @@ closeSidebar.onclick = () => sidebar.classList.remove('active');
 // --- SEND LOGIC ---
 async function sendMessage() {
     const text = userInput.value.trim();
-    const fileInput = document.getElementById('imageUpload');
     const display = document.getElementById('chatDisplay');
+    
+    if (!text) return;
+
+    // 1. Show user message immediately
+    display.innerHTML += `<div class="user-msg"><b>You:</b> ${text}</div>`;
+    userInput.value = "";
+    
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}` 
+            },
+            body: JSON.stringify({ prompt: text })
+        });
+
+        const data = await response.json();
+
+        // 2. The FIX: Check if 'reply' actually exists before showing it
+        if (data && data.reply) {
+            display.innerHTML += `<div class="ai-msg"><b>Naija AI:</b> ${data.reply}</div>`;
+        } else {
+            // This catches if the server sent an error instead of a reply
+            display.innerHTML += `<div class="ai-msg">Omo, I no understand wetin happen. Check your Render logs!</div>`;
+            console.error("Server Response:", data);
+        }
+    } catch (err) {
+        display.innerHTML += `<div class="ai-msg">Network wahala: I no fit reach the server.</div>`;
+    }
+}
 
     if (!text && !fileInput.files[0]) return;
 
