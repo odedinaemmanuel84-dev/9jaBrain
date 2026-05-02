@@ -2,52 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naija AI | Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Naija AI | Oga, Wetin Dey?</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
-        <header class="top-bar">
-            <div class="nav-left">
-                <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
-                <span class="logo-brand">Naija AI</span>
+        <!-- Top Bar Layout Fix: Type box is now part of the header area -->
+        <header class="main-interface">
+            <div class="top-bar">
+                <div class="nav-left">
+                    <button id="menuBtn" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <span class="logo-brand">Naija AI</span>
+                </div>
+                <div class="nav-right">
+                    <button id="newChatBtn" class="icon-btn"><i class="far fa-edit"></i></button>
+                    <!-- THE FIX: Clickable profile container to trigger upload -->
+                    <label for="profilePictureUpload" class="profile-area">
+                        <img id="userImg" src="default-avatar.png" class="user-avatar" title="Upload new photo">
+                        <input type="file" id="profilePictureUpload" hidden accept="image/*">
+                    </label>
+                </div>
             </div>
-            <div class="nav-right">
-                <button id="newChatBtn" class="icon-btn"><i class="far fa-edit"></i></button>
-                <div class="profile-area"><img id="userImg" src="default-avatar.png" class="user-avatar"></div>
+
+            <!-- THE FIX: Typing box moved UP from the bottom. This prevents the "swipe up" issue -->
+            <div class="rainbow-input-section">
+                <div class="rainbow-border-box">
+                    <div class="input-container">
+                        <label for="imageUpload" class="action-btn"><i class="fas fa-paperclip"></i></label>
+                        <input type="file" id="imageUpload" hidden accept="image/*">
+                        <input type="text" id="userInput" placeholder="Gist with Naija AI..." autocomplete="off">
+                        <div class="input-actions">
+                            <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
+                            <button id="sendBtn" class="send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <p class="disclaimer">Confirm gist before you carry am go.</p>
             </div>
         </header>
 
+        <!-- Messages Display (Occupies remaining screen height) -->
         <main id="chatDisplay" class="chat-content">
-            <!-- Personalized Welcome Screen -->
-            <div class="welcome-section" id="welcomeUI">
-                <h2 id="welcomeGreeting">Oga, I dey listen. Wetin you want make we gist about today?</h2>
-                <div class="suggestion-grid">
-                    <div class="suggest-card" onclick="setPrompt('Tell me a Nigerian joke')"><i class="fas fa-laugh"></i><p>Joke</p></div>
-                    <div class="suggest-card" onclick="setPrompt('How to cook Jollof?')"><i class="fas fa-utensils"></i><p>Cooking</p></div>
-                    <div class="suggest-card" onclick="setPrompt('Wetin dey sup?')"><i class="fas fa-comment"></i><p>Gist</p></div>
-                </div>
+            <div id="thinkingIndicator" class="thinking-container">
+                <div class="spinner"></div>
             </div>
+            <!-- Dynamic bubbles will appear here -->
         </main>
 
-        <footer class="input-section">
-            <div class="rainbow-border-box">
-                <div class="input-container">
-                    <label for="imageUpload" class="action-btn">
-                        <i class="fas fa-paperclip"></i>
-                        <input type="file" id="imageUpload" hidden accept="image/*">
-                    </label>
-                    <input type="text" id="userInput" placeholder="Ask anything...">
-                    <div class="input-actions">
-                        <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
-                        <button id="sendBtn" class="send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
-                    </div>
-                </div>
+        <!-- THE FIX: SIDEBAR MENU NOW COMPLETE -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Senior Features</h3>
+                <button id="closeSidebar" class="icon-btn"><i class="fas fa-times"></i></button>
             </div>
-            <p class="bot-disclaimer">Naija AI fit make mistakes. Check your gist well.</p>
-        </footer>
+            <ul class="feature-list">
+                <li onclick="window.location.reload()"><i class="fas fa-plus"></i> New Gist</li>
+                <li onclick="alert('Omo, I dey think logic!')"><i class="fas fa-image"></i> Create Image</li>
+                <li onclick="window.location.href='voice.html'"><i class="fas fa-headset"></i> Voice Mode</li>
+                <li id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</li>
+            </ul>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
