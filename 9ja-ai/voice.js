@@ -1,73 +1,63 @@
-const BACKEND_WS_URL = "wss://nineja-ai-backend-5.onrender.com/voice"; // Use wss:// for Render
-let socket;
-let myVAD;
+const BACKEND_URL = "https://your-render-app.onrender.com";
+const SUPABASE_URL = "https://fkizxpuzwueryoguyyu.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY"; 
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// 1. Auth & Personalized Name
 async function initVoice() {
-    const status = document.getElementById('callStatus');
-    const stateText = document.getElementById('aiStateText');
-
-    // 1. Connect to Backend WebSocket
-    socket = new WebSocket(BACKEND_WS_URL);
-
-    socket.onopen = () => {
-        status.innerText = "Live";
-        status.style.background = "#00ff88";
-        startListening();
-    };
-
-    socket.onmessage = async (event) => {
-        // AI sends audio back as Blobs or Base64
-        const audioBlob = new Blob([event.data], { type: 'audio/pcm' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        
-        stateText.innerText = "Naija AI is speaking...";
-        document.querySelector('.avatar-glow').classList.add('talking');
-        
-        await audio.play();
-        
-        audio.onended = () => {
-            stateText.innerText = "Naija AI is listening...";
-            document.querySelector('.avatar-glow').classList.remove('talking');
-        };
-    };
-
-    socket.onerror = () => {
-        status.innerText = "Error";
-        status.style.background = "#ff4d4d";
-    };
-}
-
-async function startListening() {
-    // 2. Initialize VAD (Voice Activity Detection)
-    myVAD = await vad.mic.create({
-        onSpeechStart: () => {
-            console.log("User started talking");
-            // If AI is talking, stop it (Barge-in)
-            socket.send(JSON.stringify({ type: "INTERRUPT" }));
-        },
-        onSpeechEnd: (audio) => {
-            console.log("User finished talking");
-            // Send audio data to backend
-            socket.send(audio.buffer);
-        }
-    });
-    myVAD.receive();
-}
-
-// Mute Toggle
-let isMuted = false;
-document.getElementById('muteBtn').onclick = () => {
-    isMuted = !isMuted;
-    if (isMuted) {
-        myVAD.pause();
-        document.getElementById('muteBtn').innerHTML = '<i class="fas fa-microphone-slash"></i>';
-        document.getElementById('muteBtn').classList.add('muted');
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) {
+        window.location.href = "auth.html";
     } else {
-        myVAD.receive();
-        document.getElementById('muteBtn').innerHTML = '<i class="fas fa-microphone"></i>';
-        document.getElementById('muteBtn').classList.remove('muted');
+        const name = user.email.split('@')[0];
+        document.getElementById('voiceGreeting').innerText = `${name}, I dey listen...`;
+    }
+}
+initVoice();
+
+// 2. Speech Recognition Setup
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'en-NG'; // Nigerian English context
+recognition.interimResults = false;
+
+const micBtn = document.getElementById('toggleMic');
+const statusText = document.getElementById('statusText');
+const userSpeech = document.getElementById('userSpeech');
+
+micBtn.onclick = () => {
+    recognition.start();
+    statusText.innerText = "Listening to your gist...";
+    document.getElementById('pulseContainer').classList.add('listening');
+};
+
+recognition.onresult = async (event) => {
+    const transcript = event.results[0][0].transcript;
+    userSpeech.innerText = transcript;
+    statusText.innerText = "Naija AI dey think...";
+
+    // Send voice transcript to backend
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: transcript })
+        });
+        const data = await res.json();
+        
+        // Speak the reply back
+        speak(data.reply);
+        statusText.innerText = "AI is talking...";
+    } catch (e) {
+        statusText.innerText = "Error dey!";
     }
 };
 
-initVoice();
+function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-GB'; 
+    window.speechSynthesis.speak(utterance);
+    utterance.onend = () => {
+        statusText.innerText = "Gist finished.";
+        document.getElementById('pulseContainer').classList.remove('listening');
+    };
+}
