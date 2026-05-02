@@ -1,4 +1,4 @@
-const BACKEND_WS_URL = "wss://your-render-app.onrender.com/voice"; // Use wss:// for Render
+const BACKEND_WS_URL = "wss://nineja-ai-backend-5.onrender.com/voice"; // Use wss:// for Render
 let socket;
 let myVAD;
 
