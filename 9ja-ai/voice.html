@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Call | Naija AI</title>
+    <title>Naija AI | Voice Mode</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- VAD Library for silence detection -->
-    <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="voice-body">
     <div class="voice-container">
         <header class="voice-header">
-            <button onclick="window.location.href='index.html'"><i class="fas fa-chevron-left"></i> Back</button>
-            <div class="status-badge" id="callStatus">Connecting...</div>
+            <button onclick="window.location.href='index.html'" class="icon-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <span class="voice-status" id="statusText">Ready to gist...</span>
         </header>
 
-        <div class="voice-visualizer">
-            <div class="avatar-glow">
-                <span class="logo-icon">N</span>
+        <main class="voice-main">
+            <!-- Personalized Greeting -->
+            <h1 id="voiceGreeting">Oga, I dey listen...</h1>
+            
+            <!-- Animated Pulse Circle -->
+            <div class="pulse-wrapper" id="pulseContainer">
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-circle">
+                    <i class="fas fa-microphone"></i>
+                </div>
             </div>
-            <!-- Pulsing Rings -->
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring delay-1"></div>
-        </div>
 
-        <div class="voice-info">
-            <h2 id="aiStateText">Naija AI is listening...</h2>
-            <p>Speak naturally, Oga. I dey here.</p>
-        </div>
+            <div class="transcript-area">
+                <p id="userSpeech">...</p>
+            </div>
+        </main>
 
-        <div class="voice-controls">
-            <button id="muteBtn" class="control-btn"><i class="fas fa-microphone"></i></button>
-            <button onclick="window.location.href='index.html'" class="control-btn end-call"><i class="fas fa-phone-slash"></i></button>
-        </div>
+        <footer class="voice-footer">
+            <button id="toggleMic" class="mic-main-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <p>Tap to talk or listen</p>
+        </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="voice.js"></script>
 </body>
 </html>
