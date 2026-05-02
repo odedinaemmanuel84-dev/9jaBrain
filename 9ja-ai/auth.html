@@ -3,46 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Naija AI</title>
+    <title>Naija AI | Welcome</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
-    <div class="auth-wrapper">
-        <!-- Left Side: Moving Background -->
-        <div class="visual-side">
-            <ul class="image-slideshow">
-                <li style="background-image: url('assets/images/image1.jpg');"></li>
-                <li style="background-image: url('assets/images/image2.jpg');"></li>
-                <li style="background-image: url('assets/images/image3.jpg');"></li>
-            </ul>
-            <div class="features-overlay">
-                <h1 id="feature-text">Real-Time Naija Voice Chat</h1>
-            </div>
-        </div>
+<body class="auth-body">
+    <!-- Faded Moving Background Images -->
+    <div class="bg-slider">
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995');"></div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa');"></div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485');"></div>
+    </div>
 
-        <!-- Right Side: The Form -->
-        <div class="form-side">
-            <div class="auth-header">
-                <div class="naija-logo">
-                    <span class="logo-icon">N</span>
-                    <span class="logo-text">Naija AI</span>
-                </div>
-                <p>By Emmanuel Odedina</p>
-            </div>
-
-            <div id="auth-form" class="form-container">
-                <h3 id="form-title">Welcome Back</h3>
-                <input type="email" id="email" placeholder="Email address">
-                <input type="password" id="password" placeholder="Password">
-                <button class="primary-btn" onclick="handleAuth()">Continue</button>
-                <p class="switch-auth">
-                    <span id="toggle-text">New here?</span> 
-                    <button onclick="toggleAuthMode()" id="toggle-btn">Register now</button>
-                </p>
-            </div>
+    <div class="auth-container">
+        <h1 class="logo-text">Naija AI</h1>
+        <div id="authForm" class="auth-card">
+            <h2 id="authTitle">Login</h2>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="password" placeholder="Password">
+            <button id="authBtn">Enter Gist</button>
+            <p id="toggleAuth">No get account? <b>Register here</b></p>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
 </body>
 </html>
