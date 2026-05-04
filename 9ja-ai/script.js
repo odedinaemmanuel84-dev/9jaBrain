@@ -38,23 +38,16 @@ async function init() {
     } catch (err) {
         console.error("Initialization failed:", err);
     }
-
-    // Always activate buttons to ensure the UI works
     activateTriggers(); 
 }
 
-// --- 2. ACTIVATION (The Fix for the Send Button) ---
+// --- 2. ACTIVATION (Event Listeners) ---
 function activateTriggers() {
-    console.log("Activating buttons...");
-
-    // Send Button Click
     ui.send.onclick = (e) => {
         e.preventDefault();
-        console.log("Send clicked!");
         sendMessage();
     };
 
-    // Enter Key Press
     ui.input.onkeydown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -62,14 +55,12 @@ function activateTriggers() {
         }
     };
 
-    // Toggle Send/Speak Icons while typing
     ui.input.oninput = () => {
         const hasText = ui.input.value.trim() !== "";
         ui.voice.style.display = hasText ? "none" : "flex";
         ui.send.style.display = hasText ? "flex" : "none";
     };
 
-    // Sidebar Controls
     document.getElementById('menuBtn').onclick = () => ui.sidebar.classList.add('active');
     document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
     document.getElementById('signOutBtn').onclick = async () => {
@@ -83,21 +74,23 @@ async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
-    console.log("Sending message:", text);
-    
+    // 1. Show User Message with Edit Pencil
     appendBubble('user', text);
     chatHistory.push({ role: "user", content: text });
     
+    // Reset Input
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
 
+    // 2. GEMINI STYLE SPINNER: Move thinking indicator to the bottom of display
+    ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
-    ui.think.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    ui.think.scrollIntoView({ behavior: 'smooth' });
 
-    // --- ABORT CONTROLLER SETUP ---
+    // 3. Setup Timeout/Abort
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute timer
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     try {
         const { data: { user } } = await sb.auth.getUser();
@@ -105,54 +98,77 @@ async function sendMessage() {
         const response = await fetch(`${BACKEND_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal, // Connect the timer to this request
+            signal: controller.signal,
             body: JSON.stringify({ 
                 messages: chatHistory, 
                 user_id: user.id 
             })
         });
 
-        // If we get here, the request finished, so stop the timer
         clearTimeout(timeoutId);
-
         const data = await response.json();
         
+        // 4. Hide Spinner and Show AI Response
         ui.think.style.display = 'none';
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
+        // 5. Update Sidebar History
+        saveAndRefreshHistory(text, user.id);
+
     } catch (e) {
         ui.think.style.display = 'none';
-        
-        // Check if the error was specifically a timeout
         if (e.name === 'AbortError') {
-            console.error("Request timed out after 60s");
-            appendAiBubble("Omo, the server dey take too long to answer. Try again in a small while.");
+            appendAiBubble("Omo, the server dey take too long. Try again small-small.");
         } else {
-            console.error("Chat Error:", e);
             appendAiBubble("Omo, network wahala! Confirm your Render backend dey active.");
         }
     }
 }
 
-// --- 4. MASTERING THE AI BUBBLE (CODE & ACTIONS) ---
+// --- 4. BUBBLE LOGIC (User & AI) ---
+
+// User Bubble with Edit Pencil
+function appendBubble(sender, msg) {
+    const container = document.createElement('div');
+    container.className = sender === 'user' ? 'user-msg-container' : 'ai-msg-container';
+
+    const div = document.createElement('div');
+    div.className = sender === 'user' ? 'user-msg-bubble' : 'ai-msg-bubble';
+    div.innerText = msg;
+    container.appendChild(div);
+
+    if (sender === 'user') {
+        const editIcon = document.createElement('div');
+        editIcon.className = 'edit-btn';
+        editIcon.style.cursor = "pointer";
+        editIcon.style.fontSize = "12px";
+        editIcon.style.color = "#888";
+        editIcon.innerHTML = '<i class="fas fa-pencil-alt"></i> Edit';
+        editIcon.onclick = () => {
+            const newText = prompt("Update your message:", msg);
+            if (newText && newText !== msg) {
+                div.innerText = newText;
+                alert("Message updated! Resend to get a new response.");
+            }
+        };
+        container.appendChild(editIcon);
+    }
+
+    ui.display.appendChild(container);
+    ui.display.scrollTop = ui.display.scrollHeight;
+}
+
+// AI Bubble with Code Handling
 function appendAiBubble(text) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ai-msg-container';
 
-    // Strictly identify code blocks
-    const codeRegex = /```(html|css|js|javascript|python)?([\s\S]*?)```/g;
-    
+    const codeRegex = /```(html|css|js|javascript|python)?([\s\S]*?)
+```/g;
     let formattedText = text.replace(codeRegex, (match, lang, code) => {
         const languageName = lang || 'code';
-        
-        // Escape HTML so it doesn't disappear in the bubble
-        const escapedCode = code.trim()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        const escapedCode = code.trim().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         return `
             <div class="code-container">
@@ -170,7 +186,6 @@ function appendAiBubble(text) {
     msgDiv.className = 'ai-msg-bubble';
     msgDiv.innerHTML = formattedText;
 
-    // AI Action Icons
     const actionDiv = document.createElement('div');
     actionDiv.className = 'ai-actions';
     actionDiv.innerHTML = `
@@ -185,37 +200,37 @@ function appendAiBubble(text) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// Simple User Bubble
-function appendBubble(sender, msg) {
-    const div = document.createElement('div');
-    div.className = sender === 'user' ? 'user-msg-bubble' : 'ai-msg-bubble';
-    div.innerText = msg;
-    ui.display.appendChild(div);
-    ui.display.scrollTop = ui.display.scrollHeight;
-}
+// --- 5. SIDEBAR & UTILITIES ---
 
-// --- 5. UTILITY FUNCTIONS ---
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text);
-    alert("Oga Emmanuel, e don copy!"); 
+async function saveAndRefreshHistory(title, userId) {
+    await sb.from('chats').insert([{ title: title, user_id: userId }]);
+    loadSidebarHistory(); 
 }
 
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+
     const { data: chats } = await sb.from('chats')
-        .select('title, id')
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
     const list = document.querySelector('.feature-list');
     if (chats && list) {
+        list.innerHTML = ""; // Clear list before reloading
         chats.forEach(chat => {
             const li = document.createElement('li');
-            li.innerHTML = `<i class="fas fa-comment-alt"></i> ${chat.title}`;
+            li.style.cursor = "pointer";
+            li.innerHTML = `<i class="far fa-comment"></i> ${chat.title.substring(0, 25)}...`;
             list.appendChild(li);
         });
     }
 }
 
-// Start the app
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert("Oga Emmanuel, e don copy!"); 
+}
+
 init();
