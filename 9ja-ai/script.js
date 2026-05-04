@@ -18,19 +18,50 @@ const ui = {
     sidebar: document.getElementById('sidebar')
 };
 
-// --- 1. INITIALIZATION ---
+// --- 1. INITIALIZATION (Safe Version) ---
 async function init() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) { window.location.href = "auth.html"; return; }
+    try {
+        const { data: { user } } = await sb.auth.getUser();
+        
+        if (!user) { 
+            window.location.href = "auth.html"; 
+            return; 
+        }
 
-    // Set User metadata Profile Picture if it exists
-    if (user.user_metadata?.avatar_url) {
-        ui.pfp.src = user.user_metadata.avatar_url;
+        if (user.user_metadata?.avatar_url) {
+            ui.pfp.src = user.user_metadata.avatar_url;
+        }
+        
+        loadSidebarHistory();
+    } catch (err) {
+        console.error("Initialization failed, but I will still activate buttons:", err);
     }
-    
-    // Load sidebar history from Supabase
-    loadSidebarHistory();
+
+    // THE FIX: Move these OUTSIDE the try/catch or at the bottom 
+    // to ensure they run even if Supabase is slow.
+    activateButtons(); 
 }
+
+function activateButtons() {
+    // Check if ui.send exists before assigning
+    if (ui.send) {
+        ui.send.onclick = (e) => {
+            e.preventDefault();
+            sendMessage();
+        };
+    }
+
+    if (ui.input) {
+        ui.input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+}
+
+// Start the app
 init();
 
 // --- 2. LAYOUT & UI EVENT LISTENERS ---
