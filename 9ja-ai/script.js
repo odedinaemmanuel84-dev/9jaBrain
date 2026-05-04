@@ -1,9 +1,22 @@
+// --- DYNAMIC CONFIGURATION ---
 const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com";
 const SUPABASE_URL = " https://fkizxpuzwuerryoguyyu.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXp4cHV6d3VlcnJ5b2d1eXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTM4NjIsImV4cCI6MjA5MzIyOTg2Mn0.P7plmQphMbXqvF84qIE4iJNJO51wvSUuhWnbXL-frTA";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let chatHistory = []; // THE FIX: Stores memory for the session
+// Conversation Memory for Session
+let chatHistory = []; 
+
+// Feature Variables for UI
+const ui = {
+    input: document.getElementById('userInput'),
+    display: document.getElementById('chatDisplay'),
+    think: document.getElementById('thinkingIndicator'), // Spinner & "Thinking" text wrapper
+    voice: document.getElementById('voiceBtn'),
+    send: document.getElementById('sendBtn'),
+    pfp: document.getElementById('userImg'),
+    sidebar: document.getElementById('sidebar')
+};
 
 // --- 1. INITIALIZATION ---
 async function init() {
@@ -11,47 +24,38 @@ async function init() {
     if (!user) { window.location.href = "auth.html"; return; }
 
     // Set User metadata Profile Picture if it exists
-    if (user.user_metadata.avatar_url) {
-        document.getElementById('userImg').src = user.user_metadata.avatar_url;
+    if (user.user_metadata?.avatar_url) {
+        ui.pfp.src = user.user_metadata.avatar_url;
     }
     
-    // Load the sidebar history on startup
-    loadSidebarHistory(); 
+    // Load sidebar history from Supabase
+    loadSidebarHistory();
 }
 init();
 
-// 2. Feature Variables
-const ui = {
-    input: document.getElementById('userInput'),
-    display: document.getElementById('chatDisplay'),
-    think: document.getElementById('thinkingIndicator'), // Spinner & "Thinking" text
-    voice: document.getElementById('voiceBtn'),
-    send: document.getElementById('sendBtn'),
-    sidebar: document.getElementById('sidebar'),
-    pfp: document.getElementById('userImg')
-};
-
-// --- 3. LAYOUT & BUTTONS ---
+// --- 2. LAYOUT & UI EVENT LISTENERS ---
 ui.input.addEventListener('input', () => {
     const typing = ui.input.value.trim() !== "";
     ui.voice.style.display = typing ? "none" : "flex";
     ui.send.style.display = typing ? "flex" : "none";
 });
 
+// Menu Toggle
 document.getElementById('menuBtn').onclick = () => ui.sidebar.classList.add('active');
 document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
-document.getElementById('newChatBtn').onclick = () => window.location.reload();
+
+// Sign Out
 document.getElementById('signOutBtn').onclick = async () => {
     await sb.auth.signOut();
     window.location.href = "auth.html";
 };
 
-// --- 4. PROFILE PICTURE LOGIC ---
+// --- 3. PROFILE PICTURE UPLOAD LOGIC ---
 document.getElementById('profilePictureUpload').onchange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    ui.pfp.src = "uploading.gif"; 
+    ui.pfp.src = "uploading.gif"; // Placeholder while uploading
 
     try {
         const { data: { user } } = await sb.auth.getUser();
@@ -72,26 +76,28 @@ document.getElementById('profilePictureUpload').onchange = async (event) => {
     }
 };
 
-// --- 5. THE BRAIN: SENDING MESSAGES WITH MEMORY ---
+// --- 4. THE BRAIN: SENDING MESSAGES WITH MEMORY & SPINNER ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
-    // 1. Update UI and Local Memory
+    // 1. Show User Message
     appendBubble('user', text);
     chatHistory.push({ role: "user", content: text });
+    
+    // Reset Input
     ui.input.value = "";
     ui.voice.style.display = "flex";
     ui.send.style.display = "none";
 
-    // 2. ACTIVATE THINKING SPINNER
+    // 2. ACTIVATE SPINNER IMMEDIATELY
     ui.think.style.display = 'flex';
-    ui.think.scrollIntoView();
+    ui.think.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     try {
         const { data: { user } } = await sb.auth.getUser();
         
-        // THE FIX: Send 'messages' array for history/memory
+        // Call Backend (Render)
         const response = await fetch(`${BACKEND_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -109,28 +115,34 @@ async function sendMessage() {
         // 4. Save AI response to memory
         chatHistory.push({ role: "assistant", content: data.reply });
         
-        // 5. Display with Gemini-style buttons
+        // 5. Display AI Bubble with formatting
         appendAiBubble(data.reply);
 
     } catch (e) {
         ui.think.style.display = 'none';
-        appendBubble('ai', "Backend wahala! Confirm your Render app dey active.");
+        appendAiBubble("Backend wahala! Omo, I get small headache. Confirm your Render app dey active.");
     }
 }
-document.getElementById('sendBtn').onclick = sendMessage;
 
-// --- 6. GEMINI-STYLE UI BUBBLES ---
+// Button and Keyboard Triggers
+ui.send.onclick = sendMessage;
+ui.input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+
+// --- 5. MASTERING THE AI BUBBLE (CODE & ACTIONS) ---
 function appendAiBubble(text) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ai-msg-container';
 
-    // THE FIX: Process code blocks and add "Copy" button
-    let formattedText = text.replace(/```(\w+)?([\s\S]*?)```/g, (match, lang, code) => {
+    // Regex to find code blocks and format them with headers
+    let formattedText = text.replace(/```(html|css|js|python)?([\s\S]*?)```/g, (match, lang, code) => {
+        const languageName = lang || 'code';
         return `
             <div class="code-container">
                 <div class="code-header">
-                    <span>${lang || 'code'}</span>
-                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim()}\`)">Copy</button>
+                    <span>${languageName}</span>
+                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`')}\`)">Copy</button>
                 </div>
                 <pre><code>${code.trim()}</code></pre>
             </div>`;
@@ -140,14 +152,13 @@ function appendAiBubble(text) {
     msgDiv.className = 'ai-msg-bubble';
     msgDiv.innerHTML = formattedText;
 
-    // THE FIX: Adding Like, Dislike, Share, Copy buttons
+    // AI Actions (Like, Dislike, Copy)
     const actionDiv = document.createElement('div');
     actionDiv.className = 'ai-actions';
     actionDiv.innerHTML = `
-        <i class="far fa-thumbs-up action-icon" title="Good response"></i>
-        <i class="far fa-thumbs-down action-icon" title="Bad response"></i>
-        <i class="far fa-share-square action-icon" onclick="shareGist(\`${text}\`)"></i>
-        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text}\`)"></i>
+        <i class="far fa-thumbs-up action-icon" title="E make sense"></i>
+        <i class="far fa-thumbs-down action-icon" title="E no follow"></i>
+        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`')}\`)" title="Copy Gist"></i>
     `;
 
     wrapper.appendChild(msgDiv);
@@ -156,7 +167,7 @@ function appendAiBubble(text) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// Basic bubble for User
+// Simple Bubble for User
 function appendBubble(sender, msg) {
     const div = document.createElement('div');
     div.className = sender === 'user' ? 'user-msg-bubble' : 'ai-msg-bubble';
@@ -165,28 +176,28 @@ function appendBubble(sender, msg) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// --- 7. UTILITY FUNCTIONS ---
+// --- 6. UTILITY FUNCTIONS ---
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
-    alert("Oga, e don copy!"); //
+    alert("Oga Emmanuel, e don copy!"); 
 }
 
+// Sidebar History Loader
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
     
-    // Fetch previous chats from Supabase 'chats' table
     const { data: chats } = await sb.from('chats')
         .select('title, id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
     const list = document.querySelector('.feature-list');
-    if (chats) {
-        list.innerHTML = ""; // Clear existing list
+    if (chats && list) {
+        list.innerHTML = ""; 
         chats.forEach(chat => {
             const li = document.createElement('li');
             li.innerHTML = `<i class="fas fa-comment-alt"></i> ${chat.title}`;
-            li.onclick = () => loadSpecificChat(chat.id);
+            li.onclick = () => alert("Logic to load chat " + chat.id + " coming soon!");
             list.appendChild(li);
         });
     }
