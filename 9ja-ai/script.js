@@ -85,18 +85,19 @@ async function sendMessage() {
 
     console.log("Sending message:", text);
     
-    // 1. Show User Message
     appendBubble('user', text);
     chatHistory.push({ role: "user", content: text });
     
-    // Reset UI
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
 
-    // 2. ACTIVATE THINKING SPINNER
     ui.think.style.display = 'flex';
     ui.think.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+    // --- ABORT CONTROLLER SETUP ---
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute timer
 
     try {
         const { data: { user } } = await sb.auth.getUser();
@@ -104,25 +105,33 @@ async function sendMessage() {
         const response = await fetch(`${BACKEND_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal, // Connect the timer to this request
             body: JSON.stringify({ 
                 messages: chatHistory, 
                 user_id: user.id 
             })
         });
 
+        // If we get here, the request finished, so stop the timer
+        clearTimeout(timeoutId);
+
         const data = await response.json();
         
-        // 3. DEACTIVATE SPINNER
         ui.think.style.display = 'none';
-
-        // 4. Save & Display AI response
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
     } catch (e) {
-        console.error("Chat Error:", e);
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Confirm your Render backend dey active.");
+        
+        // Check if the error was specifically a timeout
+        if (e.name === 'AbortError') {
+            console.error("Request timed out after 60s");
+            appendAiBubble("Omo, the server dey take too long to answer. Try again in a small while.");
+        } else {
+            console.error("Chat Error:", e);
+            appendAiBubble("Omo, network wahala! Confirm your Render backend dey active.");
+        }
     }
 }
 
