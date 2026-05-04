@@ -135,25 +135,30 @@ function appendAiBubble(text) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ai-msg-container';
 
-    // THE FIX: We escape the code so < > tags don't disappear
-    let formattedText = text.replace(/```(html|css|js|python)?([\s\S]*?)```/g, (match, lang, code) => {
+    // 1. REGEX FIX: This identifies code blocks more strictly
+    const codeRegex = /```(html|css|js|javascript|python)?([\s\S]*?)```/g;
+    
+    let formattedText = text.replace(codeRegex, (match, lang, code) => {
         const languageName = lang || 'code';
         
-        // Clean the code so it doesn't break the HTML display
-        const cleanCode = code.trim()
+        // 2. HTML ESCAPING: This prevents the "Invisible HTML" problem
+        const escapedCode = code.trim()
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
 
+        // 3. THE FIX: Returning the proper structure with the Header and Copy button
         return `
             <div class="code-container">
                 <div class="code-header">
-                    <span>${languageName}</span>
-                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">Copy</button>
+                    <span>${languageName.toUpperCase()}</span>
+                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
                 </div>
-                <pre><code>${cleanCode}</code></pre>
+                <pre><code>${escapedCode}</code></pre>
             </div>`;
     });
 
@@ -161,27 +166,18 @@ function appendAiBubble(text) {
     msgDiv.className = 'ai-msg-bubble';
     msgDiv.innerHTML = formattedText;
 
-    // AI Actions (Like, Dislike, Copy)
+    // Feedback/Action Icons at the bottom of the bubble
     const actionDiv = document.createElement('div');
     actionDiv.className = 'ai-actions';
     actionDiv.innerHTML = `
         <i class="far fa-thumbs-up action-icon" title="E make sense"></i>
         <i class="far fa-thumbs-down action-icon" title="E no follow"></i>
-        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)" title="Copy Gist"></i>
+        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)" title="Copy Full Gist"></i>
     `;
 
     wrapper.appendChild(msgDiv);
     wrapper.appendChild(actionDiv);
     ui.display.appendChild(wrapper);
-    ui.display.scrollTop = ui.display.scrollHeight;
-}
-
-// Simple Bubble for User
-function appendBubble(sender, msg) {
-    const div = document.createElement('div');
-    div.className = sender === 'user' ? 'user-msg-bubble' : 'ai-msg-bubble';
-    div.innerText = msg;
-    ui.display.appendChild(div);
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
