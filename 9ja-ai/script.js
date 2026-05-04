@@ -1,6 +1,6 @@
 // --- DYNAMIC CONFIGURATION ---
 const BACKEND_URL = "https://nineja-ai-backend-5.onrender.com";
-const SUPABASE_URL = " https://fkizxpuzwuerryoguyyu.supabase.co";
+const SUPABASE_URL = "https://fkizxpuzwuerryoguyyu.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXp4cHV6d3VlcnJ5b2d1eXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTM4NjIsImV4cCI6MjA5MzIyOTg2Mn0.P7plmQphMbXqvF84qIE4iJNJO51wvSUuhWnbXL-frTA";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
