@@ -58,7 +58,6 @@ body {
     letter-spacing: -0.5px; 
 }
 
-/* THE FIX: Profile Picture Circle in Top Right */
 .profile-area {
     width: 38px; 
     height: 38px;
@@ -76,7 +75,6 @@ body {
 .profile-area:hover { border-color: var(--accent); }
 .user-avatar { width: 100%; height: 100%; object-fit: cover; }
 
-/* Icon Buttons (menu, newchat) */
 .icon-btn { 
     background: none; 
     border: none; 
@@ -84,12 +82,11 @@ body {
     font-size: 1.3rem; 
     cursor: pointer; 
 }
-.action-icon:hover { color: var(--accent); }
 
-/* --- CHAT CONTENT (SCROLLABLE AREA) --- */
+/* --- CHAT CONTENT AREA --- */
 .chat-content {
-    margin-top: 75px;    /* Space for Top Bar */
-    margin-bottom: 150px; /* Space for Bottom Input */
+    margin-top: 75px; 
+    margin-bottom: 150px; 
     flex: 1; 
     overflow-y: auto;
     padding: 20px; 
@@ -104,15 +101,35 @@ body {
 .chat-content::-webkit-scrollbar { width: 4px; }
 .chat-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
-/* Message Bubbles */
+/* --- MESSAGE BUBBLES & EDIT ICON --- */
+.user-msg-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align user stuff to the right */
+    margin-bottom: 5px;
+}
+
 .user-msg-bubble {
-    align-self: flex-end; 
     background: #2a2a2a;
     padding: 12px 18px; 
     border-radius: 20px 20px 0 20px;
     max-width: 80%; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     word-wrap: break-word;
+}
+
+.edit-btn {
+    font-size: 11px;
+    color: #666;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-right: 5px;
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.edit-btn:hover {
+    color: var(--accent);
 }
 
 .ai-msg-container {
@@ -128,7 +145,6 @@ body {
     word-wrap: break-word;
 }
 
-/* AI Action Icons (Like, Dislike, Copy) */
 .ai-actions { 
     display: flex; 
     gap: 15px; 
@@ -137,34 +153,29 @@ body {
     font-size: 0.9rem; 
 }
 
-/* --- THE THINKING SPINNER (BOTTOM ALIGNED) --- */
-.thinking-wrapper {
-    display: none; /* Controlled by script.js */
-    align-self: flex-start;
-    flex-direction: column; 
+/* --- GEMINI STYLE THINKING INDICATOR --- */
+#thinkingIndicator {
+    display: none; /* Hidden by default - logic handles this */
     align-items: center;
-    gap: 10px; 
+    gap: 12px;
     padding: 15px 0;
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.9rem;
 }
 
 .spinner {
-    width: 28px; 
-    height: 28px;
+    width: 22px; 
+    height: 22px;
     border: 3px solid rgba(0, 255, 136, 0.1);
     border-top: 3px solid var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
 
-.thinking-text { 
-    font-size: 0.8rem; 
-    color: var(--accent); 
-    font-style: italic; 
-}
-
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* --- FIXED RAINBOW INPUT SECTION --- */
+/* --- RAINBOW INPUT SECTION --- */
 .rainbow-input-section {
     position: fixed; 
     bottom: 0; 
@@ -205,14 +216,7 @@ body {
     outline: none; 
 }
 
-.disclaimer { 
-    font-size: 0.7rem; 
-    color: var(--text-dim); 
-    margin-top: 10px; 
-    text-align: center; 
-}
-
-/* --- BUTTONS --- */
+/* --- BUTTONS & CODE BLOCKS --- */
 .speak-btn, .arrow-send-btn {
     background: #222; 
     border: none; 
@@ -220,22 +224,9 @@ body {
     padding: 8px 15px; 
     border-radius: 20px;
     font-size: 0.85rem; 
-    font-weight: 600;
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
     cursor: pointer;
 }
 
-.attachment-btn { 
-    color: white; 
-    background: none; 
-    border: none; 
-    font-size: 1.2rem; 
-    cursor: pointer;
-}
-
-/* --- GEMINI Style CODE BOXES --- */
 .code-container { 
     background: #000; 
     border-radius: 8px; 
@@ -253,19 +244,10 @@ body {
     color: var(--accent); 
 }
 
-.copy-code-btn { 
-    background: none; 
-    border: none; 
-    color: white; 
-    cursor: pointer; 
-    font-weight: bold;
-}
-
 pre { 
     padding: 15px; 
     overflow-x: auto; 
     font-family: 'Courier New', monospace; 
-    color: #f8f8f2;
 }
 
 /* --- SIDEBAR --- */
@@ -283,9 +265,7 @@ pre {
 }
 
 .sidebar.active { left: 0; }
-
 .feature-list { list-style: none; margin-top: 20px; }
-
 .feature-list li {
     padding: 15px 0;
     border-bottom: 1px solid #222;
