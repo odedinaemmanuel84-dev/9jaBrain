@@ -135,16 +135,25 @@ function appendAiBubble(text) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ai-msg-container';
 
-    // Regex to find code blocks and format them with headers
+    // THE FIX: We escape the code so < > tags don't disappear
     let formattedText = text.replace(/```(html|css|js|python)?([\s\S]*?)```/g, (match, lang, code) => {
         const languageName = lang || 'code';
+        
+        // Clean the code so it doesn't break the HTML display
+        const cleanCode = code.trim()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
         return `
             <div class="code-container">
                 <div class="code-header">
                     <span>${languageName}</span>
-                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`')}\`)">Copy</button>
+                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">Copy</button>
                 </div>
-                <pre><code>${code.trim()}</code></pre>
+                <pre><code>${cleanCode}</code></pre>
             </div>`;
     });
 
@@ -158,7 +167,7 @@ function appendAiBubble(text) {
     actionDiv.innerHTML = `
         <i class="far fa-thumbs-up action-icon" title="E make sense"></i>
         <i class="far fa-thumbs-down action-icon" title="E no follow"></i>
-        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`')}\`)" title="Copy Gist"></i>
+        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)" title="Copy Gist"></i>
     `;
 
     wrapper.appendChild(msgDiv);
