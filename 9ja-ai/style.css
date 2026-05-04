@@ -1,76 +1,118 @@
-/* --- NAIJA AI MASTER STYLE (BOTTOM INPUT + GEMINI UI) --- */
+/* --- NAIJA AI MASTER STYLE (PRO VERSION) --- */
 :root {
     --bg: #0d0d0d;
     --card: #1a1a1a;
     --accent: #00ff88; /* Glowing Green */
     --text: #ffffff;
     --text-dim: #b3b3b3;
+    --border: #222;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
 }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden; /* Only the chat area will scroll */
+body { 
+    background-color: var(--bg); 
+    color: var(--text); 
+    height: 100vh; 
+    width: 100vw; 
+    overflow: hidden; 
 }
 
-/* --- TOP NAVIGATION BAR --- */
+.app-container { 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
+}
+
+/* --- FIXED TOP HEADER AREA --- */
 .main-interface {
-    position: fixed;
-    top: 0;
+    position: fixed; 
+    top: 0; 
     width: 100%;
-    background: var(--bg);
+    background: var(--bg); 
     z-index: 1000;
+    border-bottom: 1px solid var(--border);
+}
+
+.top-nav {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
     padding: 15px 20px;
-    border-bottom: 1px solid #222;
-    display: flex;
-    justify-content: space-between;
+}
+
+.nav-left, .nav-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 18px; 
+}
+
+.logo-brand { 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    letter-spacing: -0.5px; 
+}
+
+/* THE FIX: Profile Picture Circle in Top Right */
+.profile-area {
+    width: 38px; 
+    height: 38px;
+    border-radius: 50%; 
+    overflow: hidden;
+    border: 2px solid #333; 
+    cursor: pointer;
+    transition: 0.3s; 
+    background: #222;
+    display: flex; 
+    justify-content: center; 
     align-items: center;
 }
 
-.logo-brand {
-    font-size: 1.3rem;
-    font-weight: 800;
-}
+.profile-area:hover { border-color: var(--accent); }
+.user-avatar { width: 100%; height: 100%; object-fit: cover; }
 
-.profile-area {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid #333;
-    cursor: pointer;
-    background: #222;
+/* Icon Buttons (menu, newchat) */
+.icon-btn { 
+    background: none; 
+    border: none; 
+    color: white; 
+    font-size: 1.3rem; 
+    cursor: pointer; 
 }
+.action-icon:hover { color: var(--accent); }
 
-/* --- CHAT CONTENT AREA --- */
+/* --- CHAT CONTENT (SCROLLABLE AREA) --- */
 .chat-content {
-    margin-top: 70px;    /* Space for Top Bar */
-    margin-bottom: 140px; /* Space for Bottom Input so messages aren't hidden */
-    flex: 1;
+    margin-top: 75px;    /* Space for Top Bar */
+    margin-bottom: 150px; /* Space for Bottom Input */
+    flex: 1; 
     overflow-y: auto;
-    padding: 20px;
+    padding: 20px; 
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
     gap: 20px;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* --- MESSAGE BUBBLES --- */
+/* Custom Scrollbar */
+.chat-content::-webkit-scrollbar { width: 4px; }
+.chat-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+/* Message Bubbles */
 .user-msg-bubble {
-    align-self: flex-end;
+    align-self: flex-end; 
     background: #2a2a2a;
-    padding: 12px 18px;
+    padding: 12px 18px; 
     border-radius: 20px 20px 0 20px;
-    max-width: 80%;
+    max-width: 80%; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    word-wrap: break-word;
 }
 
 .ai-msg-container {
@@ -81,43 +123,12 @@ body {
 }
 
 .ai-msg-bubble {
-    line-height: 1.6;
-    font-size: 1.05rem;
+    line-height: 1.6; 
+    font-size: 1.05rem; 
+    word-wrap: break-word;
 }
 
-/* --- GEMINI CODE BOXES --- */
-.code-container {
-    background: #000;
-    border-radius: 8px;
-    margin: 15px 0;
-    border: 1px solid #333;
-    overflow: hidden;
-}
-
-.code-header {
-    background: #2d2d2d;
-    padding: 8px 15px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: var(--accent);
-}
-
-.copy-code-btn { 
-    background: none; 
-    border: none; 
-    color: white; 
-    cursor: pointer; 
-    font-weight: bold;
-}
-
-pre {
-    padding: 15px;
-    overflow-x: auto;
-    font-family: 'Courier New', monospace;
-}
-
-/* --- AI ACTION BUTTONS (Like, Dislike, etc) --- */
+/* AI Action Icons (Like, Dislike, Copy) */
 .ai-actions { 
     display: flex; 
     gap: 15px; 
@@ -126,24 +137,19 @@ pre {
     font-size: 0.9rem; 
 }
 
-.action-icon:hover { 
-    color: var(--accent); 
-    cursor: pointer; 
-}
-
-/* --- THINKING SPINNER + TEXT --- */
+/* --- THE THINKING SPINNER (BOTTOM ALIGNED) --- */
 .thinking-wrapper {
     display: none; /* Controlled by script.js */
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
     align-self: flex-start;
-    padding: 10px 0;
+    flex-direction: column; 
+    align-items: center;
+    gap: 10px; 
+    padding: 15px 0;
 }
 
 .spinner {
-    width: 22px;
-    height: 22px;
+    width: 28px; 
+    height: 28px;
     border: 3px solid rgba(0, 255, 136, 0.1);
     border-top: 3px solid var(--accent);
     border-radius: 50%;
@@ -156,86 +162,124 @@ pre {
     font-style: italic; 
 }
 
-@keyframes spin {
-    100% { transform: rotate(360deg); }
-}
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* --- RAINBOW INPUT SECTION (FIXED BOTTOM) --- */
+/* --- FIXED RAINBOW INPUT SECTION --- */
 .rainbow-input-section {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
     width: 100%;
     padding: 15px 20px 30px 20px;
-    background: var(--bg);
+    background: var(--bg); 
     z-index: 1000;
 }
 
 .rainbow-border-box {
-    padding: 2px;
+    padding: 2px; 
     border-radius: 30px;
     background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
-    background-size: 400%;
+    background-size: 400%; 
     animation: moveRainbow 8s linear infinite;
-    max-width: 800px;
+    max-width: 800px; 
     margin: 0 auto;
 }
 
-@keyframes moveRainbow {
-    0% { background-position: 0%; }
-    100% { background-position: 400%; }
-}
+@keyframes moveRainbow { 0% { background-position: 0%; } 100% { background-position: 400%; } }
 
 .input-container {
-    background: #111;
+    background: #111; 
     border-radius: 28px;
-    display: flex;
+    display: flex; 
     align-items: center;
-    padding: 8px 12px;
+    padding: 8px 12px; 
     gap: 10px;
 }
 
-#userInput {
-    flex: 1;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1rem;
-    outline: none;
+#userInput { 
+    flex: 1; 
+    background: none; 
+    border: none; 
+    color: white; 
+    font-size: 1rem; 
+    outline: none; 
 }
 
-.send-btn {
-    background: var(--accent);
-    color: black;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
+.disclaimer { 
+    font-size: 0.7rem; 
+    color: var(--text-dim); 
+    margin-top: 10px; 
+    text-align: center; 
+}
+
+/* --- BUTTONS --- */
+.speak-btn, .arrow-send-btn {
+    background: #222; 
+    border: none; 
+    color: white;
+    padding: 8px 15px; 
+    border-radius: 20px;
+    font-size: 0.85rem; 
+    font-weight: 600;
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
     cursor: pointer;
 }
 
-.disclaimer {
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    margin-top: 10px;
-    text-align: center;
+.attachment-btn { 
+    color: white; 
+    background: none; 
+    border: none; 
+    font-size: 1.2rem; 
+    cursor: pointer;
+}
+
+/* --- GEMINI Style CODE BOXES --- */
+.code-container { 
+    background: #000; 
+    border-radius: 8px; 
+    margin: 15px 0; 
+    border: 1px solid #333; 
+    overflow: hidden; 
+}
+
+.code-header { 
+    background: #2d2d2d; 
+    padding: 8px 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 0.8rem; 
+    color: var(--accent); 
+}
+
+.copy-code-btn { 
+    background: none; 
+    border: none; 
+    color: white; 
+    cursor: pointer; 
+    font-weight: bold;
+}
+
+pre { 
+    padding: 15px; 
+    overflow-x: auto; 
+    font-family: 'Courier New', monospace; 
+    color: #f8f8f2;
 }
 
 /* --- SIDEBAR --- */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px;
-    width: 260px;
-    height: 100%;
-    background: #111;
-    border-right: 1px solid #222;
-    transition: 0.3s ease;
-    z-index: 2000;
-    padding: 25px;
+.sidebar { 
+    position: fixed; 
+    top: 0; 
+    left: -280px; 
+    width: 260px; 
+    height: 100%; 
+    background: #111; 
+    border-right: 1px solid #222; 
+    transition: 0.3s ease; 
+    z-index: 2000; 
+    padding: 25px; 
 }
 
 .sidebar.active { left: 0; }
@@ -251,6 +295,3 @@ pre {
     gap: 12px;
     color: var(--text-dim);
 }
-
-.chat-content::-webkit-scrollbar { width: 4px; }
-.chat-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
