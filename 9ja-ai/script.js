@@ -74,18 +74,26 @@ async function sendMessage() {
     if (!text) return;
 
     if (currentlyEditingId) {
+        // 1. Update the User's text in the UI
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // --- THE FIX: REMOVE OLD REPLIES AFTER EDIT ---
+        // 2. THE WIPER: Delete EVERY bubble that exists after this edited message
+        // This ensures the "Oga, make I no..." and everything below it disappears.
         let nextElement = userWrapper.nextElementSibling;
-        while (nextElement && nextElement !== ui.think) {
+        while (nextElement) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
-            toDelete.remove(); 
+            
+            // Don't delete the thinking indicator, just hide it for now
+            if (toDelete === ui.think) {
+                toDelete.style.display = 'none';
+            } else {
+                toDelete.remove();
+            }
         }
 
-        // Update memory so AI knows you changed your mind
+        // 3. Update Memory: Remove all old history after this message
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
@@ -93,17 +101,19 @@ async function sendMessage() {
         }
 
         currentlyEditingId = null;
-        ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>'; // Reset to your arrow icon
+        ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
         const msgId = 'msg-' + Date.now();
         appendBubble('user', text, msgId);
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
-    // UI Feedback
+    // Prepare for the new AI reply
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
+    
+    // Move thinking indicator to the bottom and show it
     ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
     ui.display.scrollTop = ui.display.scrollHeight;
@@ -121,6 +131,9 @@ async function sendMessage() {
 
         const data = await response.json();
         ui.think.style.display = 'none';
+        
+        // 4. Add the NEW reply (e.g., the Sonic reply)
+        // It will now appear exactly where the old one used to be!
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
