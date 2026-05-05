@@ -31,27 +31,42 @@ async function init() {
 
 // --- 2. ACTIVATION (LOGOUT IS HERE!) ---
 function activateTriggers() {
-    // Logout Logic
+    // 1. Logout Logic (Matches id="logoutBtn")
     if (ui.logout) {
-        ui.logout.onclick = async () => {
+        ui.logout.onclick = async (e) => {
+            e.preventDefault(); // Stops any default link behavior
             await sb.auth.signOut();
             window.location.href = "auth.html";
         };
     }
 
-    ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
-    ui.input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
+    // 2. Send Message Button
+    ui.send.onclick = (e) => { 
+        e.preventDefault(); 
+        sendMessage(); 
+    };
+
+    // 3. Enter Key Logic
+    ui.input.onkeydown = (e) => { 
+        if (e.key === 'Enter') { 
+            e.preventDefault(); 
+            sendMessage(); 
+        } 
+    };
     
+    // 4. Icon Toggle (Voice vs Send)
     ui.input.oninput = () => {
         const hasText = ui.input.value.trim() !== "";
         ui.voice.style.display = hasText ? "none" : "flex";
         ui.send.style.display = hasText ? "flex" : "none";
     };
 
-    document.getElementById('menuBtn').onclick = () => ui.sidebar.classList.add('active');
-    document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
-}
-
+    // 5. Sidebar Open/Close
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeSidebar');
+    if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
+    if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
+} // <--- Don't forget this closing bracket!
 // --- 3. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
