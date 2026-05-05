@@ -14,7 +14,8 @@ const ui = {
     voice: document.getElementById('voiceBtn'),
     send: document.getElementById('sendBtn'),
     pfp: document.getElementById('userImg'),
-    sidebar: document.getElementById('sidebar')
+    sidebar: document.getElementById('sidebar'),
+    logout: document.getElementById('logoutBtn') // MAKE SURE YOUR HTML HAS id="logoutBtn"
 };
 
 // --- 1. INITIALIZATION ---
@@ -28,8 +29,16 @@ async function init() {
     activateTriggers(); 
 }
 
-// --- 2. ACTIVATION ---
+// --- 2. ACTIVATION (LOGOUT IS HERE!) ---
 function activateTriggers() {
+    // Logout Logic
+    if (ui.logout) {
+        ui.logout.onclick = async () => {
+            await sb.auth.signOut();
+            window.location.href = "auth.html";
+        };
+    }
+
     ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
     ui.input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
     
@@ -43,17 +52,15 @@ function activateTriggers() {
     document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
 }
 
-// --- 3. THE BRAIN (WIPE & REGENERATE LOGIC) ---
+// --- 3. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
     if (currentlyEditingId) {
-        // --- GEMINI STYLE: WIPE EVERYTHING BELOW ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 1. Remove all messages (User & AI) that appear after this edited bubble
         let nextElement = userWrapper.nextElementSibling;
         while (nextElement && nextElement !== ui.think) {
             let toDelete = nextElement;
@@ -61,41 +68,33 @@ async function sendMessage() {
             toDelete.remove();
         }
 
-        // 2. Cut the History Array so the AI forgets everything after this message
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
-            // This is the key: keep only from start up to the edited message
             chatHistory = chatHistory.slice(0, index + 1); 
         }
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-paper-plane"></i>';
     } else {
-        // Normal New Message
         const msgId = 'msg-' + Date.now();
         appendBubble('user', text, msgId);
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
-    // Reset Input
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
-
-    // Position thinking indicator and show it
     ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
     ui.display.scrollTop = ui.display.scrollHeight;
 
     try {
         const { data: { user } } = await sb.auth.getUser();
-        
         const response = await fetch(`${BACKEND_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                // We send the cleaned history so the AI doesn't see old "Sonic" chats
                 messages: chatHistory.map(({role, content}) => ({role, content})), 
                 user_id: user.id 
             })
@@ -103,22 +102,20 @@ async function sendMessage() {
 
         const data = await response.json();
         ui.think.style.display = 'none';
-        
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
     } catch (e) {
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Check your connection.");
+        appendAiBubble("Omo, network wahala! Check your server.");
     }
 }
 
-// --- 4. UI BUILDERS ---
+// --- 4. UI BUBBLES ---
 function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
-
     wrapper.innerHTML = `
         <div class="user-msg-bubble">${msg}</div>
         <div class="edit-btn" onclick="startEditing('${id}')">
@@ -126,7 +123,6 @@ function appendBubble(sender, msg, id) {
         </div>
     `;
     ui.display.appendChild(wrapper);
-    ui.display.scrollTop = ui.display.scrollHeight;
 }
 
 function startEditing(id) {
@@ -143,23 +139,15 @@ function startEditing(id) {
 function appendAiBubble(text) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ai-msg-container';
-
-    const codeRegex = /```(html|css|js|javascript|python)?([\s\S]*?)```/g;
-    let formattedText = text.replace(codeRegex, (match, lang, code) => {
-        const escapedCode = code.trim().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        return `<div class="code-container"><pre><code>${escapedCode}</code></pre></div>`;
-    });
-
     const msgDiv = document.createElement('div');
     msgDiv.className = 'ai-msg-bubble';
-    msgDiv.innerHTML = formattedText;
-
+    msgDiv.innerHTML = text; // Simplify for now
     wrapper.appendChild(msgDiv);
     ui.display.appendChild(wrapper);
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// --- 5. HISTORY ---
+// --- 5. UTILS ---
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
