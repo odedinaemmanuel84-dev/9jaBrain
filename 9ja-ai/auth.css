@@ -1,120 +1,127 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@500;700&display=swap');
-
 :root {
-    /* Sophisticated Modern Palette */
-    --primary: #10b981;      /* A more balanced, premium Emerald green */
-    --primary-soft: #d1fae5;
-    --bg: #09090b;           /* Deep obsidian black */
-    --card: #18181b;         /* Zinc dark grey */
-    --text-main: #fafafa;
-    --text-dim: #a1a1aa;
-    --border: rgba(255, 255, 255, 0.08);
+    --primary: #10b981; /* Sophisticated Green */
+    --primary-hover: #059669;
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --error: #ef4444;
 }
 
 body {
-    background-color: var(--bg);
+    background: var(--bg);
     color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    font-family: 'Inter', -apple-system, sans-serif;
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     overflow: hidden;
 }
 
-/* Modern Logo - "Outfit" font for that tech look */
-.logo-area {
-    margin-bottom: 30px;
+.auth-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
 }
 
-.logo-icon {
-    font-family: 'Outfit', sans-serif;
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: -1.5px;
-    background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-h1 { 
-    font-family: 'Outfit', sans-serif;
-    margin-top: 10px;
-    font-size: 1.5rem;
-    letter-spacing: -0.5px;
-}
-
-/* Glass-morphism Card */
 .auth-card {
-    background: var(--card);
+    background: var(--surface);
     padding: 40px;
     border-radius: 24px;
-    width: 100%;
-    max-width: 400px;
-    border: 1px solid var(--border);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.tabs {
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.modern-logo {
     display: flex;
-    background: #000;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+.auth-tabs {
+    display: flex;
+    background: rgba(15, 23, 42, 0.5);
     padding: 4px;
     border-radius: 12px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
-.tabs button {
+.tab-btn {
     flex: 1;
     padding: 10px;
     border: none;
     background: transparent;
     color: var(--text-dim);
-    font-weight: 600;
-    font-size: 0.9rem;
     cursor: pointer;
-    border-radius: 9px;
-    transition: all 0.2s ease;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: 0.2s;
 }
 
-.tabs button.active {
-    background: var(--primary);
-    color: #fff;
+.tab-btn.active {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Input Fields */
-.input-group {
-    position: relative;
-    margin-bottom: 16px;
+.input-container {
+    margin-bottom: 20px;
+    text-align: left;
 }
 
-.input-group i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+.input-container label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
     color: var(--text-dim);
-    font-size: 0.9rem;
 }
 
-input {
+.input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-box i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-dim);
+}
+
+.input-box input {
     width: 100%;
-    padding: 14px 14px 14px 48px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border);
+    padding: 12px 12px 12px 42px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    color: #fff;
-    font-size: 0.95rem;
-    transition: border-color 0.2s;
-}
-
-input:focus {
+    color: white;
     outline: none;
-    border-color: var(--primary);
-    background: rgba(16, 185, 129, 0.05);
+    transition: 0.2s;
 }
 
-button[type="submit"] {
+.input-box input:focus {
+    border-color: var(--primary);
+    background: rgba(15, 23, 42, 0.8);
+}
+
+.primary-btn {
     width: 100%;
     padding: 14px;
     background: var(--primary);
@@ -124,27 +131,38 @@ button[type="submit"] {
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
+    transition: 0.3s;
     margin-top: 10px;
-    transition: transform 0.1s, filter 0.2s;
 }
 
-button[type="submit"]:hover {
-    filter: brightness(1.1);
+.primary-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-button[type="submit"]:active {
-    transform: scale(0.98);
+/* Feature Marquee */
+.marquee-container {
+    margin-top: 40px;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
 }
 
-/* Moving Features (Bottom) */
-.features-wrapper {
-    margin-top: 50px;
-    opacity: 0.6;
+.marquee-content {
+    display: flex;
+    white-space: nowrap;
+    gap: 30px;
+    animation: scroll 30s linear infinite;
 }
 
-.features-track span {
-    font-size: 0.85rem;
+.marquee-content span {
     color: var(--text-dim);
-    font-weight: 500;
-    margin: 0 25px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
 }
