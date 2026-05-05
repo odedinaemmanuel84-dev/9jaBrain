@@ -3,55 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naija AI | Welcome</title>
-    <link rel="stylesheet" href="auth-style.css">
+    <title>Naija AI - Join the Gist</title>
+    <link rel="stylesheet" href="auth.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
     <div class="auth-container">
-        <!-- Brand Section -->
-        <div class="brand-header">
-            <div class="logo">
-                <span class="logo-icon"><i class="fas fa-bolt"></i></span>
-                <h1>Naija <span>AI</span></h1>
-            </div>
-            <p class="tagline">The smartest way to gist and learn.</p>
+        <!-- Modern Logo -->
+        <div class="logo-area">
+            <div class="logo-icon">N<span>AI</span></div>
+            <h1>Naija AI</h1>
+            <p>The smartest way to gist.</p>
         </div>
 
-        <!-- Form Card -->
+        <!-- Auth Card -->
         <div class="auth-card">
             <div class="tabs">
-                <button id="loginTab" class="active">Login</button>
-                <button id="registerTab">Register</button>
+                <button id="loginTab" class="active" onclick="toggleAuth('login')">Login</button>
+                <button id="registerTab" onclick="toggleAuth('register')">Register</button>
             </div>
 
             <form id="authForm">
+                <div id="nameField" class="input-group" style="display: none;">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="fullName" placeholder="Full Name">
+                </div>
+
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
                     <input type="email" id="email" placeholder="Email Address" required>
                 </div>
+
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="Password" required>
                 </div>
-                <button type="submit" id="submitBtn">Get Started</button>
+
+                <div class="form-footer">
+                    <a href="#" class="forgot-pass">Forgot Password?</a>
+                </div>
+
+                <button type="submit" id="authBtn">Welcome Back</button>
             </form>
+            <p id="authMsg"></p>
         </div>
 
-        <!-- Moving Features Section -->
-        <div class="features-slider">
-            <div class="slider-track">
-                <span><i class="fas fa-check-circle"></i> Smart Pidgin Responses</span>
-                <span><i class="fas fa-code"></i> Code Assistant</span>
-                <span><i class="fas fa-bolt"></i> Fast & Reliable</span>
-                <span><i class="fas fa-shield-alt"></i> Secure Chats</span>
-                <span><i class="fas fa-pen-nib"></i> Content Writing</span>
-                <!-- Duplicate for seamless loop -->
-                <span><i class="fas fa-check-circle"></i> Smart Pidgin Responses</span>
-                <span><i class="fas fa-code"></i> Code Assistant</span>
-                <span><i class="fas fa-bolt"></i> Fast & Reliable</span>
+        <!-- Moving Features Carousel -->
+        <div class="features-wrapper">
+            <div class="features-track">
+                <span><i class="fas fa-bolt"></i> Real-time Pidgin Gist</span>
+                <span><i class="fas fa-code"></i> Smart Code Assistant</span>
+                <span><i class="fas fa-brain"></i> Deep Thinking Logic</span>
+                <span><i class="fas fa-shield-alt"></i> Secure Data</span>
+                <span><i class="fas fa-bolt"></i> Real-time Pidgin Gist</span>
+                <span><i class="fas fa-code"></i> Smart Code Assistant</span>
             </div>
         </div>
     </div>
+
+    <script src="auth.js"></script>
 </body>
 </html>
