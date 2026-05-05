@@ -103,11 +103,12 @@ body {
 
 /* --- MESSAGE BUBBLES & EDITING --- */
 .user-msg-container {
-    align-self: flex-end;
+    align-self: flex-end; /* This keeps it on the right */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     max-width: 80%;
+    width: fit-content; /* FIX: Prevents container from stretching to 100% width */
 }
 
 .user-msg-bubble {
@@ -117,6 +118,7 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     word-wrap: break-word;
     color: white;
+    text-align: left; /* Keeps text inside bubble aligned left */
 }
 
 .edit-btn {
