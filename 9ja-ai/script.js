@@ -66,7 +66,8 @@ function activateTriggers() {
     const closeBtn = document.getElementById('closeSidebar');
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
-} // <--- Don't forget this closing bracket!
+} 
+
 // --- 3. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
