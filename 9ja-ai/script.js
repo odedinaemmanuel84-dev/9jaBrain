@@ -118,23 +118,24 @@ async function sendMessage() {
     }
 }
 
-// --- 4. MASTERING THE BUBBLES ---
-
-// FIXED: Now uses the container to push to the right
+// --- UPDATED USER BUBBLE ---
 function appendBubble(sender, msg) {
     if (sender === 'user') {
         const wrapper = document.createElement('div');
-        wrapper.className = 'user-msg-container'; // This forces it to the right
+        wrapper.className = 'user-msg-container';
+
+        // We use a unique ID so we can find this specific bubble later to change it
+        const bubbleId = 'msg-' + Date.now();
+        wrapper.id = bubbleId;
 
         wrapper.innerHTML = `
             <div class="user-msg-bubble">${msg}</div>
-            <div class="edit-btn" onclick="editLastMessage('${msg.replace(/'/g, "\\'")}')">
-                <i class="fas fa-pen"></i> Edit
+            <div class="edit-btn" onclick="startEditing('${bubbleId}')">
+                <i class="fas fa-pen" style="font-size: 12px;"></i>
             </div>
         `;
         ui.display.appendChild(wrapper);
     } else {
-        // Fallback for simple AI messages if needed
         const div = document.createElement('div');
         div.className = 'ai-msg-bubble';
         div.innerText = msg;
@@ -143,45 +144,54 @@ function appendBubble(sender, msg) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-function appendAiBubble(text) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ai-msg-container';
+// --- NEW EDITING LOGIC ---
+let currentlyEditingId = null;
 
-    const codeRegex = /```(html|css|js|javascript|python)?([\s\S]*?)```/g;
+function startEditing(id) {
+    const wrapper = document.getElementById(id);
+    const oldText = wrapper.querySelector('.user-msg-bubble').innerText;
     
-    let formattedText = text.replace(codeRegex, (match, lang, code) => {
-        const languageName = lang || 'code';
-        const escapedCode = code.trim()
-            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // Put text in input and focus
+    ui.input.value = oldText;
+    ui.input.focus();
+    
+    // Remember which bubble we are changing
+    currentlyEditingId = id;
+    
+    // Change Send Icon to a "Checkmark" or Update icon if you want
+    ui.send.innerHTML = '<i class="fas fa-check"></i>'; 
+}
 
-        return `
-            <div class="code-container">
-                <div class="code-header">
-                    <span>${languageName.toUpperCase()}</span>
-                    <button class="copy-code-btn" onclick="copyToClipboard(\`${code.trim().replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">
-                        <i class="far fa-copy"></i> Copy
-                    </button>
-                </div>
-                <pre><code>${escapedCode}</code></pre>
-            </div>`;
-    });
+// Update the sendMessage function to handle the "Update"
+async function sendMessage() {
+    const text = ui.input.value.trim();
+    if (!text) return;
 
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'ai-msg-bubble';
-    msgDiv.innerHTML = formattedText;
+    if (currentlyEditingId) {
+        // --- CASE: UPDATING EXISTING MESSAGE ---
+        const wrapper = document.getElementById(currentlyEditingId);
+        wrapper.querySelector('.user-msg-bubble').innerText = text;
+        
+        // Update chat history memory too
+        const index = Array.from(ui.display.children).indexOf(wrapper);
+        if(chatHistory[index]) chatHistory[index].content = text;
 
-    const actionDiv = document.createElement('div');
-    actionDiv.className = 'ai-actions';
-    actionDiv.innerHTML = `
-        <i class="far fa-thumbs-up action-icon"></i>
-        <i class="far fa-thumbs-down action-icon"></i>
-        <i class="far fa-copy action-icon" onclick="copyToClipboard(\`${text.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)"></i>
-    `;
-
-    wrapper.appendChild(msgDiv);
-    wrapper.appendChild(actionDiv);
-    ui.display.appendChild(wrapper);
-    ui.display.scrollTop = ui.display.scrollHeight;
+        // Reset editing state
+        currentlyEditingId = null;
+        ui.send.innerHTML = '<i class="fas fa-paper-plane"></i>'; // Reset icon
+    } else {
+        // --- CASE: NEW MESSAGE ---
+        appendBubble('user', text);
+        chatHistory.push({ role: "user", content: text });
+    }
+    
+    // ... rest of your existing sendMessage code (the fetch part) ...
+    ui.input.value = "";
+    ui.send.style.display = "none";
+    ui.voice.style.display = "flex";
+    
+    // Run the AI part again for the new/edited text
+    processAiResponse(); 
 }
 
 // --- 5. UTILITY FUNCTIONS ---
