@@ -43,51 +43,47 @@ function activateTriggers() {
     document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
 }
 
-// --- 3. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
+// --- 3. THE BRAIN (WIPE & REGENERATE LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
     if (currentlyEditingId) {
-        // --- GEMINI STYLE DISAPPEARANCE ---
+        // --- GEMINI STYLE: WIPE EVERYTHING BELOW ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 1. Remove everything below this edited message immediately
+        // 1. Remove all messages (User & AI) that appear after this edited bubble
         let nextElement = userWrapper.nextElementSibling;
-        while (nextElement) {
+        while (nextElement && nextElement !== ui.think) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
-            // Don't delete the thinking indicator itself, just hide it or skip it
-            if (toDelete !== ui.think) {
-                toDelete.remove();
-            } else {
-                break; // Stop when we hit the thinking indicator area
-            }
+            toDelete.remove();
         }
 
-        // 2. Wipe history from memory for a fresh context
+        // 2. Cut the History Array so the AI forgets everything after this message
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
-            chatHistory = chatHistory.slice(0, index + 1); // Keep only up to the edited message
+            // This is the key: keep only from start up to the edited message
+            chatHistory = chatHistory.slice(0, index + 1); 
         }
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-paper-plane"></i>';
     } else {
-        // New Message
+        // Normal New Message
         const msgId = 'msg-' + Date.now();
         appendBubble('user', text, msgId);
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
-    // Reset UI
+    // Reset Input
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
 
-    // Show thinking indicator at the bottom of the new/edited stack
+    // Position thinking indicator and show it
     ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
     ui.display.scrollTop = ui.display.scrollHeight;
@@ -99,6 +95,7 @@ async function sendMessage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
+                // We send the cleaned history so the AI doesn't see old "Sonic" chats
                 messages: chatHistory.map(({role, content}) => ({role, content})), 
                 user_id: user.id 
             })
@@ -112,11 +109,11 @@ async function sendMessage() {
 
     } catch (e) {
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Refresh your page.");
+        appendAiBubble("Omo, network wahala! Check your connection.");
     }
 }
 
-// --- 4. BUBBLE UI ---
+// --- 4. UI BUILDERS ---
 function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
