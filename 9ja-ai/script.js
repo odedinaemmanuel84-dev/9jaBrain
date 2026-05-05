@@ -10,7 +10,7 @@ let currentlyEditingId = null;
 const ui = {
     input: document.getElementById('userInput'),
     display: document.getElementById('chatDisplay'),
-    think: document.getElementById('thinkingIndicator'),
+    think: document.getElementById('thinkingIndicator'), // Make sure this ID exists in your HTML
     voice: document.getElementById('voiceBtn'),
     send: document.getElementById('sendBtn'),
     pfp: document.getElementById('userImg'),
@@ -43,37 +43,49 @@ function activateTriggers() {
     document.getElementById('closeSidebar').onclick = () => ui.sidebar.classList.remove('active');
 }
 
-// --- 3. THE BRAIN (SEND & EDIT & AI RESPONSE) ---
+// --- 3. THE BRAIN (SEND & EDIT & RESET LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
     if (currentlyEditingId) {
-        // --- CASE: UPDATING EXISTING MESSAGE ---
-        const wrapper = document.getElementById(currentlyEditingId);
-        wrapper.querySelector('.user-msg-bubble').innerText = text;
+        // 1. Update edited bubble
+        const userWrapper = document.getElementById(currentlyEditingId);
+        userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // Update history memory
+        // 2. Clear old AI response following this message
+        let nextElement = userWrapper.nextElementSibling;
+        while (nextElement && nextElement !== ui.think) {
+            let toDelete = nextElement;
+            nextElement = nextElement.nextElementSibling;
+            toDelete.remove();
+        }
+
+        // 3. Reset history from that point
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
-        if (index !== -1) chatHistory[index].content = text;
+        if (index !== -1) {
+            chatHistory[index].content = text;
+            chatHistory.splice(index + 1); 
+        }
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-paper-plane"></i>';
     } else {
-        // --- CASE: NEW MESSAGE ---
         const msgId = 'msg-' + Date.now();
         appendBubble('user', text, msgId);
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
-    // Prepare UI for AI
+    // UI Cleanup
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
+
+    // RESTORED: Move thinking indicator to the very bottom and show it
+    ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
     ui.display.scrollTop = ui.display.scrollHeight;
 
-    // --- CALL BACKEND ---
     try {
         const { data: { user } } = await sb.auth.getUser();
         
@@ -87,6 +99,8 @@ async function sendMessage() {
         });
 
         const data = await response.json();
+        
+        // Hide thinking after reply arrives
         ui.think.style.display = 'none';
         
         chatHistory.push({ role: "assistant", content: data.reply });
@@ -94,7 +108,7 @@ async function sendMessage() {
 
     } catch (e) {
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Confirm your Render backend dey active.");
+        appendAiBubble("Omo, network wahala! Check your backend.");
     }
 }
 
@@ -147,6 +161,7 @@ function appendAiBubble(text) {
 // --- 5. UTILS ---
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
+    if(!user) return;
     const { data: chats } = await sb.from('chats').select('title, id').eq('user_id', user.id).order('created_at', { ascending: false });
     const list = document.querySelector('.feature-list');
     if (chats && list) {
