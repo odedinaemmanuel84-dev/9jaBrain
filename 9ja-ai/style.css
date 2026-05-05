@@ -311,3 +311,28 @@ pre {
     position: relative; /* Needed for the pencil positioning */
     margin-left: auto;
 }
+
+.rainbow-input-section {
+    padding: 10px 15px 20px 15px; /* Added bottom padding for space */
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.rainbow-border-box {
+    width: 100%;
+    max-width: 800px; /* Limits width on larger screens like Gemini */
+    /* Keep your existing rainbow glow styles here */
+}
+
+.disclaimer {
+    font-size: 11px;
+    color: #9aa0a6; /* Subtle grey like Gemini */
+    text-align: center;
+    margin: 0;
+    padding: 4px 0;
+    font-family: sans-serif;
+    letter-spacing: 0.2px;
+}
