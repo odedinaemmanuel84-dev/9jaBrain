@@ -77,13 +77,15 @@ async function sendMessage() {
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
+        // --- THE FIX: REMOVE OLD REPLIES AFTER EDIT ---
         let nextElement = userWrapper.nextElementSibling;
         while (nextElement && nextElement !== ui.think) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
-            toDelete.remove();
+            toDelete.remove(); 
         }
 
+        // Update memory so AI knows you changed your mind
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
@@ -91,13 +93,14 @@ async function sendMessage() {
         }
 
         currentlyEditingId = null;
-        ui.send.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>'; // Reset to your arrow icon
     } else {
         const msgId = 'msg-' + Date.now();
         appendBubble('user', text, msgId);
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
+    // UI Feedback
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
