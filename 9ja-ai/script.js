@@ -15,7 +15,7 @@ const ui = {
     send: document.getElementById('sendBtn'),
     pfp: document.getElementById('userImg'),
     sidebar: document.getElementById('sidebar'),
-    logout: document.getElementById('logoutBtn') // MAKE SURE YOUR HTML HAS id="logoutBtn"
+    logout: document.getElementById('logoutBtn')
 };
 
 // --- 1. INITIALIZATION ---
@@ -29,12 +29,12 @@ async function init() {
     activateTriggers(); 
 }
 
-// --- 2. ACTIVATION (LOGOUT IS HERE!) ---
+// --- 2. ACTIVATION ---
 function activateTriggers() {
-    // 1. Logout Logic (Matches id="logoutBtn")
+    // 1. Logout Logic
     if (ui.logout) {
         ui.logout.onclick = async (e) => {
-            e.preventDefault(); // Stops any default link behavior
+            e.preventDefault();
             await sb.auth.signOut();
             window.location.href = "auth.html";
         };
@@ -157,7 +157,7 @@ function appendAiBubble(text) {
     wrapper.className = 'ai-msg-container';
     const msgDiv = document.createElement('div');
     msgDiv.className = 'ai-msg-bubble';
-    msgDiv.innerHTML = text; // Simplify for now
+    msgDiv.innerHTML = text; 
     wrapper.appendChild(msgDiv);
     ui.display.appendChild(wrapper);
     ui.display.scrollTop = ui.display.scrollHeight;
