@@ -40,26 +40,23 @@
         </main>
 
         <!-- FIXED BOTTOM INPUT: Rainbow glow and clean buttons -->
-        <footer class="rainbow-input-section">
-            <div class="rainbow-border-box">
-                <div class="input-container">
-                    <!-- Attachment button -->
-                    <label for="imageUpload" class="action-btn attachment-btn"><i class="fas fa-paperclip"></i></label>
-                    <input type="file" id="imageUpload" hidden accept="image/*">
-                    
-                    <!-- Main Text Box -->
-                    <input type="text" id="userInput" placeholder="Gist with Naija AI..." autocomplete="off">
-                    
-                    <!-- Dynamic Speak/Send Toggle -->
-                    <div class="input-actions">
-                        <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
-                        <!-- Send arrow now matches the Speak button design -->
-                        <button id="sendBtn" class="arrow-send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
-                    </div>
-                </div>
+       <footer class="rainbow-input-section">
+    <div class="rainbow-border-box">
+        <div class="input-container">
+            <label for="imageUpload" class="action-btn attachment-btn"><i class="fas fa-paperclip"></i></label>
+            <input type="file" id="imageUpload" hidden accept="image/*">
+            
+            <input type="text" id="userInput" placeholder="Gist with Naija AI..." autocomplete="off">
+            
+            <div class="input-actions">
+                <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
+                <button id="sendBtn" class="arrow-send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
             </div>
-            <p class="disclaimer">Confirm gist before you carry am go.</p>
-        </footer>
+        </div>
+    </div>
+    <!-- Adjusted Disclaimer Position -->
+    <p class="disclaimer">Confirm gist before you carry am go.</p>
+</footer>
 
         <!-- SIDEBAR MENU -->
         <div id="sidebar" class="sidebar">
