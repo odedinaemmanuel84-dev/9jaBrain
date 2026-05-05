@@ -4,28 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naija AI | Welcome</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="auth-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="auth-body">
-    <!-- Faded Moving Background Images -->
-    <div class="bg-slider">
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995');"></div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa');"></div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485');"></div>
-    </div>
-
+<body>
     <div class="auth-container">
-        <h1 class="logo-text">Naija AI</h1>
-        <div id="authForm" class="auth-card">
-            <h2 id="authTitle">Login</h2>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="password" placeholder="Password">
-            <button id="authBtn">Enter Gist</button>
-            <p id="toggleAuth">No get account? <b>Register here</b></p>
+        <!-- Brand Section -->
+        <div class="brand-header">
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-bolt"></i></span>
+                <h1>Naija <span>AI</span></h1>
+            </div>
+            <p class="tagline">The smartest way to gist and learn.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="auth-card">
+            <div class="tabs">
+                <button id="loginTab" class="active">Login</button>
+                <button id="registerTab">Register</button>
+            </div>
+
+            <form id="authForm">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <button type="submit" id="submitBtn">Get Started</button>
+            </form>
+        </div>
+
+        <!-- Moving Features Section -->
+        <div class="features-slider">
+            <div class="slider-track">
+                <span><i class="fas fa-check-circle"></i> Smart Pidgin Responses</span>
+                <span><i class="fas fa-code"></i> Code Assistant</span>
+                <span><i class="fas fa-bolt"></i> Fast & Reliable</span>
+                <span><i class="fas fa-shield-alt"></i> Secure Chats</span>
+                <span><i class="fas fa-pen-nib"></i> Content Writing</span>
+                <!-- Duplicate for seamless loop -->
+                <span><i class="fas fa-check-circle"></i> Smart Pidgin Responses</span>
+                <span><i class="fas fa-code"></i> Code Assistant</span>
+                <span><i class="fas fa-bolt"></i> Fast & Reliable</span>
+            </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth.js"></script>
 </body>
 </html>
