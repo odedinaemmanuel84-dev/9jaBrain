@@ -15,7 +15,9 @@ const ui = {
     send: document.getElementById('sendBtn'),
     pfp: document.getElementById('userImg'),
     sidebar: document.getElementById('sidebar'),
-    logout: document.getElementById('logoutBtn')
+    logout: document.getElementById('logoutBtn'),
+    welcome: document.getElementById('welcomeScreen'),
+    userName: document.getElementById('userName')
 };
 
 // --- 1. INITIALIZATION ---
@@ -23,7 +25,14 @@ async function init() {
     try {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) { window.location.href = "auth.html"; return; }
+        
+        // Load User Profile Data
         if (user.user_metadata?.avatar_url) ui.pfp.src = user.user_metadata.avatar_url;
+        
+        // Personalize Welcome Message
+        const name = user.user_metadata?.full_name || "Oga";
+        if (ui.userName) ui.userName.innerText = name.split(' ')[0];
+
         loadSidebarHistory();
     } catch (err) { console.error(err); }
     activateTriggers(); 
@@ -68,24 +77,34 @@ function activateTriggers() {
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 } 
 
-// --- 3. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
+// --- 3. SUGGESTION LOGIC ---
+function useSuggestion(text) {
+    ui.input.value = text;
+    // Force the send button to show so the UI reflects the change
+    ui.voice.style.display = "none";
+    ui.send.style.display = "flex";
+    sendMessage();
+}
+
+// --- 4. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
+
+    // HIDE THE WELCOME SCREEN automatically on first message
+    if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
         // 1. Update the User's text in the UI
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 2. THE WIPER: Delete EVERY bubble that exists after this edited message
-        // This ensures the "Oga, make I no..." and everything below it disappears.
+        // 2. THE WIPER: Delete bubbles after edited message
         let nextElement = userWrapper.nextElementSibling;
         while (nextElement) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
             
-            // Don't delete the thinking indicator, just hide it for now
             if (toDelete === ui.think) {
                 toDelete.style.display = 'none';
             } else {
@@ -93,7 +112,7 @@ async function sendMessage() {
             }
         }
 
-        // 3. Update Memory: Remove all old history after this message
+        // 3. Update Memory
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
@@ -108,12 +127,11 @@ async function sendMessage() {
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
-    // Prepare for the new AI reply
+    // Prepare UI for AI reply
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
     
-    // Move thinking indicator to the bottom and show it
     ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
     ui.display.scrollTop = ui.display.scrollHeight;
@@ -132,8 +150,6 @@ async function sendMessage() {
         const data = await response.json();
         ui.think.style.display = 'none';
         
-        // 4. Add the NEW reply (e.g., the Sonic reply)
-        // It will now appear exactly where the old one used to be!
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
@@ -143,7 +159,7 @@ async function sendMessage() {
     }
 }
 
-// --- 4. UI BUBBLES ---
+// --- 5. UI BUBBLES ---
 function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
@@ -179,7 +195,7 @@ function appendAiBubble(text) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// --- 5. UTILS ---
+// --- 6. UTILS ---
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
@@ -187,6 +203,7 @@ async function loadSidebarHistory() {
     const list = document.querySelector('.feature-list');
     if (chats && list) {
         list.innerHTML = "";
+        // Keep the New Gist/Logout items if they are static in HTML, or rebuild here
         chats.forEach(chat => {
             const li = document.createElement('li');
             li.innerHTML = `<i class="fas fa-comment-alt"></i> ${chat.title}`;
