@@ -40,6 +40,7 @@ async function init() {
 
 // --- 2. ACTIVATION ---
 function activateTriggers() {
+    // 1. Logout Logic
     if (ui.logout) {
         ui.logout.onclick = async (e) => {
             e.preventDefault();
@@ -48,11 +49,13 @@ function activateTriggers() {
         };
     }
 
+    // 2. Send Message Button
     ui.send.onclick = (e) => { 
         e.preventDefault(); 
         sendMessage(); 
     };
 
+    // 3. Enter Key Logic
     ui.input.onkeydown = (e) => { 
         if (e.key === 'Enter') { 
             e.preventDefault(); 
@@ -60,12 +63,14 @@ function activateTriggers() {
         } 
     };
     
+    // 4. Icon Toggle (Voice vs Send)
     ui.input.oninput = () => {
         const hasText = ui.input.value.trim() !== "";
         ui.voice.style.display = hasText ? "none" : "flex";
         ui.send.style.display = hasText ? "flex" : "none";
     };
 
+    // 5. Sidebar Open/Close
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
@@ -75,6 +80,7 @@ function activateTriggers() {
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
     ui.input.value = text;
+    // Force the send button to show so the UI reflects the change
     ui.voice.style.display = "none";
     ui.send.style.display = "flex";
     sendMessage();
@@ -85,16 +91,20 @@ async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text) return;
 
+    // HIDE THE WELCOME SCREEN automatically on first message
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
+        // 1. Update the User's text in the UI
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
+        // 2. THE WIPER: Delete bubbles after edited message
         let nextElement = userWrapper.nextElementSibling;
         while (nextElement) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
+            
             if (toDelete === ui.think) {
                 toDelete.style.display = 'none';
             } else {
@@ -102,6 +112,7 @@ async function sendMessage() {
             }
         }
 
+        // 3. Update Memory
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
@@ -116,6 +127,7 @@ async function sendMessage() {
         chatHistory.push({ role: "user", content: text, id: msgId });
     }
 
+    // Prepare UI for AI reply
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
@@ -147,7 +159,52 @@ async function sendMessage() {
     }
 }
 
-// --- 5. UI BUBBLES ---
+// --- 5. UI BUBBLES & FORMATTING ---
+
+// Helper to detect and format code blocks
+function formatAIResponse(text) {
+    // Regex to find code blocks: ```language [newline] code ```
+    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    
+    return text.replace(codeRegex, (match, lang, code) => {
+        const language = lang || 'code';
+        return `
+            <div class="code-container">
+                <div class="code-header">
+                    <span>${language.toUpperCase()}</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <pre><code>${escapeHtml(code.trim())}</code></pre>
+            </div>
+        `;
+    });
+}
+
+// Helper to prevent HTML from actually rendering inside the code box
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Copy to Clipboard Logic
+function copyCode(button) {
+    const code = button.parentElement.nextElementSibling.innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.style.color = "var(--accent)";
+        setTimeout(() => {
+            button.innerHTML = '<i class="far fa-copy"></i> Copy';
+            button.style.color = "";
+        }, 2000);
+    });
+}
+
 function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
@@ -178,7 +235,7 @@ function appendAiBubble(text) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'ai-msg-bubble';
     
-    // Apply Code Formatting
+    // Apply code formatting to the AI's response
     msgDiv.innerHTML = formatAIResponse(text); 
     
     wrapper.appendChild(msgDiv);
@@ -186,50 +243,7 @@ function appendAiBubble(text) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// --- 6. CODE FORMATTING TOOLS ---
-function formatAIResponse(text) {
-    // Regex to find code blocks: ```language [newline] code ```
-    const codeRegex = /
-```(\w+)?\n([\s\S]*?)```/g;
-    
-    return text.replace(codeRegex, (match, lang, code) => {
-        const language = lang || 'code';
-        return `
-            <div class="code-container">
-                <div class="code-header">
-                    <span>${language.toUpperCase()}</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                        <i class="far fa-copy"></i> Copy
-                    </button>
-                </div>
-                <pre><code>${escapeHtml(code.trim())}</code></pre>
-            </div>
-        `;
-    });
-}
-
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function copyCode(button) {
-    const code = button.parentElement.nextElementSibling.innerText;
-    navigator.clipboard.writeText(code).then(() => {
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        button.style.color = "var(--accent)";
-        setTimeout(() => {
-            button.innerHTML = '<i class="far fa-copy"></i> Copy';
-            button.style.color = "";
-        }, 2000);
-    });
-}
-
-// --- 7. UTILS ---
+// --- 6. UTILS ---
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
