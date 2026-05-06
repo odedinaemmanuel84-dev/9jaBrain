@@ -28,9 +28,35 @@
             </div>
         </header>
 
-        <!-- MAIN CHAT AREA: Smooth scrolling and clear layout -->
+        <!-- MAIN CHAT AREA: Featuring the Modern Welcome Screen -->
         <main id="chatDisplay" class="chat-content">
-            <!-- Messages appear here dynamicallly -->
+            
+            <!-- Welcome Screen: Disappears once chat starts -->
+            <div id="welcomeScreen" class="welcome-container">
+                <h1 class="greeting">Hello, <span id="userName">Oga</span></h1>
+                <p class="intro-text">How I fit help you today?</p>
+                
+                <div class="suggestion-grid">
+                    <div class="suggestion-card" onclick="useSuggestion('Explain quantum physics like I be small pikin')">
+                        <i class="fas fa-lightbulb"></i>
+                        <p>Explain quantum physics like I be small pikin</p>
+                    </div>
+                    <div class="suggestion-card" onclick="useSuggestion('Write me a cold email for a remote job')">
+                        <i class="fas fa-pen-nib"></i>
+                        <p>Write me a cold email for a remote job</p>
+                    </div>
+                    <div class="suggestion-card" onclick="useSuggestion('Give me 5 Nigerian dinner ideas')">
+                        <i class="fas fa-utensils"></i>
+                        <p>Give me 5 Nigerian dinner ideas</p>
+                    </div>
+                    <div class="suggestion-card" onclick="useSuggestion('Plan 3-day trip to Lagos')">
+                        <i class="fas fa-plane"></i>
+                        <p>Plan 3-day trip to Lagos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages appear here dynamically -->
 
             <!-- THE SPINNER: Hidden until you ask a question -->
             <div id="thinkingIndicator" class="thinking-wrapper" style="display: none;">
@@ -40,23 +66,23 @@
         </main>
 
         <!-- FIXED BOTTOM INPUT: Rainbow glow and clean buttons -->
-       <footer class="rainbow-input-section">
-    <div class="rainbow-border-box">
-        <div class="input-container">
-            <label for="imageUpload" class="action-btn attachment-btn"><i class="fas fa-paperclip"></i></label>
-            <input type="file" id="imageUpload" hidden accept="image/*">
-            
-            <input type="text" id="userInput" placeholder="Gist with Naija AI..." autocomplete="off">
-            
-            <div class="input-actions">
-                <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
-                <button id="sendBtn" class="arrow-send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
+        <footer class="rainbow-input-section">
+            <div class="rainbow-border-box">
+                <div class="input-container">
+                    <label for="imageUpload" class="action-btn attachment-btn"><i class="fas fa-paperclip"></i></label>
+                    <input type="file" id="imageUpload" hidden accept="image/*">
+                    
+                    <input type="text" id="userInput" placeholder="Gist with Naija AI..." autocomplete="off">
+                    
+                    <div class="input-actions">
+                        <button id="voiceBtn" class="speak-btn"><i class="fas fa-microphone"></i> <span>Speak</span></button>
+                        <button id="sendBtn" class="arrow-send-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <!-- Adjusted Disclaimer Position -->
-    <p class="disclaimer">Confirm gist before you carry am go.</p>
-</footer>
+            <!-- Adjusted Disclaimer Position -->
+            <p class="disclaimer">Confirm gist before you carry am go.</p>
+        </footer>
 
         <!-- SIDEBAR MENU -->
         <div id="sidebar" class="sidebar">
