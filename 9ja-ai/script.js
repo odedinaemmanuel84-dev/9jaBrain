@@ -119,44 +119,31 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
-    let targetAiBubble = null;
-
     if (currentlyEditingId) {
-        // --- GEMINI-STYLE EDIT LOGIC ---
+        // --- GEMINI-STYLE RESET & THINK LOGIC ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // Clear all UI messages AFTER this edited message
+        // 1. Clear everything after this message in UI
         while (userWrapper.nextElementSibling) {
-            const next = userWrapper.nextElementSibling;
-            // Preserve the very first AI container following the edit to reuse it
-            if (!targetAiBubble && next.classList.contains('ai-msg-container')) {
-                targetAiBubble = next.querySelector('.ai-msg-bubble');
-                targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
-            } else {
-                next.remove();
-            }
+            userWrapper.nextElementSibling.remove();
         }
 
-        // If for some reason there was no AI reply to reuse, create one
-        if (!targetAiBubble) {
-            appendAiBubble("...");
-            const newAiContainer = ui.display.lastElementChild;
-            targetAiBubble = newAiContainer.querySelector('.ai-msg-bubble');
-            targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
-        }
-
-        // Update local history and clear the "future" context
+        // 2. Clear chatHistory from this point forward
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
 
+        // 3. Move thinking indicator directly after the edited message
+        ui.display.appendChild(ui.think);
+        ui.think.style.display = 'flex';
+
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
-        // Standard flow for new messages
+        // Standard New Message Flow
         const msgId = 'msg-' + Date.now();
         let displayHTML = text;
         if (selectedImageBase64) {
@@ -169,21 +156,19 @@ async function sendMessage() {
             messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
+
+        // Show global thinking
+        ui.display.appendChild(ui.think); 
+        ui.think.style.display = 'flex';
     }
 
-    // Reset UI state for next input
+    // Reset UI state
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
     ui.previewContainer.style.display = 'none';
     toggleButtons();
-    
-    // Only show global thinking if we aren't using a targeted update bubble
-    if (!targetAiBubble) {
-        ui.display.appendChild(ui.think); 
-        ui.think.style.display = 'flex';
-    }
     ui.display.scrollTop = ui.display.scrollHeight;
 
     try {
@@ -203,25 +188,17 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("Server error");
-
         const data = await response.json();
+        
+        // Hide thinking indicator
         ui.think.style.display = 'none';
         
         chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
-        
-        if (targetAiBubble) {
-            targetAiBubble.innerHTML = formatAIResponse(data.reply);
-        } else {
-            appendAiBubble(data.reply);
-        }
+        appendAiBubble(data.reply);
 
     } catch (e) {
-        console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        const errorMsg = "Omo, network wahala! Check your server.";
-        if (targetAiBubble) targetAiBubble.innerText = errorMsg;
-        else appendAiBubble(errorMsg);
+        appendAiBubble("Omo, network wahala! Check your server.");
     }
 }
 
@@ -263,7 +240,6 @@ function appendBubble(sender, msg, id) {
     wrapper.id = id;
     wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
-    ui.display.scrollTop = ui.display.scrollHeight;
 }
 
 function appendAiBubble(text) {
