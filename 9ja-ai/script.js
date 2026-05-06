@@ -77,22 +77,42 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // Image Upload Logic
-    if (ui.fileInput) {
-        ui.fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    selectedImageBase64 = event.target.result.split(',')[1];
-                    selectedImageMime = file.type;
-                    alert("Image carry come! You fit ask question now."); // Simple alert for confirmation
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-    }
-} 
+    // --- UPDATED IMAGE UPLOAD LOGIC ---
+if (ui.fileInput) {
+    ui.fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewImage = document.getElementById('imagePreview');
+        const removeBtn = document.getElementById('removeImgBtn');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                // Store data for Gemini
+                selectedImageBase64 = event.target.result.split(',')[1];
+                selectedImageMime = file.type;
+
+                // Show the image on the screen
+                if (previewImage && previewContainer) {
+                    previewImage.src = event.target.result;
+                    previewContainer.style.display = 'block';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+}
+
+// Logic for the "X" button to remove the photo before sending
+const removeBtn = document.getElementById('removeImgBtn');
+if (removeBtn) {
+    removeBtn.onclick = () => {
+        selectedImageBase64 = null;
+        selectedImageMime = null;
+        ui.fileInput.value = "";
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    };
+}
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
