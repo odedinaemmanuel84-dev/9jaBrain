@@ -6,6 +6,8 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let chatHistory = []; 
 let currentlyEditingId = null; 
+let selectedImageBase64 = null; // To store image data
+let selectedImageMime = null;   // To store image type
 
 const ui = {
     input: document.getElementById('userInput'),
@@ -17,7 +19,8 @@ const ui = {
     sidebar: document.getElementById('sidebar'),
     logout: document.getElementById('logoutBtn'),
     welcome: document.getElementById('welcomeScreen'),
-    userName: document.getElementById('userName')
+    userName: document.getElementById('userName'),
+    fileInput: document.getElementById('imageUpload') // Assuming this is your ID in HTML
 };
 
 // --- 1. INITIALIZATION ---
@@ -26,10 +29,8 @@ async function init() {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) { window.location.href = "auth.html"; return; }
         
-        // Load User Profile Data
         if (user.user_metadata?.avatar_url) ui.pfp.src = user.user_metadata.avatar_url;
         
-        // Personalize Welcome Message
         const name = user.user_metadata?.full_name || "Oga";
         if (ui.userName) ui.userName.innerText = name.split(' ')[0];
 
@@ -40,7 +41,7 @@ async function init() {
 
 // --- 2. ACTIVATION ---
 function activateTriggers() {
-    // 1. Logout Logic
+    // Logout Logic
     if (ui.logout) {
         ui.logout.onclick = async (e) => {
             e.preventDefault();
@@ -49,13 +50,13 @@ function activateTriggers() {
         };
     }
 
-    // 2. Send Message Button
+    // Send Message Button
     ui.send.onclick = (e) => { 
         e.preventDefault(); 
         sendMessage(); 
     };
 
-    // 3. Enter Key Logic
+    // Enter Key Logic
     ui.input.onkeydown = (e) => { 
         if (e.key === 'Enter') { 
             e.preventDefault(); 
@@ -63,48 +64,59 @@ function activateTriggers() {
         } 
     };
     
-    // 4. Icon Toggle (Voice vs Send)
+    // Icon Toggle (Voice vs Send)
     ui.input.oninput = () => {
         const hasText = ui.input.value.trim() !== "";
         ui.voice.style.display = hasText ? "none" : "flex";
         ui.send.style.display = hasText ? "flex" : "none";
     };
 
-    // 5. Sidebar Open/Close
+    // Sidebar Open/Close
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
+
+    // Image Upload Logic
+    if (ui.fileInput) {
+        ui.fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedImageBase64 = event.target.result.split(',')[1];
+                    selectedImageMime = file.type;
+                    alert("Image carry come! You fit ask question now."); // Simple alert for confirmation
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+    }
 } 
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
     ui.input.value = text;
-    // Force the send button to show so the UI reflects the change
     ui.voice.style.display = "none";
     ui.send.style.display = "flex";
     sendMessage();
 }
 
-// --- 4. THE BRAIN (SEND & EDIT & DISAPPEAR LOGIC) ---
+// --- 4. THE BRAIN (SEND, EDIT, & VISION LOGIC) ---
 async function sendMessage() {
     const text = ui.input.value.trim();
-    if (!text) return;
+    if (!text && !selectedImageBase64) return;
 
-    // HIDE THE WELCOME SCREEN automatically on first message
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
-        // 1. Update the User's text in the UI
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 2. THE WIPER: Delete bubbles after edited message
         let nextElement = userWrapper.nextElementSibling;
         while (nextElement) {
             let toDelete = nextElement;
             nextElement = nextElement.nextElementSibling;
-            
             if (toDelete === ui.think) {
                 toDelete.style.display = 'none';
             } else {
@@ -112,22 +124,39 @@ async function sendMessage() {
             }
         }
 
-        // 3. Update Memory
         const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (index !== -1) {
             chatHistory[index].content = text;
             chatHistory = chatHistory.slice(0, index + 1); 
         }
-
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
         const msgId = 'msg-' + Date.now();
-        appendBubble('user', text, msgId);
-        chatHistory.push({ role: "user", content: text, id: msgId });
+        
+        // Handle User Display Content (Text + Image if exists)
+        let displayHTML = text;
+        if (selectedImageBase64) {
+            displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
+        }
+        
+        appendBubble('user', displayHTML, msgId);
+
+        // Add to history with Gemini Vision Support
+        const messageParts = [{ text: text || "What is in this image?" }];
+        if (selectedImageBase64) {
+            messageParts.push({
+                inlineData: {
+                    mimeType: selectedImageMime,
+                    data: selectedImageBase64
+                }
+            });
+        }
+        
+        chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
 
-    // Prepare UI for AI reply
+    // Reset UI
     ui.input.value = "";
     ui.send.style.display = "none";
     ui.voice.style.display = "flex";
@@ -138,13 +167,20 @@ async function sendMessage() {
 
     try {
         const { data: { user } } = await sb.auth.getUser();
+        
+        // Prepare payload for Gemini (mapping parts correctly)
+        const payload = {
+            messages: chatHistory.map(msg => ({
+                role: msg.role,
+                parts: msg.parts ? msg.parts : [{ text: msg.content }]
+            })),
+            user_id: user.id
+        };
+
         const response = await fetch(`${BACKEND_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                messages: chatHistory.map(({role, content}) => ({role, content})), 
-                user_id: user.id 
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
@@ -152,6 +188,11 @@ async function sendMessage() {
         
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
+
+        // Clear image state after successful send
+        selectedImageBase64 = null;
+        selectedImageMime = null;
+        if (ui.fileInput) ui.fileInput.value = "";
 
     } catch (e) {
         ui.think.style.display = 'none';
@@ -161,11 +202,8 @@ async function sendMessage() {
 
 // --- 5. UI BUBBLES & FORMATTING ---
 
-// Helper to detect and format code blocks
 function formatAIResponse(text) {
-    // Regex to find code blocks: ```language [newline] code ```
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    
     return text.replace(codeRegex, (match, lang, code) => {
         const language = lang || 'code';
         return `
@@ -182,7 +220,6 @@ function formatAIResponse(text) {
     });
 }
 
-// Helper to prevent HTML from actually rendering inside the code box
 function escapeHtml(text) {
     return text
         .replace(/&/g, "&amp;")
@@ -192,7 +229,6 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-// Copy to Clipboard Logic
 function copyCode(button) {
     const code = button.parentElement.nextElementSibling.innerText;
     navigator.clipboard.writeText(code).then(() => {
@@ -234,10 +270,7 @@ function appendAiBubble(text) {
     wrapper.className = 'ai-msg-container';
     const msgDiv = document.createElement('div');
     msgDiv.className = 'ai-msg-bubble';
-    
-    // Apply code formatting to the AI's response
     msgDiv.innerHTML = formatAIResponse(text); 
-    
     wrapper.appendChild(msgDiv);
     ui.display.appendChild(wrapper);
     ui.display.scrollTop = ui.display.scrollHeight;
