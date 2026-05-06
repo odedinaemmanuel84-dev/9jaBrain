@@ -85,7 +85,6 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
-                    
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
                     toggleButtons();
@@ -123,18 +122,31 @@ async function sendMessage() {
     let targetAiBubble = null;
 
     if (currentlyEditingId) {
-        // --- RESTORED EDIT LOGIC ---
+        // --- GEMINI-STYLE EDIT LOGIC ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // Find the AI bubble immediately following the user's edited message
-        const nextElement = userWrapper.nextElementSibling;
-        if (nextElement && nextElement.classList.contains('ai-msg-container')) {
-            targetAiBubble = nextElement.querySelector('.ai-msg-bubble');
+        // Clear all UI messages AFTER this edited message
+        while (userWrapper.nextElementSibling) {
+            const next = userWrapper.nextElementSibling;
+            // Preserve the very first AI container following the edit to reuse it
+            if (!targetAiBubble && next.classList.contains('ai-msg-container')) {
+                targetAiBubble = next.querySelector('.ai-msg-bubble');
+                targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
+            } else {
+                next.remove();
+            }
+        }
+
+        // If for some reason there was no AI reply to reuse, create one
+        if (!targetAiBubble) {
+            appendAiBubble("...");
+            const newAiContainer = ui.display.lastElementChild;
+            targetAiBubble = newAiContainer.querySelector('.ai-msg-bubble');
             targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
         }
 
-        // Update local history and clear forward context
+        // Update local history and clear the "future" context
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
@@ -144,25 +156,22 @@ async function sendMessage() {
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
+        // Standard flow for new messages
         const msgId = 'msg-' + Date.now();
         let displayHTML = text;
-
         if (selectedImageBase64) {
             displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
         }
         appendBubble('user', displayHTML, msgId);
 
-        const messageParts = [];
-        if (text) messageParts.push({ text: text });
+        const messageParts = [{ text: text }];
         if (selectedImageBase64) {
-            messageParts.push({
-                inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 }
-            });
+            messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
 
-    // Reset UI State
+    // Reset UI state for next input
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
@@ -170,7 +179,7 @@ async function sendMessage() {
     ui.previewContainer.style.display = 'none';
     toggleButtons();
     
-    // Only show the main thinking indicator if we aren't targeting an existing bubble
+    // Only show global thinking if we aren't using a targeted update bubble
     if (!targetAiBubble) {
         ui.display.appendChild(ui.think); 
         ui.think.style.display = 'flex';
