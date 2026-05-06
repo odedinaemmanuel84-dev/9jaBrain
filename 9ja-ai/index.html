@@ -76,17 +76,21 @@
 
             <div class="rainbow-border-box">
                 <div class="input-container">
+                    <!-- CHANGED: Now using a Photo/Image icon instead of a square/clip -->
                     <label for="imageUpload" class="icon-btn" style="cursor: pointer; padding: 0 10px; color: #b3b3b3;">
-                        <i class="fas fa-image"></i>
+                        <i class="fas fa-image"></i> 
                     </label>
                     <input type="file" id="imageUpload" accept="image/*" style="display: none;">
                     
                     <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
                     
-                    <div class="button-group" style="display: flex; gap: 8px;">
-                        <button class="speak-btn" id="voiceBtn">
+                    <div class="button-group">
+                        <!-- CHANGED: Dedicated Speak Button with Text -->
+                        <button class="speak-btn-text" id="voiceBtn">
                             <i class="fas fa-microphone"></i>
+                            <span>Speak</span>
                         </button>
+                        
                         <button class="arrow-send-btn" id="sendBtn" style="display: none;">
                             <i class="fas fa-arrow-up"></i>
                         </button>
