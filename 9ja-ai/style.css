@@ -348,3 +348,68 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- ENHANCED CODE BOXES (GEMINI STYLE) --- */
+.code-container {
+    background: #000000;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #333;
+    overflow: hidden;
+    width: 100%;
+}
+
+.code-header {
+    background: #202123;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid #333;
+    font-family: 'Inter', sans-serif;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid #444;
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.copy-btn:hover {
+    background: #333;
+    color: white;
+    border-color: var(--accent);
+}
+
+pre {
+    padding: 15px;
+    overflow-x: auto;
+    background: #000;
+}
+
+pre code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+    height: 6px;
+}
+pre::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
