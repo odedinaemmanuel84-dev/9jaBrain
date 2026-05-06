@@ -93,8 +93,8 @@ body {
 .chat-content {
     flex: 1; 
     overflow-y: auto;
-    /* Added top padding to clear header and bottom to clear input box */
-    padding: 90px 20px 180px 20px; 
+    /* Adjusted padding to make room for dynamic footer height */
+    padding: 90px 20px 160px 20px; 
     display: flex;
     flex-direction: column; 
     gap: 20px;
@@ -109,7 +109,7 @@ body {
 
 /* --- WELCOME SCREEN (GEMINI STYLE) --- */
 .welcome-container {
-    margin: auto; /* This centers it perfectly vertically and horizontally */
+    margin: auto; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -264,6 +264,18 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    /* CRITICAL: Ensure this never fills the whole screen */
+    height: auto !important; 
+    max-height: 40vh;
+}
+
+/* Fix for the Image Preview Container */
+#imagePreviewContainer {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 10px;
 }
 
 .rainbow-border-box {
@@ -285,6 +297,7 @@ body {
     align-items: center;
     padding: 8px 12px; 
     gap: 10px;
+    min-height: 50px;
 }
 
 #userInput { 
@@ -294,20 +307,28 @@ body {
     color: white; 
     font-size: 1rem; 
     outline: none; 
+    padding: 5px 0;
 }
 
 .speak-btn, .arrow-send-btn {
     background: #222; 
     border: none; 
     color: white;
-    padding: 8px 15px; 
-    border-radius: 20px;
-    font-size: 0.85rem; 
-    font-weight: 600;
+    width: 40px; /* Made square for cleaner look */
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1rem; 
     display: flex; 
+    justify-content: center;
     align-items: center; 
-    gap: 8px; 
     cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.speak-btn:hover, .arrow-send-btn:hover {
+    background: #333;
+    transform: scale(1.05);
 }
 
 .disclaimer {
