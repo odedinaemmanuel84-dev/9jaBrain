@@ -336,3 +336,73 @@ pre {
     font-family: sans-serif;
     letter-spacing: 0.2px;
 }
+
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 20px;
+    animation: fadeIn 0.8s ease;
+}
+
+.greeting {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #10b981, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.intro-text {
+    color: #a0a0a0;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+}
+
+.suggestion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.suggestion-card {
+    background: #161616;
+    border: 1px solid #222;
+    padding: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.suggestion-card:hover {
+    background: #1e1e1e;
+    border-color: #10b981;
+    transform: translateY(-4px);
+}
+
+.suggestion-card i {
+    color: #10b981;
+    font-size: 1.2rem;
+}
+
+.suggestion-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #e0e0e0;
+    line-height: 1.4;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
