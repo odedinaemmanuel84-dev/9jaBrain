@@ -70,7 +70,6 @@ function activateTriggers() {
         if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } 
     };
     
-    // Toggle send/speak on typing
     ui.input.oninput = toggleButtons;
 
     const menuBtn = document.getElementById('menuBtn');
@@ -78,7 +77,6 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // Image Upload Logic (Direct Preview, No Alerts)
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -88,17 +86,15 @@ function activateTriggers() {
                     selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
                     
-                    // Show Preview UI
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
-                    toggleButtons(); // Show send button because image is present
+                    toggleButtons();
                 };
                 reader.readAsDataURL(file);
             }
         };
     }
 
-    // Remove Image Logic
     if (ui.removeImg) {
         ui.removeImg.onclick = () => {
             selectedImageBase64 = null;
@@ -124,24 +120,20 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
+    const msgId = 'msg-' + Date.now();
+    let displayHTML = text;
+
     if (currentlyEditingId) {
-        // Edit logic (keeping it simple for now, usually doesn't include new images)
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
-        const msgId = 'msg-' + Date.now();
-        
-        // Display HTML in bubble
-        let displayHTML = text;
         if (selectedImageBase64) {
             displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
         }
-        
         appendBubble('user', displayHTML, msgId);
 
-        // Build Gemini Parts
         const messageParts = [];
         if (text) messageParts.push({ text: text });
         if (selectedImageBase64) {
@@ -149,12 +141,13 @@ async function sendMessage() {
                 inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 }
             });
         }
-        
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
 
     // Reset UI State
     ui.input.value = "";
+    const tempImgBase64 = selectedImageBase64;
+    const tempImgMime = selectedImageMime;
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
@@ -168,6 +161,7 @@ async function sendMessage() {
     try {
         const { data: { user } } = await sb.auth.getUser();
         
+        // Network Wahala Fix: Ensure all messages have parts
         const payload = {
             messages: chatHistory.map(msg => ({
                 role: msg.role,
@@ -182,20 +176,24 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
+        if (!response.ok) throw new Error("Server error");
+
         const data = await response.json();
         ui.think.style.display = 'none';
         
-        chatHistory.push({ role: "assistant", content: data.reply });
+        chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
         appendAiBubble(data.reply);
 
     } catch (e) {
+        console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Check your server.");
+        appendAiBubble("Omo, network wahala! Make sure your Render backend is awake.");
     }
 }
 
 // --- 5. UI BUBBLES & FORMATTING ---
 function formatAIResponse(text) {
+    if (!text) return "";
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
     return text.replace(codeRegex, (match, lang, code) => {
         const language = lang || 'code';
@@ -231,6 +229,7 @@ function appendBubble(sender, msg, id) {
     wrapper.id = id;
     wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
+    ui.display.scrollTop = ui.display.scrollHeight;
 }
 
 function appendAiBubble(text) {
@@ -242,6 +241,15 @@ function appendAiBubble(text) {
     wrapper.appendChild(msgDiv);
     ui.display.appendChild(wrapper);
     ui.display.scrollTop = ui.display.scrollHeight;
+}
+
+function startEditing(id) {
+    currentlyEditingId = id;
+    const bubble = document.getElementById(id).querySelector('.user-msg-bubble');
+    ui.input.value = bubble.innerText;
+    ui.input.focus();
+    ui.send.innerHTML = '<i class="fas fa-check"></i>';
+    toggleButtons();
 }
 
 async function loadSidebarHistory() {
