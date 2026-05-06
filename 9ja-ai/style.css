@@ -434,3 +434,44 @@ pre::-webkit-scrollbar-thumb {
     background: #333;
     border-radius: 10px;
 }
+
+/* Styling for the new Speak Button with Text */
+.speak-btn-text {
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+    margin-right: 5px;
+}
+
+.speak-btn-text i {
+    font-size: 0.8rem;
+    color: var(--accent); /* Makes the mic green to match your theme */
+}
+
+.speak-btn-text:hover {
+    background: #333;
+    border-color: var(--accent);
+}
+
+/* Ensure the button group doesn't shrink */
+.button-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Make sure the input leaves enough room for the longer button */
+#userInput {
+    flex: 1;
+    min-width: 0; /* Prevents input from pushing buttons off screen */
+}
