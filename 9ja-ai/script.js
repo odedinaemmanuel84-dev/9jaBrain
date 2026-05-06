@@ -133,15 +133,27 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    } else {
-        const msgId = 'msg-' + Date.now();
-        let displayHTML = text;
-        if (selectedImageBase64) {
-            displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
-        }
-        appendBubble('user', displayHTML, msgId);
+// --- Inside sendMessage() function ---
+} else {
+    // Standard flow for new messages
+    const msgId = 'msg-' + Date.now();
+    let displayHTML = "";
 
-        const messageParts = [{ text: text }];
+    if (selectedImageBase64) {
+        // Gemini Style: Image on left, Text on right
+        displayHTML = `
+            <div class="msg-image-container">
+                <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+            </div>
+            <div class="msg-text">${text}</div>
+        `;
+    } else {
+        displayHTML = `<div class="msg-text">${text}</div>`;
+    }
+
+    appendBubble('user', displayHTML, msgId);
+    
+const messageParts = [{ text: text }];
         if (selectedImageBase64) {
             messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
