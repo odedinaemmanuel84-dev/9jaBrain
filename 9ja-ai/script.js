@@ -119,41 +119,45 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
-    // Edit logic remains the same...
+    let msgId = 'msg-' + Date.now();
+
     if (currentlyEditingId) {
+        // Edit logic: Update existing bubble
         const userWrapper = document.getElementById(currentlyEditingId);
-        userWrapper.querySelector('.user-msg-bubble').innerText = text;
+        // Find the text part of the bubble specifically
+        const textElement = userWrapper.querySelector('.msg-text');
+        if (textElement) textElement.innerText = text;
+        
         while (userWrapper.nextElementSibling) userWrapper.nextElementSibling.remove();
+        
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
+        
         ui.display.appendChild(ui.think);
         ui.think.style.display = 'flex';
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
-// --- Inside sendMessage() function ---
-} else {
-    // Standard flow for new messages
-    const msgId = 'msg-' + Date.now();
-    let displayHTML = "";
-
-    if (selectedImageBase64) {
-        // Gemini Style: Image on left, Text on right
-        displayHTML = `
-            <div class="msg-image-container">
-                <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
-            </div>
-            <div class="msg-text">${text}</div>
-        `;
+        msgId = currentlyEditingId; // Keep the ID for history tracking
     } else {
-        displayHTML = `<div class="msg-text">${text}</div>`;
-    }
+        // Standard flow for new messages
+        let displayHTML = "";
+        if (selectedImageBase64) {
+            displayHTML = `
+                <div class="msg-image-container">
+                    <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+                </div>
+                <div class="msg-text">${text}</div>
+            `;
+        } else {
+            displayHTML = `<div class="msg-text">${text}</div>`;
+        }
 
-    appendBubble('user', displayHTML, msgId);
-    
-const messageParts = [{ text: text }];
+        appendBubble('user', displayHTML, msgId);
+        
+        const messageParts = [{ text: text }];
         if (selectedImageBase64) {
             messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
@@ -209,7 +213,6 @@ const messageParts = [{ text: text }];
         console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
         
-        // Logical check: Is it a timeout/sleep issue or a real crash?
         if (e.message.includes("Failed to fetch")) {
             appendAiBubble("Omo, Render is still waking up the server. Give it 30 seconds and try again!");
         } else {
@@ -254,7 +257,10 @@ function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
-    wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
+    wrapper.innerHTML = `
+        <div class="user-msg-bubble">${msg}</div>
+        <div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>
+    `;
     ui.display.appendChild(wrapper);
 }
 
@@ -271,8 +277,9 @@ function appendAiBubble(text) {
 
 function startEditing(id) {
     currentlyEditingId = id;
-    const bubble = document.getElementById(id).querySelector('.user-msg-bubble');
-    ui.input.value = bubble.innerText;
+    const container = document.getElementById(id);
+    const textPart = container.querySelector('.msg-text');
+    ui.input.value = textPart ? textPart.innerText : "";
     ui.input.focus();
     ui.send.innerHTML = '<i class="fas fa-check"></i>';
     toggleButtons();
