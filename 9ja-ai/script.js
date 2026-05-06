@@ -85,6 +85,7 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
+                    
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
                     toggleButtons();
@@ -126,35 +127,37 @@ async function sendMessage() {
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // Find the AI bubble immediately following the edited message
+        // Find the AI bubble immediately following the user's edited message
         const nextElement = userWrapper.nextElementSibling;
         if (nextElement && nextElement.classList.contains('ai-msg-container')) {
             targetAiBubble = nextElement.querySelector('.ai-msg-bubble');
             targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
         }
 
-        // Update history entry
+        // Update local history and clear forward context
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
-            // Remove everything after the edited message to keep context consistent
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
-        // Standard New Message Logic
         const msgId = 'msg-' + Date.now();
         let displayHTML = text;
+
         if (selectedImageBase64) {
             displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
         }
         appendBubble('user', displayHTML, msgId);
 
-        const messageParts = [{ text: text }];
+        const messageParts = [];
+        if (text) messageParts.push({ text: text });
         if (selectedImageBase64) {
-            messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
+            messageParts.push({
+                inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 }
+            });
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
@@ -167,7 +170,7 @@ async function sendMessage() {
     ui.previewContainer.style.display = 'none';
     toggleButtons();
     
-    // Only show global thinking if we aren't targeting a specific bubble
+    // Only show the main thinking indicator if we aren't targeting an existing bubble
     if (!targetAiBubble) {
         ui.display.appendChild(ui.think); 
         ui.think.style.display = 'flex';
@@ -191,11 +194,13 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
+        if (!response.ok) throw new Error("Server error");
+
         const data = await response.json();
         ui.think.style.display = 'none';
         
         chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
-
+        
         if (targetAiBubble) {
             targetAiBubble.innerHTML = formatAIResponse(data.reply);
         } else {
@@ -203,6 +208,7 @@ async function sendMessage() {
         }
 
     } catch (e) {
+        console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
         const errorMsg = "Omo, network wahala! Check your server.";
         if (targetAiBubble) targetAiBubble.innerText = errorMsg;
@@ -248,6 +254,7 @@ function appendBubble(sender, msg, id) {
     wrapper.id = id;
     wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
+    ui.display.scrollTop = ui.display.scrollHeight;
 }
 
 function appendAiBubble(text) {
