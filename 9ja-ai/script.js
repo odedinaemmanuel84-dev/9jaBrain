@@ -119,23 +119,18 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
+    // Edit logic remains the same...
     if (currentlyEditingId) {
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
-        
-        while (userWrapper.nextElementSibling) {
-            userWrapper.nextElementSibling.remove();
-        }
-
+        while (userWrapper.nextElementSibling) userWrapper.nextElementSibling.remove();
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
-
         ui.display.appendChild(ui.think);
         ui.think.style.display = 'flex';
-
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
@@ -156,6 +151,7 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
     }
 
+    // UI Reset
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
@@ -181,12 +177,11 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
-        // Hide thinking indicator before processing results
         ui.think.style.display = 'none';
 
         if (!response.ok) {
-            // This handles 404, 500, etc.
-            throw new Error(`Server error: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Server status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -195,14 +190,19 @@ async function sendMessage() {
             chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
             appendAiBubble(data.reply);
         } else {
-            appendAiBubble("Omo, the AI give empty response. Try again?");
+            appendAiBubble("Omo, Naija AI is speechless. Try refreshing?");
         }
 
     } catch (e) {
         console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        // Detailed error message so you know exactly what happened
-        appendAiBubble("Omo, network wahala! Either the backend is sleeping or your internet dey move like turtle. Check Render dashboard.");
+        
+        // Logical check: Is it a timeout/sleep issue or a real crash?
+        if (e.message.includes("Failed to fetch")) {
+            appendAiBubble("Omo, Render is still waking up the server. Give it 30 seconds and try again!");
+        } else {
+            appendAiBubble(`Error: ${e.message}. Check your Render logs, Oga.`);
+        }
     }
 }
 
