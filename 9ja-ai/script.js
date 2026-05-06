@@ -119,20 +119,31 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
-    let msgId = 'msg-' + Date.now();
-
     if (currentlyEditingId) {
-        // Edit logic: Update existing bubble
+        // --- Edit Logic ---
         const userWrapper = document.getElementById(currentlyEditingId);
-        // Find the text part of the bubble specifically
-        const textElement = userWrapper.querySelector('.msg-text');
-        if (textElement) textElement.innerText = text;
+        
+        // Update display depending on if there is an image or not
+        if (selectedImageBase64) {
+            userWrapper.querySelector('.user-msg-bubble').innerHTML = `
+                <div class="msg-image-container">
+                    <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+                </div>
+                <div class="msg-text">${text}</div>
+            `;
+        } else {
+            userWrapper.querySelector('.user-msg-bubble').innerHTML = `<div class="msg-text">${text}</div>`;
+        }
         
         while (userWrapper.nextElementSibling) userWrapper.nextElementSibling.remove();
         
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
-            chatHistory[histIndex].parts = [{ text: text }];
+            const messageParts = [{ text: text }];
+            if (selectedImageBase64) {
+                messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
+            }
+            chatHistory[histIndex].parts = messageParts;
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
         
@@ -140,10 +151,12 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
-        msgId = currentlyEditingId; // Keep the ID for history tracking
+
     } else {
-        // Standard flow for new messages
+        // --- Standard New Message Flow ---
+        const msgId = 'msg-' + Date.now();
         let displayHTML = "";
+
         if (selectedImageBase64) {
             displayHTML = `
                 <div class="msg-image-container">
@@ -257,10 +270,7 @@ function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
-    wrapper.innerHTML = `
-        <div class="user-msg-bubble">${msg}</div>
-        <div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>
-    `;
+    wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
 }
 
@@ -277,9 +287,10 @@ function appendAiBubble(text) {
 
 function startEditing(id) {
     currentlyEditingId = id;
-    const container = document.getElementById(id);
-    const textPart = container.querySelector('.msg-text');
-    ui.input.value = textPart ? textPart.innerText : "";
+    const bubble = document.getElementById(id).querySelector('.user-msg-bubble');
+    // Extract only text for the input field
+    const textDiv = bubble.querySelector('.msg-text');
+    ui.input.value = textDiv ? textDiv.innerText : bubble.innerText;
     ui.input.focus();
     ui.send.innerHTML = '<i class="fas fa-check"></i>';
     toggleButtons();
