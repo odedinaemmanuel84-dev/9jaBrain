@@ -120,30 +120,25 @@ async function sendMessage() {
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
-        // --- THE RESET LOGIC ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 1. Clear everything after this message in the UI
         while (userWrapper.nextElementSibling) {
             userWrapper.nextElementSibling.remove();
         }
 
-        // 2. Clear history from this point forward
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
 
-        // 3. Put the thinking indicator EXACTLY after the edited message
         ui.display.appendChild(ui.think);
         ui.think.style.display = 'flex';
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
-        // New Message Flow
         const msgId = 'msg-' + Date.now();
         let displayHTML = text;
         if (selectedImageBase64) {
@@ -157,12 +152,10 @@ async function sendMessage() {
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
 
-        // Show global thinking
         ui.display.appendChild(ui.think); 
         ui.think.style.display = 'flex';
     }
 
-    // Reset UI state
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
@@ -188,17 +181,28 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
+        // Hide thinking indicator before processing results
+        ui.think.style.display = 'none';
+
+        if (!response.ok) {
+            // This handles 404, 500, etc.
+            throw new Error(`Server error: ${response.status}`);
+        }
+
         const data = await response.json();
         
-        // Hide thinking indicator
-        ui.think.style.display = 'none';
-        
-        chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
-        appendAiBubble(data.reply);
+        if (data.reply) {
+            chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
+            appendAiBubble(data.reply);
+        } else {
+            appendAiBubble("Omo, the AI give empty response. Try again?");
+        }
 
     } catch (e) {
+        console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Check your server.");
+        // Detailed error message so you know exactly what happened
+        appendAiBubble("Omo, network wahala! Either the backend is sleeping or your internet dey move like turtle. Check Render dashboard.");
     }
 }
 
