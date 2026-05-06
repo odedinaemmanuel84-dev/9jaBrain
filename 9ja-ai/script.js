@@ -120,30 +120,30 @@ async function sendMessage() {
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
-        // --- GEMINI-STYLE RESET & THINK LOGIC ---
+        // --- THE RESET LOGIC ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
         
-        // 1. Clear everything after this message in UI
+        // 1. Clear everything after this message in the UI
         while (userWrapper.nextElementSibling) {
             userWrapper.nextElementSibling.remove();
         }
 
-        // 2. Clear chatHistory from this point forward
+        // 2. Clear history from this point forward
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
             chatHistory[histIndex].parts = [{ text: text }];
             chatHistory = chatHistory.slice(0, histIndex + 1);
         }
 
-        // 3. Move thinking indicator directly after the edited message
+        // 3. Put the thinking indicator EXACTLY after the edited message
         ui.display.appendChild(ui.think);
         ui.think.style.display = 'flex';
 
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
-        // Standard New Message Flow
+        // New Message Flow
         const msgId = 'msg-' + Date.now();
         let displayHTML = text;
         if (selectedImageBase64) {
