@@ -6,8 +6,8 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let chatHistory = []; 
 let currentlyEditingId = null; 
-let selectedImageBase64 = null; // To store image data
-let selectedImageMime = null;   // To store image type
+let selectedImageBase64 = null; 
+let selectedImageMime = null;   
 
 const ui = {
     input: document.getElementById('userInput'),
@@ -20,7 +20,10 @@ const ui = {
     logout: document.getElementById('logoutBtn'),
     welcome: document.getElementById('welcomeScreen'),
     userName: document.getElementById('userName'),
-    fileInput: document.getElementById('imageUpload') // Assuming this is your ID in HTML
+    fileInput: document.getElementById('imageUpload'),
+    previewContainer: document.getElementById('imagePreviewContainer'),
+    previewImg: document.getElementById('imagePreview'),
+    removeImg: document.getElementById('removeImgBtn')
 };
 
 // --- 1. INITIALIZATION ---
@@ -30,7 +33,6 @@ async function init() {
         if (!user) { window.location.href = "auth.html"; return; }
         
         if (user.user_metadata?.avatar_url) ui.pfp.src = user.user_metadata.avatar_url;
-        
         const name = user.user_metadata?.full_name || "Oga";
         if (ui.userName) ui.userName.innerText = name.split(' ')[0];
 
@@ -39,9 +41,21 @@ async function init() {
     activateTriggers(); 
 }
 
-// --- 2. ACTIVATION ---
+// --- 2. ACTIVATION & BUTTON LOGIC ---
+function toggleButtons() {
+    const hasText = ui.input.value.trim() !== "";
+    const hasImage = selectedImageBase64 !== null;
+    
+    if (hasText || hasImage) {
+        ui.voice.style.display = "none";
+        ui.send.style.display = "flex";
+    } else {
+        ui.voice.style.display = "flex";
+        ui.send.style.display = "none";
+    }
+}
+
 function activateTriggers() {
-    // Logout Logic
     if (ui.logout) {
         ui.logout.onclick = async (e) => {
             e.preventDefault();
@@ -50,34 +64,21 @@ function activateTriggers() {
         };
     }
 
-    // Send Message Button
-    ui.send.onclick = (e) => { 
-        e.preventDefault(); 
-        sendMessage(); 
-    };
+    ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
 
-    // Enter Key Logic
     ui.input.onkeydown = (e) => { 
-        if (e.key === 'Enter') { 
-            e.preventDefault(); 
-            sendMessage(); 
-        } 
+        if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } 
     };
     
-    // Icon Toggle (Voice vs Send)
-    ui.input.oninput = () => {
-        const hasText = ui.input.value.trim() !== "";
-        ui.voice.style.display = hasText ? "none" : "flex";
-        ui.send.style.display = hasText ? "flex" : "none";
-    };
+    // Toggle send/speak on typing
+    ui.input.oninput = toggleButtons;
 
-    // Sidebar Open/Close
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // Image Upload Logic
+    // Image Upload Logic (Direct Preview, No Alerts)
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -86,10 +87,25 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
-                    alert("Image carry come! You fit ask question now."); // Simple alert for confirmation
+                    
+                    // Show Preview UI
+                    ui.previewImg.src = event.target.result;
+                    ui.previewContainer.style.display = 'block';
+                    toggleButtons(); // Show send button because image is present
                 };
                 reader.readAsDataURL(file);
             }
+        };
+    }
+
+    // Remove Image Logic
+    if (ui.removeImg) {
+        ui.removeImg.onclick = () => {
+            selectedImageBase64 = null;
+            selectedImageMime = null;
+            ui.fileInput.value = "";
+            ui.previewContainer.style.display = 'none';
+            toggleButtons();
         };
     }
 } 
@@ -97,12 +113,11 @@ function activateTriggers() {
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
     ui.input.value = text;
-    ui.voice.style.display = "none";
-    ui.send.style.display = "flex";
+    toggleButtons();
     sendMessage();
 }
 
-// --- 4. THE BRAIN (SEND, EDIT, & VISION LOGIC) ---
+// --- 4. THE BRAIN ---
 async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text && !selectedImageBase64) return;
@@ -110,31 +125,15 @@ async function sendMessage() {
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
+        // Edit logic (keeping it simple for now, usually doesn't include new images)
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
-        
-        let nextElement = userWrapper.nextElementSibling;
-        while (nextElement) {
-            let toDelete = nextElement;
-            nextElement = nextElement.nextElementSibling;
-            if (toDelete === ui.think) {
-                toDelete.style.display = 'none';
-            } else {
-                toDelete.remove();
-            }
-        }
-
-        const index = chatHistory.findIndex(m => m.id === currentlyEditingId);
-        if (index !== -1) {
-            chatHistory[index].content = text;
-            chatHistory = chatHistory.slice(0, index + 1); 
-        }
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
         const msgId = 'msg-' + Date.now();
         
-        // Handle User Display Content (Text + Image if exists)
+        // Display HTML in bubble
         let displayHTML = text;
         if (selectedImageBase64) {
             displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
@@ -142,24 +141,25 @@ async function sendMessage() {
         
         appendBubble('user', displayHTML, msgId);
 
-        // Add to history with Gemini Vision Support
-        const messageParts = [{ text: text || "What is in this image?" }];
+        // Build Gemini Parts
+        const messageParts = [];
+        if (text) messageParts.push({ text: text });
         if (selectedImageBase64) {
             messageParts.push({
-                inlineData: {
-                    mimeType: selectedImageMime,
-                    data: selectedImageBase64
-                }
+                inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 }
             });
         }
         
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
 
-    // Reset UI
+    // Reset UI State
     ui.input.value = "";
-    ui.send.style.display = "none";
-    ui.voice.style.display = "flex";
+    selectedImageBase64 = null;
+    selectedImageMime = null;
+    if (ui.fileInput) ui.fileInput.value = "";
+    ui.previewContainer.style.display = 'none';
+    toggleButtons();
     
     ui.display.appendChild(ui.think); 
     ui.think.style.display = 'flex';
@@ -168,7 +168,6 @@ async function sendMessage() {
     try {
         const { data: { user } } = await sb.auth.getUser();
         
-        // Prepare payload for Gemini (mapping parts correctly)
         const payload = {
             messages: chatHistory.map(msg => ({
                 role: msg.role,
@@ -189,11 +188,6 @@ async function sendMessage() {
         chatHistory.push({ role: "assistant", content: data.reply });
         appendAiBubble(data.reply);
 
-        // Clear image state after successful send
-        selectedImageBase64 = null;
-        selectedImageMime = null;
-        if (ui.fileInput) ui.fileInput.value = "";
-
     } catch (e) {
         ui.think.style.display = 'none';
         appendAiBubble("Omo, network wahala! Check your server.");
@@ -201,7 +195,6 @@ async function sendMessage() {
 }
 
 // --- 5. UI BUBBLES & FORMATTING ---
-
 function formatAIResponse(text) {
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
     return text.replace(codeRegex, (match, lang, code) => {
@@ -221,23 +214,14 @@ function formatAIResponse(text) {
 }
 
 function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function copyCode(button) {
     const code = button.parentElement.nextElementSibling.innerText;
     navigator.clipboard.writeText(code).then(() => {
         button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        button.style.color = "var(--accent)";
-        setTimeout(() => {
-            button.innerHTML = '<i class="far fa-copy"></i> Copy';
-            button.style.color = "";
-        }, 2000);
+        setTimeout(() => { button.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000);
     });
 }
 
@@ -245,24 +229,8 @@ function appendBubble(sender, msg, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
-    wrapper.innerHTML = `
-        <div class="user-msg-bubble">${msg}</div>
-        <div class="edit-btn" onclick="startEditing('${id}')">
-            <i class="fas fa-pen" style="font-size: 12px;"></i>
-        </div>
-    `;
+    wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
-}
-
-function startEditing(id) {
-    const wrapper = document.getElementById(id);
-    const oldText = wrapper.querySelector('.user-msg-bubble').innerText;
-    ui.input.value = oldText;
-    ui.input.focus();
-    currentlyEditingId = id;
-    ui.send.innerHTML = '<i class="fas fa-check"></i>'; 
-    ui.send.style.display = "flex";
-    ui.voice.style.display = "none";
 }
 
 function appendAiBubble(text) {
@@ -276,7 +244,6 @@ function appendAiBubble(text) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-// --- 6. UTILS ---
 async function loadSidebarHistory() {
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
