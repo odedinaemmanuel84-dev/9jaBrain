@@ -3,6 +3,8 @@
     --bg: #0d0d0d;
     --card: #1a1a1a;
     --accent: #00ff88; /* Glowing Green */
+    --primary: #10b981; /* Emerald for Tabs */
+    --error: #ff4d4d;
     --text: #ffffff;
     --text-dim: #b3b3b3;
     --border: #222;
@@ -34,16 +36,20 @@ body {
     position: fixed; 
     top: 0; 
     width: 100%;
+    height: 70px;
     background: var(--bg); 
     z-index: 1000;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
 }
 
 .top-nav {
     display: flex; 
     justify-content: space-between; 
     align-items: center;
-    padding: 15px 20px;
+    width: 100%;
+    padding: 0 20px;
 }
 
 .nav-left, .nav-right { 
@@ -85,30 +91,99 @@ body {
 
 /* --- CHAT CONTENT (SCROLLABLE AREA) --- */
 .chat-content {
-    margin-top: 75px; 
-    margin-bottom: 150px; 
     flex: 1; 
     overflow-y: auto;
-    padding: 20px; 
+    /* Added top padding to clear header and bottom to clear input box */
+    padding: 90px 20px 180px 20px; 
     display: flex;
     flex-direction: column; 
     gap: 20px;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    position: relative;
 }
 
 /* Custom Scrollbar */
 .chat-content::-webkit-scrollbar { width: 4px; }
 .chat-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
-/* --- MESSAGE BUBBLES & EDITING --- */
+/* --- WELCOME SCREEN (GEMINI STYLE) --- */
+.welcome-container {
+    margin: auto; /* This centers it perfectly vertically and horizontally */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.8s ease;
+}
+
+.greeting {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-weight: 700;
+    background: linear-gradient(to right, #10b981, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    line-height: 1.1;
+}
+
+.intro-text {
+    color: var(--text-dim);
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    margin-bottom: 50px;
+}
+
+.suggestion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    width: 100%;
+}
+
+.suggestion-card {
+    background: #161616;
+    border: 1px solid #222;
+    padding: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.suggestion-card:hover {
+    background: #1e1e1e;
+    border-color: var(--primary);
+    transform: translateY(-4px);
+}
+
+.suggestion-card i {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.suggestion-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #e0e0e0;
+    line-height: 1.4;
+}
+
+/* --- MESSAGE BUBBLES --- */
 .user-msg-container {
-    align-self: flex-end; /* This keeps it on the right */
+    position: relative;
+    align-self: flex-end;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     max-width: 80%;
-    width: fit-content; /* FIX: Prevents container from stretching to 100% width */
+    margin-left: auto;
 }
 
 .user-msg-bubble {
@@ -118,18 +193,29 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     word-wrap: break-word;
     color: white;
-    text-align: left; /* Keeps text inside bubble aligned left */
+    text-align: left;
 }
 
-.edit-btn {
-    font-size: 0.75rem;
+.user-msg-container .edit-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    padding: 5px;
+    background: #333;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: -35px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--text-dim);
-    margin-top: 5px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.edit-btn:hover { color: var(--accent); }
+.user-msg-container:hover .edit-btn { opacity: 1; }
 
 .ai-msg-container {
     align-self: flex-start;
@@ -144,19 +230,9 @@ body {
     word-wrap: break-word;
 }
 
-.ai-actions { 
-    display: flex; 
-    gap: 15px; 
-    margin-top: 10px; 
-    color: #666; 
-    font-size: 0.9rem; 
-}
-
-.action-icon:hover { color: var(--accent); cursor: pointer; }
-
 /* --- THE THINKING SPINNER --- */
 #thinkingIndicator {
-    display: none; /* Sync with your JS ID */
+    display: none;
     align-self: flex-start;
     flex-direction: row; 
     align-items: center;
@@ -181,9 +257,13 @@ body {
     bottom: 0; 
     left: 0; 
     width: 100%;
-    padding: 15px 20px 30px 20px;
+    padding: 10px 15px 20px 15px;
     background: var(--bg); 
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
 .rainbow-border-box {
@@ -192,8 +272,8 @@ body {
     background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     background-size: 400%; 
     animation: moveRainbow 8s linear infinite;
+    width: 100%;
     max-width: 800px; 
-    margin: 0 auto;
 }
 
 @keyframes moveRainbow { 0% { background-position: 0%; } 100% { background-position: 400%; } }
@@ -216,7 +296,6 @@ body {
     outline: none; 
 }
 
-/* --- BUTTONS --- */
 .speak-btn, .arrow-send-btn {
     background: #222; 
     border: none; 
@@ -231,29 +310,12 @@ body {
     cursor: pointer;
 }
 
-/* --- CODE BOXES --- */
-.code-container { 
-    background: #000; 
-    border-radius: 8px; 
-    margin: 15px 0; 
-    border: 1px solid #333; 
-    overflow: hidden; 
-}
-
-.code-header { 
-    background: #2d2d2d; 
-    padding: 8px 15px; 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 0.8rem; 
-    color: var(--accent); 
-}
-
-pre { 
-    padding: 15px; 
-    overflow-x: auto; 
-    font-family: 'Courier New', monospace; 
-    color: #f8f8f2;
+.disclaimer {
+    font-size: 11px;
+    color: #9aa0a6;
+    text-align: center;
+    margin: 0;
+    padding: 4px 0;
 }
 
 /* --- SIDEBAR --- */
@@ -271,9 +333,7 @@ pre {
 }
 
 .sidebar.active { left: 0; }
-
 .feature-list { list-style: none; margin-top: 20px; }
-
 .feature-list li {
     padding: 15px 0;
     border-bottom: 1px solid #222;
@@ -282,124 +342,6 @@ pre {
     align-items: center;
     gap: 12px;
     color: var(--text-dim);
-}
-
-/* --- GEMINI STYLE EDIT BUTTON --- */
-.user-msg-container .edit-btn {
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.2s ease;
-    padding: 5px;
-    background: #333;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: -35px; /* Position it to the left of the bubble */
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* Show pencil when hovering over the message block */
-.user-msg-container:hover .edit-btn {
-    opacity: 1;
-}
-
-.user-msg-container {
-    position: relative; /* Needed for the pencil positioning */
-    margin-left: auto;
-}
-
-.rainbow-input-section {
-    padding: 10px 15px 20px 15px; /* Added bottom padding for space */
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.rainbow-border-box {
-    width: 100%;
-    max-width: 800px; /* Limits width on larger screens like Gemini */
-    /* Keep your existing rainbow glow styles here */
-}
-
-.disclaimer {
-    font-size: 11px;
-    color: #9aa0a6; /* Subtle grey like Gemini */
-    text-align: center;
-    margin: 0;
-    padding: 4px 0;
-    font-family: sans-serif;
-    letter-spacing: 0.2px;
-}
-
-.welcome-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-    padding: 20px;
-    animation: fadeIn 0.8s ease;
-}
-
-.greeting {
-    font-size: 2.5rem;
-    font-weight: 700;
-    background: linear-gradient(to right, #10b981, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-}
-
-.intro-text {
-    color: #a0a0a0;
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-}
-
-.suggestion-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    width: 100%;
-    max-width: 800px;
-}
-
-.suggestion-card {
-    background: #161616;
-    border: 1px solid #222;
-    padding: 20px;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.suggestion-card:hover {
-    background: #1e1e1e;
-    border-color: #10b981;
-    transform: translateY(-4px);
-}
-
-.suggestion-card i {
-    color: #10b981;
-    font-size: 1.2rem;
-}
-
-.suggestion-card p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #e0e0e0;
-    line-height: 1.4;
 }
 
 @keyframes fadeIn {
