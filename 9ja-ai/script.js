@@ -85,7 +85,6 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
-                    
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
                     toggleButtons();
@@ -120,52 +119,68 @@ async function sendMessage() {
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
-    const msgId = 'msg-' + Date.now();
-    let displayHTML = text;
+    let targetAiBubble = null;
 
     if (currentlyEditingId) {
+        // --- RESTORED EDIT LOGIC ---
         const userWrapper = document.getElementById(currentlyEditingId);
         userWrapper.querySelector('.user-msg-bubble').innerText = text;
+        
+        // Find the AI bubble immediately following the edited message
+        const nextElement = userWrapper.nextElementSibling;
+        if (nextElement && nextElement.classList.contains('ai-msg-container')) {
+            targetAiBubble = nextElement.querySelector('.ai-msg-bubble');
+            targetAiBubble.innerHTML = `<div class="spinner-small"></div> Naija AI dey update...`;
+        }
+
+        // Update history entry
+        const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
+        if (histIndex !== -1) {
+            chatHistory[histIndex].parts = [{ text: text }];
+            // Remove everything after the edited message to keep context consistent
+            chatHistory = chatHistory.slice(0, histIndex + 1);
+        }
+
         currentlyEditingId = null;
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
     } else {
+        // Standard New Message Logic
+        const msgId = 'msg-' + Date.now();
+        let displayHTML = text;
         if (selectedImageBase64) {
             displayHTML = `<img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:10px; display:block; margin-bottom:8px;"> ${text}`;
         }
         appendBubble('user', displayHTML, msgId);
 
-        const messageParts = [];
-        if (text) messageParts.push({ text: text });
+        const messageParts = [{ text: text }];
         if (selectedImageBase64) {
-            messageParts.push({
-                inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 }
-            });
+            messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
     }
 
     // Reset UI State
     ui.input.value = "";
-    const tempImgBase64 = selectedImageBase64;
-    const tempImgMime = selectedImageMime;
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
     ui.previewContainer.style.display = 'none';
     toggleButtons();
     
-    ui.display.appendChild(ui.think); 
-    ui.think.style.display = 'flex';
+    // Only show global thinking if we aren't targeting a specific bubble
+    if (!targetAiBubble) {
+        ui.display.appendChild(ui.think); 
+        ui.think.style.display = 'flex';
+    }
     ui.display.scrollTop = ui.display.scrollHeight;
 
     try {
         const { data: { user } } = await sb.auth.getUser();
         
-        // Network Wahala Fix: Ensure all messages have parts
         const payload = {
             messages: chatHistory.map(msg => ({
                 role: msg.role,
-                parts: msg.parts ? msg.parts : [{ text: msg.content }]
+                parts: msg.parts
             })),
             user_id: user.id
         };
@@ -176,18 +191,22 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("Server error");
-
         const data = await response.json();
         ui.think.style.display = 'none';
         
         chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
-        appendAiBubble(data.reply);
+
+        if (targetAiBubble) {
+            targetAiBubble.innerHTML = formatAIResponse(data.reply);
+        } else {
+            appendAiBubble(data.reply);
+        }
 
     } catch (e) {
-        console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        appendAiBubble("Omo, network wahala! Make sure your Render backend is awake.");
+        const errorMsg = "Omo, network wahala! Check your server.";
+        if (targetAiBubble) targetAiBubble.innerText = errorMsg;
+        else appendAiBubble(errorMsg);
     }
 }
 
@@ -229,7 +248,6 @@ function appendBubble(sender, msg, id) {
     wrapper.id = id;
     wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
     ui.display.appendChild(wrapper);
-    ui.display.scrollTop = ui.display.scrollHeight;
 }
 
 function appendAiBubble(text) {
