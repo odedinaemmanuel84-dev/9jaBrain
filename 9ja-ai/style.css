@@ -93,7 +93,6 @@ body {
 .chat-content {
     flex: 1; 
     overflow-y: auto;
-    /* Reduced gap to 8px to keep messages close */
     padding: 90px 20px 160px 20px; 
     display: flex;
     flex-direction: column; 
@@ -180,28 +179,41 @@ body {
     position: relative;
     align-self: flex-end;
     display: flex;
-    flex-direction: row; /* Align bubble and edit button horizontally */
+    flex-direction: row; 
     align-items: center;
     justify-content: flex-end;
-    max-width: 80%;
+    max-width: 85%; /* Increased from 80% to prevent tight squeezing */
     margin-left: auto;
     margin-top: 0;
     margin-bottom: 0;
+    gap: 10px;
 }
 
 .user-msg-bubble {
     background: #2a2a2a;
     padding: 10px 16px; 
-    border-radius: 18px 18px 4px 18px; /* Sharper corner on the bottom-right */
+    border-radius: 18px 18px 4px 18px; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    word-wrap: break-word;
     color: white;
-    text-align: left;
-    display: flex;
-    flex-direction: row;
+    
+    /* THE FIX */
+    display: flex !important;
+    flex-direction: row !important;
     align-items: flex-start;
     gap: 12px;
-    line-height: 1.4; /* Fixed vertical letter spacing */
+    min-width: fit-content; /* Prevents squishing small text */
+    max-width: 100%;
+    word-wrap: break-word;
+    line-height: 1.4; 
+}
+
+.msg-text {
+    flex: 1; /* Forces text to occupy space properly */
+    white-space: pre-wrap;
+    display: block !important;
+    text-align: left;
+    min-width: 20px; /* Ensures space even for one letter */
+    word-break: break-word;
 }
 
 .user-msg-container .edit-btn {
@@ -215,10 +227,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 10px; /* Space between edit btn and bubble */
+    margin-right: 10px; 
     color: var(--text-dim);
     cursor: pointer;
-    order: -1; /* Puts edit button to the left of the user bubble */
+    order: -1; 
 }
 
 .user-msg-container:hover .edit-btn { opacity: 1; }
@@ -479,11 +491,6 @@ pre code {
     height: 100%;
     object-fit: cover;
     display: block;
-}
-
-.msg-text {
-    flex-grow: 1;
-    word-break: break-word;
 }
 
 /* Styling for the Speak Button with Text */
