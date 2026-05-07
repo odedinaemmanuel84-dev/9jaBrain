@@ -178,15 +178,17 @@ body {
 .user-msg-container {
     position: relative;
     align-self: flex-end;
-    display: flex;
+    display: flex !important;
     flex-direction: row; 
     align-items: center;
-    justify-content: flex-end;
-    max-width: 85%; /* Increased from 80% to prevent tight squeezing */
+    justify-content: flex-end !important;
+    width: 100% !important;
+    max-width: 100% !important;
     margin-left: auto;
     margin-top: 0;
     margin-bottom: 0;
     gap: 10px;
+    padding: 5px 0 !important;
 }
 
 .user-msg-bubble {
@@ -195,25 +197,23 @@ body {
     border-radius: 18px 18px 4px 18px; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     color: white;
-    
-    /* THE FIX */
-    display: flex !important;
+    display: inline-flex !important;
     flex-direction: row !important;
     align-items: flex-start !important;
     gap: 12px;
-    min-width: fit-content; /* Prevents squishing small text */
-    max-width: 100%;
+    width: auto !important;
+    min-width: 50px !important;
+    max-width: 80% !important;
     word-wrap: break-word;
     line-height: 1.6 !important;
 }
 
 .msg-text {
     flex: 1;
-    display: block !important;
-    /* Ensure the text has its own space */
+    display: inline-block !important;
     padding: 2px 0;
     word-break: break-word;
-    white-space: pre-wrap; /* Keeps your spacing/newlines natural */
+    white-space: pre-wrap !important;
 }
 
 .user-msg-container .edit-btn {
@@ -525,30 +525,4 @@ pre code {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-}
-
-/* THE NUCLEAR FIX - PUT AT THE VERY BOTTOM OF CSS */
-
-.user-msg-container {
-    display: flex !important;
-    justify-content: flex-end !important;
-    width: 100% !important; /* Ensure it spans the full width of the chat */
-    max-width: 100% !important;
-    padding: 5px 0 !important;
-}
-
-.user-msg-bubble {
-    display: inline-flex !important; /* This forces it to fit the content */
-    flex-direction: row !important;
-    width: auto !important; /* Prevent it from stretching or shrinking to 0 */
-    min-width: 50px !important; /* Give it a base size */
-    max-width: 80% !important;
-    white-space: nowrap !important; /* Force 'Hi' to stay on one line */
-}
-
-.msg-text {
-    display: inline-block !important;
-    white-space: normal !important; /* Allow long sentences to wrap, but not tiny words */
-    width: auto !important;
-    flex: none !important; 
 }
