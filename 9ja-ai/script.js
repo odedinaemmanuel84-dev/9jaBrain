@@ -34,7 +34,7 @@ async function init() {
         
         if (user.user_metadata?.avatar_url) ui.pfp.src = user.user_metadata.avatar_url;
         const name = user.user_metadata?.full_name || "Oga";
-        if (ui.userName) ui.userName.innerText = name.split(' ')[0];
+        if (ui.userName) ui.userName.innerText = name.split(' ');
 
         loadSidebarHistory();
     } catch (err) { console.error(err); }
@@ -79,11 +79,11 @@ function activateTriggers() {
 
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files[0];
+            const file = e.target.files;
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    selectedImageBase64 = event.target.result.split(',')[1];
+                    selectedImageBase64 = event.target.result.split(',');
                     selectedImageMime = file.type;
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
@@ -120,20 +120,21 @@ async function sendMessage() {
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
-        // --- Edit Logic ---
         const userWrapper = document.getElementById(currentlyEditingId);
         
-        // Update display depending on if there is an image or not
+        let newContent = "";
         if (selectedImageBase64) {
-            userWrapper.querySelector('.user-msg-bubble').innerHTML = `
+            newContent = `
                 <div class="msg-image-container">
                     <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
                 </div>
                 <div class="msg-text">${text}</div>
             `;
         } else {
-            userWrapper.querySelector('.user-msg-bubble').innerHTML = `<div class="msg-text">${text}</div>`;
+            newContent = `<div class="msg-text">${text}</div>`;
         }
+
+        userWrapper.querySelector('.user-msg-bubble').innerHTML = newContent;
         
         while (userWrapper.nextElementSibling) userWrapper.nextElementSibling.remove();
         
@@ -153,7 +154,6 @@ async function sendMessage() {
         ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
 
     } else {
-        // --- Standard New Message Flow ---
         const msgId = 'msg-' + Date.now();
         let displayHTML = "";
 
@@ -180,7 +180,6 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
     }
 
-    // UI Reset
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
@@ -191,12 +190,8 @@ async function sendMessage() {
 
     try {
         const { data: { user } } = await sb.auth.getUser();
-        
         const payload = {
-            messages: chatHistory.map(msg => ({
-                role: msg.role,
-                parts: msg.parts
-            })),
+            messages: chatHistory.map(msg => ({ role: msg.role, parts: msg.parts })),
             user_id: user.id
         };
 
@@ -214,18 +209,15 @@ async function sendMessage() {
         }
 
         const data = await response.json();
-        
         if (data.reply) {
             chatHistory.push({ role: "assistant", parts: [{ text: data.reply }] });
             appendAiBubble(data.reply);
         } else {
             appendAiBubble("Omo, Naija AI is speechless. Try refreshing?");
         }
-
     } catch (e) {
         console.error("Fetch Error:", e);
         ui.think.style.display = 'none';
-        
         if (e.message.includes("Failed to fetch")) {
             appendAiBubble("Omo, Render is still waking up the server. Give it 30 seconds and try again!");
         } else {
@@ -266,11 +258,20 @@ function copyCode(button) {
     });
 }
 
-function appendBubble(sender, msg, id) {
+function appendBubble(sender, content, id) {
     const wrapper = document.createElement('div');
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
-    wrapper.innerHTML = `<div class="user-msg-bubble">${msg}</div><div class="edit-btn" onclick="startEditing('${id}')"><i class="fas fa-pen"></i></div>`;
+    
+    // Safety: ensure text is always inside a msg-text div if not already
+    const formattedContent = content.includes('msg-text') ? content : `<div class="msg-text">${content}</div>`;
+    
+    wrapper.innerHTML = `
+        <div class="user-msg-bubble">${formattedContent}</div>
+        <div class="edit-btn" onclick="startEditing('${id}')">
+            <i class="fas fa-pen"></i>
+        </div>
+    `;
     ui.display.appendChild(wrapper);
 }
 
@@ -287,10 +288,12 @@ function appendAiBubble(text) {
 
 function startEditing(id) {
     currentlyEditingId = id;
-    const bubble = document.getElementById(id).querySelector('.user-msg-bubble');
-    // Extract only text for the input field
-    const textDiv = bubble.querySelector('.msg-text');
-    ui.input.value = textDiv ? textDiv.innerText : bubble.innerText;
+    const container = document.getElementById(id);
+    const textDiv = container.querySelector('.msg-text');
+    
+    // Pull just the text content so HTML tags don't show up in the input
+    ui.input.value = textDiv ? textDiv.innerText : container.querySelector('.user-msg-bubble').innerText;
+    
     ui.input.focus();
     ui.send.innerHTML = '<i class="fas fa-check"></i>';
     toggleButtons();
