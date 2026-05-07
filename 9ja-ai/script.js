@@ -264,7 +264,7 @@ function appendBubble(sender, content, id) {
     wrapper.id = id;
     
     // Safety: ensure text is always inside a msg-text div if not already
-    const formattedContent = content.includes('msg-text') ? content : `<div class="msg-text">${content}</div>`;
+   const finalContent = msg.includes('msg-text') ? msg : `<div class="msg-text">${msg}</div>`;
     
     wrapper.innerHTML = `
         <div class="user-msg-bubble">${formattedContent}</div>
