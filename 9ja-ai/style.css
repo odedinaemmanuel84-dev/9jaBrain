@@ -199,21 +199,21 @@ body {
     /* THE FIX */
     display: flex !important;
     flex-direction: row !important;
-    align-items: flex-start;
+    align-items: flex-start !important;
     gap: 12px;
     min-width: fit-content; /* Prevents squishing small text */
     max-width: 100%;
     word-wrap: break-word;
-    line-height: 1.4; 
+    line-height: 1.6 !important;
 }
 
 .msg-text {
-    flex: 1; /* Forces text to occupy space properly */
-    white-space: pre-wrap;
+    flex: 1;
     display: block !important;
-    text-align: left;
-    min-width: 20px; /* Ensures space even for one letter */
+    /* Ensure the text has its own space */
+    padding: 2px 0;
     word-break: break-word;
+    white-space: pre-wrap; /* Keeps your spacing/newlines natural */
 }
 
 .user-msg-container .edit-btn {
