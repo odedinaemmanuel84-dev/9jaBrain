@@ -334,25 +334,26 @@ body {
     padding: 5px 0;
 }
 
-.speak-btn, .arrow-send-btn {
-    background: #222; 
-    border: none; 
+.speak-btn-text {
+    background: #222;
+    border: 1px solid #444;
     color: white;
-    width: 40px; 
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1rem; 
-    display: flex; 
-    justify-content: center;
-    align-items: center; 
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
     transition: 0.2s;
-    flex-shrink: 0;
+    white-space: nowrap;
+    height: 38px; /* Fixed height to match circle buttons */
 }
 
-.speak-btn:hover, .arrow-send-btn:hover {
-    background: #333;
-    transform: scale(1.05);
+.speak-btn-text:hover {
+    border-color: var(--accent);
+    background: #2a2a2a;
 }
 
 .disclaimer {
