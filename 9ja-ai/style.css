@@ -526,3 +526,29 @@ pre code {
     align-items: center;
     flex-shrink: 0;
 }
+
+/* THE NUCLEAR FIX - PUT AT THE VERY BOTTOM OF CSS */
+
+.user-msg-container {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important; /* Ensure it spans the full width of the chat */
+    max-width: 100% !important;
+    padding: 5px 0 !important;
+}
+
+.user-msg-bubble {
+    display: inline-flex !important; /* This forces it to fit the content */
+    flex-direction: row !important;
+    width: auto !important; /* Prevent it from stretching or shrinking to 0 */
+    min-width: 50px !important; /* Give it a base size */
+    max-width: 80% !important;
+    white-space: nowrap !important; /* Force 'Hi' to stay on one line */
+}
+
+.msg-text {
+    display: inline-block !important;
+    white-space: normal !important; /* Allow long sentences to wrap, but not tiny words */
+    width: auto !important;
+    flex: none !important; 
+}
