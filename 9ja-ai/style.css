@@ -93,11 +93,11 @@ body {
 .chat-content {
     flex: 1; 
     overflow-y: auto;
-    /* Adjusted padding to make room for dynamic footer height */
+    /* Reduced gap to 8px to keep messages close */
     padding: 90px 20px 160px 20px; 
     display: flex;
     flex-direction: column; 
-    gap: 20px;
+    gap: 8px; 
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     position: relative;
@@ -175,25 +175,33 @@ body {
     line-height: 1.4;
 }
 
-/* --- MESSAGE BUBBLES --- */
+/* --- MESSAGE BUBBLES & CONTAINERS --- */
 .user-msg-container {
     position: relative;
     align-self: flex-end;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row; /* Align bubble and edit button horizontally */
+    align-items: center;
+    justify-content: flex-end;
     max-width: 80%;
     margin-left: auto;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .user-msg-bubble {
     background: #2a2a2a;
-    padding: 12px 18px; 
-    border-radius: 20px 20px 0 20px;
+    padding: 10px 16px; 
+    border-radius: 18px 18px 4px 18px; /* Sharper corner on the bottom-right */
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     word-wrap: break-word;
     color: white;
     text-align: left;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.4; /* Fixed vertical letter spacing */
 }
 
 .user-msg-container .edit-btn {
@@ -207,12 +215,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    left: -35px;
-    top: 50%;
-    transform: translateY(-50%);
+    margin-right: 10px; /* Space between edit btn and bubble */
     color: var(--text-dim);
     cursor: pointer;
+    order: -1; /* Puts edit button to the left of the user bubble */
 }
 
 .user-msg-container:hover .edit-btn { opacity: 1; }
@@ -222,12 +228,14 @@ body {
     max-width: 90%;
     display: flex;
     flex-direction: column;
+    margin-top: 4px;
 }
 
 .ai-msg-bubble {
-    line-height: 1.6; 
+    line-height: 1.5; 
     font-size: 1.05rem; 
     word-wrap: break-word;
+    padding: 10px 0;
 }
 
 /* --- THE THINKING INDICATOR (NAIJA PULSE) --- */
@@ -236,7 +244,7 @@ body {
     align-self: flex-start;
     align-items: center;
     gap: 10px; 
-    padding: 15px 0;
+    padding: 10px 0;
     color: var(--accent);
     font-style: italic;
     font-size: 14px;
@@ -270,12 +278,10 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    /* CRITICAL: Ensure this never fills the whole screen */
     height: auto !important; 
     max-height: 40vh;
 }
 
-/* Fix for the Image Preview Container */
 #imagePreviewContainer {
     width: 100%;
     max-width: 800px;
@@ -320,7 +326,7 @@ body {
     background: #222; 
     border: none; 
     color: white;
-    width: 40px; /* Made square for cleaner look */
+    width: 40px; 
     height: 40px;
     border-radius: 50%;
     font-size: 1rem; 
@@ -371,31 +377,26 @@ body {
     color: var(--text-dim);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 /* --- LOGO & BRANDING --- */
 .logo-container {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 24px 20px; /* Gives it some breathing room */
-    border-bottom: 1px solid var(--glass-border);
+    padding: 24px 20px; 
+    border-bottom: 1px solid var(--border);
 }
 
 .logo-icon {
     width: 36px;
     height: 36px;
-    background: var(--accent-green);
-    border-radius: 10px; /* Modern "squircle" shape */
+    background: var(--accent);
+    border-radius: 10px; 
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
     font-size: 20px;
-    color: black; /* Contrast against the green */
+    color: black; 
 }
 
 .logo-brand {
@@ -408,7 +409,7 @@ body {
     text-transform: uppercase;
 }
 
-/* --- ENHANCED CODE BOXES (GEMINI STYLE) --- */
+/* --- ENHANCED CODE BOXES --- */
 .code-container {
     background: #000000;
     border-radius: 12px;
@@ -427,7 +428,6 @@ body {
     font-size: 0.8rem;
     color: var(--text-dim);
     border-bottom: 1px solid #333;
-    font-family: 'Inter', sans-serif;
 }
 
 .copy-btn {
@@ -457,23 +457,36 @@ pre {
 }
 
 pre code {
-    font-family: 'Fira Code', 'Courier New', monospace;
+    font-family: 'Fira Code', monospace;
     font-size: 0.95rem;
     color: #e0e0e0;
     line-height: 1.5;
-    white-space: pre;
 }
 
-/* Custom scrollbar for code blocks */
-pre::-webkit-scrollbar {
-    height: 6px;
-}
-pre::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
+/* --- IMAGE HANDLING --- */
+.msg-image-container {
+    flex-shrink: 0; 
+    width: 60px;    
+    height: 60px;   
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #111;
 }
 
-/* Styling for the new Speak Button with Text */
+.msg-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.msg-text {
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+/* Styling for the Speak Button with Text */
 .speak-btn-text {
     background: #222;
     border: 1px solid #444;
@@ -493,7 +506,7 @@ pre::-webkit-scrollbar-thumb {
 
 .speak-btn-text i {
     font-size: 0.8rem;
-    color: var(--accent); /* Makes the mic green to match your theme */
+    color: var(--accent);
 }
 
 .speak-btn-text:hover {
@@ -501,50 +514,8 @@ pre::-webkit-scrollbar-thumb {
     border-color: var(--accent);
 }
 
-/* Ensure the button group doesn't shrink */
 .button-group {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-}
-
-/* Make sure the input leaves enough room for the longer button */
-#userInput {
-    flex: 1;
-    min-width: 0; /* Prevents input from pushing buttons off screen */
-}
-
-/* Container for the user message to handle layout */
-.user-msg-bubble {
-    display: flex;
-    flex-direction: row; /* Aligns image and text side-by-side */
-    align-items: flex-start;
-    gap: 12px;
-    max-width: 85%;
-    padding: 12px;
-}
-
-/* The Professional Image Container */
-.msg-image-container {
-    flex-shrink: 0; /* Prevents text from squeezing the image */
-    width: 60px;    /* Fixed width like Gemini */
-    height: 60px;   /* Fixed height */
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: #2a2a2a;
-}
-
-.msg-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures image fills the square professionally */
-    display: block;
-}
-
-/* The text next to the image */
-.msg-text {
-    flex-grow: 1;
-    line-height: 1.5;
-    word-break: break-word;
 }
