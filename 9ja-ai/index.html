@@ -66,17 +66,18 @@
 
         <!-- FIXED BOTTOM SECTION -->
         <footer class="rainbow-input-section">
-            <!-- Image Preview Box -->
-            <div id="imagePreviewContainer" style="display: none;">
-                <div class="preview-wrapper">
-                    <img id="imagePreview" src="">
-                    <button id="removeImgBtn" type="button">&times;</button>
+            
+            <!-- IMAGE PREVIEW BOX (Updated to show picked photos) -->
+            <div id="imagePreviewContainer" style="display: none; padding: 10px;">
+                <div class="preview-wrapper" style="position: relative; display: inline-block;">
+                    <img id="imagePreview" src="" alt="Preview" style="max-width: 300px; border-radius: 10px; border: 2px solid #555;">
+                    <button id="removeImgBtn" type="button" style="position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; border: none; cursor: pointer; width: 25px; height: 25px;">&times;</button>
                 </div>
             </div>
 
             <div class="rainbow-border-box">
                 <div class="input-container">
-                    <!-- CHANGED: Now using a Photo/Image icon instead of a square/clip -->
+                    <!-- Photo/Image Upload Button -->
                     <label for="imageUpload" class="icon-btn" style="cursor: pointer; padding: 0 10px; color: #b3b3b3;">
                         <i class="fas fa-image"></i> 
                     </label>
@@ -85,7 +86,7 @@
                     <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
                     
                     <div class="button-group">
-                        <!-- CHANGED: Dedicated Speak Button with Text -->
+                        <!-- Dedicated Speak Button -->
                         <button class="speak-btn-text" id="voiceBtn">
                             <i class="fas fa-microphone"></i>
                             <span>Speak</span>
