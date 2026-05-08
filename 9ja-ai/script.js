@@ -77,16 +77,21 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
+    // --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files;
+            const file = e.target.files[0]; // Get the first file picked
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    selectedImageBase64 = event.target.result.split(',');
+                    // Store the base64 string for the AI backend
+                    selectedImageBase64 = event.target.result.split(',')[1];
                     selectedImageMime = file.type;
+                    
+                    // SHOW THE PREVIEW ON SCREEN
                     ui.previewImg.src = event.target.result;
                     ui.previewContainer.style.display = 'block';
+                    
                     toggleButtons();
                 };
                 reader.readAsDataURL(file);
@@ -100,6 +105,7 @@ function activateTriggers() {
             selectedImageMime = null;
             ui.fileInput.value = "";
             ui.previewContainer.style.display = 'none';
+            ui.previewImg.src = "";
             toggleButtons();
         };
     }
@@ -263,7 +269,6 @@ function appendBubble(sender, content, id) {
     wrapper.className = 'user-msg-container';
     wrapper.id = id;
     
-    // This part is key: wrapping the content in the msg-text div
     const formattedContent = content.includes('msg-text') ? content : `<div class="msg-text">${content}</div>`;
     
     wrapper.innerHTML = `
@@ -291,7 +296,6 @@ function startEditing(id) {
     const container = document.getElementById(id);
     const textDiv = container.querySelector('.msg-text');
     
-    // Pull just the text content so HTML tags don't show up in the input
     ui.input.value = textDiv ? textDiv.innerText : container.querySelector('.user-msg-bubble').innerText;
     
     ui.input.focus();
