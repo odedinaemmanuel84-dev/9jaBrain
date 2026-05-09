@@ -120,6 +120,11 @@ body {
     animation: fadeIn 0.8s ease;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .greeting {
     font-size: clamp(2rem, 8vw, 3.5rem);
     font-weight: 700;
@@ -162,19 +167,7 @@ body {
     transform: translateY(-4px);
 }
 
-.suggestion-card i {
-    color: var(--primary);
-    font-size: 1.2rem;
-}
-
-.suggestion-card p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #e0e0e0;
-    line-height: 1.4;
-}
-
-/* --- MESSAGE BUBBLES & CONTAINERS --- */
+/* --- MESSAGE BUBBLES --- */
 .user-msg-container {
     position: relative;
     align-self: flex-end;
@@ -183,8 +176,6 @@ body {
     align-items: center;
     justify-content: flex-end !important;
     width: 100% !important;
-    max-width: 100% !important;
-    margin-left: auto;
     margin-top: 0;
     margin-bottom: 0;
     gap: 10px;
@@ -201,8 +192,6 @@ body {
     flex-direction: row !important;
     align-items: flex-start !important;
     gap: 12px;
-    width: auto !important;
-    min-width: 50px !important;
     max-width: 80% !important;
     word-wrap: break-word;
     line-height: 1.6 !important;
@@ -210,8 +199,6 @@ body {
 
 .msg-text {
     flex: 1;
-    display: inline-block !important;
-    padding: 2px 0;
     word-break: break-word;
     white-space: pre-wrap !important;
 }
@@ -227,7 +214,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 10px; 
     color: var(--text-dim);
     cursor: pointer;
     order: -1; 
@@ -240,44 +226,15 @@ body {
     max-width: 90%;
     display: flex;
     flex-direction: column;
-    margin-top: 4px;
 }
 
 .ai-msg-bubble {
     line-height: 1.5; 
     font-size: 1.05rem; 
-    word-wrap: break-word;
     padding: 10px 0;
 }
 
-/* --- THE THINKING INDICATOR (NAIJA PULSE) --- */
-#thinkingIndicator {
-    display: none;
-    align-self: flex-start;
-    align-items: center;
-    gap: 10px; 
-    padding: 10px 0;
-    color: var(--accent);
-    font-style: italic;
-    font-size: 14px;
-}
-
-#thinkingIndicator::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0.4; transform: scale(0.9); }
-}
-
-/* --- FIXED RAINBOW INPUT SECTION --- */
+/* --- RAINBOW INPUT SECTION --- */
 .rainbow-input-section {
     position: fixed; 
     bottom: 0; 
@@ -290,16 +247,6 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    height: auto !important; 
-    max-height: 40vh;
-}
-
-#imagePreviewContainer {
-    width: 100%;
-    max-width: 800px;
-    display: flex;
-    justify-content: flex-start;
-    padding-left: 10px;
 }
 
 .rainbow-border-box {
@@ -319,9 +266,9 @@ body {
     border-radius: 28px;
     display: flex; 
     align-items: center;
-    padding: 8px 12px; 
+    padding: 4px 12px; 
     gap: 10px;
-    min-height: 50px;
+    min-height: 52px;
 }
 
 #userInput { 
@@ -331,36 +278,79 @@ body {
     color: white; 
     font-size: 1rem; 
     outline: none; 
-    padding: 5px 0;
+    padding: 10px 5px;
 }
 
-.speak-btn, .arrow-send-btn {
-    background: #222; 
-    border: none; 
-    color: white;
-    width: 40px; 
-    height: 40px;
+/* --- TUCKED IN SPEAK BUTTON STYLE --- */
+.speak-btn-text {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-dim) !important;
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.speak-btn-text:hover {
+    color: white !important;
+}
+
+.speak-btn-text i {
+    font-size: 1rem;
+    color: var(--text-dim);
+}
+
+.arrow-send-btn {
+    background: white !important; 
+    color: black !important;
+    width: 32px; 
+    height: 32px;
     border-radius: 50%;
-    font-size: 1rem; 
     display: flex; 
     justify-content: center;
     align-items: center; 
+    border: none;
     cursor: pointer;
-    transition: 0.2s;
     flex-shrink: 0;
 }
 
-.speak-btn:hover, .arrow-send-btn:hover {
-    background: #333;
-    transform: scale(1.05);
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.disclaimer {
-    font-size: 11px;
-    color: #9aa0a6;
-    text-align: center;
-    margin: 0;
-    padding: 4px 0;
+/* --- CODE BOXES --- */
+.code-container {
+    background: #000000;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+.code-header {
+    background: #202123;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid #444;
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 /* --- SIDEBAR --- */
@@ -378,151 +368,10 @@ body {
 }
 
 .sidebar.active { left: 0; }
-.feature-list { list-style: none; margin-top: 20px; }
-.feature-list li {
-    padding: 15px 0;
-    border-bottom: 1px solid #222;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--text-dim);
-}
 
-/* --- LOGO & BRANDING --- */
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 24px 20px; 
-    border-bottom: 1px solid var(--border);
-}
-
-.logo-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--accent);
-    border-radius: 10px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
-    font-size: 20px;
-    color: black; 
-}
-
-.logo-brand {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #00ff88, #ffffff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-transform: uppercase;
-}
-
-/* --- ENHANCED CODE BOXES --- */
-.code-container {
-    background: #000000;
-    border-radius: 12px;
-    margin: 15px 0;
-    border: 1px solid #333;
-    overflow: hidden;
-    width: 100%;
-}
-
-.code-header {
-    background: #202123;
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    border-bottom: 1px solid #333;
-}
-
-.copy-btn {
-    background: transparent;
-    border: 1px solid #444;
-    color: var(--text-dim);
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.copy-btn:hover {
-    background: #333;
-    color: white;
-    border-color: var(--accent);
-}
-
-pre {
-    padding: 15px;
-    overflow-x: auto;
-    background: #000;
-}
-
-pre code {
-    font-family: 'Fira Code', monospace;
-    font-size: 0.95rem;
-    color: #e0e0e0;
-    line-height: 1.5;
-}
-
-/* --- IMAGE HANDLING --- */
-.msg-image-container {
-    flex-shrink: 0; 
-    width: 60px;    
-    height: 60px;   
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: #111;
-}
-
-.msg-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* Styling for the Speak Button with Text */
-.speak-btn-text {
-    background: #222;
-    border: 1px solid #444;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 18px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-    white-space: nowrap;
-    margin-right: 5px;
-}
-
-.speak-btn-text i {
-    font-size: 0.8rem;
-    color: var(--accent);
-}
-
-.speak-btn-text:hover {
-    background: #333;
-    border-color: var(--accent);
-}
-
-.button-group {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
+.disclaimer {
+    font-size: 11px;
+    color: #9aa0a6;
+    text-align: center;
+    padding: 4px 0;
 }
