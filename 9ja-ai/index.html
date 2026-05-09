@@ -75,29 +75,34 @@
                 </div>
             </div>
 
+            <!-- START REPLACED SECTION -->
             <div class="rainbow-border-box">
-                <div class="input-container">
-                    <!-- Photo/Image Upload Button -->
-                    <label for="imageUpload" class="icon-btn" style="cursor: pointer; padding: 0 10px; color: #b3b3b3;">
-                        <i class="fas fa-image"></i> 
+                <div class="input-container" style="display: flex; align-items: center; background: #2f2f2f; border-radius: 24px; padding: 4px 12px;">
+                    <!-- PLUS BUTTON (Gemini Style) -->
+                    <label for="imageUpload" class="icon-btn" style="cursor: pointer; padding: 8px; color: #b3b3b3;">
+                        <i class="fas fa-plus"></i> 
                     </label>
                     <input type="file" id="imageUpload" accept="image/*" style="display: none;">
                     
-                    <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
+                    <!-- TYPING BOX -->
+                    <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off" style="flex: 1; border: none; background: transparent; color: white; outline: none; padding: 10px;">
                     
-                    <div class="button-group">
-                        <!-- Dedicated Speak Button -->
-                        <button class="speak-btn-text" id="voiceBtn">
+                    <div class="button-group" style="display: flex; align-items: center; gap: 8px;">
+                        <!-- SPEAK BUTTON (Now tucked inside) -->
+                        <button class="speak-btn-text" id="voiceBtn" style="background: transparent; border: none; color: #b3b3b3; display: flex; align-items: center; gap: 5px; cursor: pointer;">
                             <i class="fas fa-microphone"></i>
-                            <span>Speak</span>
+                            <span style="font-size: 14px;">Speak</span>
                         </button>
                         
-                        <button class="arrow-send-btn" id="sendBtn" style="display: none;">
+                        <!-- SEND BUTTON -->
+                        <button class="arrow-send-btn" id="sendBtn" style="display: none; background: white; color: black; border-radius: 50%; width: 32px; height: 32px; border: none; justify-content: center; align-items: center;">
                             <i class="fas fa-arrow-up"></i>
                         </button>
                     </div>
                 </div>
             </div>
+            <!-- END REPLACED SECTION -->
+
             <p class="disclaimer">Naija AI fit make mistakes. Confirm gist before you carry am go.</p>
         </footer>
         
