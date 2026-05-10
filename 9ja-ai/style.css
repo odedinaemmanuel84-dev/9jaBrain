@@ -248,58 +248,40 @@ body {
     margin-top: 4px;
 }
 
-/* --- GEMINI-STYLE AI RESPONSE LAYOUT --- */
+/* --- GEMINI-STYLE AI RESPONSE --- */
 .ai-msg-bubble {
-    line-height: 1.7;
+    line-height: 1.8; /* More space between lines */
     font-size: 1.05rem;
-    color: #e3e3e3;
-    padding: 15px 0;
+    color: #e8eaed; /* Clean Gemini light grey */
+    padding: 12px 0;
     width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap; /* This makes the AI's line breaks work! */
 }
 
-/* Make headers look sharp like Gemini */
-.ai-msg-bubble h1, .ai-msg-bubble h2, .ai-msg-bubble h3 {
-    color: var(--accent);
-    margin: 20px 0 10px 0;
-    font-weight: 600;
+/* Make Bold text stand out */
+.ai-msg-bubble strong, .ai-msg-bubble b {
+    color: #ffffff;
+    font-weight: 700;
 }
 
-/* Organized Bullet Points */
+/* Style Lists so they don't look messy */
 .ai-msg-bubble ul, .ai-msg-bubble ol {
-    margin-left: 20px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    padding-left: 25px;
+    margin: 15px 0;
 }
 
 .ai-msg-bubble li {
-    padding-left: 5px;
+    margin-bottom: 8px;
 }
 
-/* Bold text highlights */
-.ai-msg-bubble strong {
-    color: #fff;
-    font-weight: 600;
+/* Add a subtle fade-in so it feels smooth */
+@keyframes bubbleFade {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-/* --- THE CHAT CONTAINER STRUCTURE --- */
-.chat-content {
-    max-width: 850px; /* Limits width for better readability */
-    margin: 0 auto;   /* Centers the chat like Gemini */
-    padding: 100px 20px 180px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px; /* More space between turns */
-}
-
-/* User Message - More minimalist */
-.user-msg-bubble {
-    background: #212121;
-    border: 1px solid #333;
-    padding: 12px 20px;
-    border-radius: 24px;
-    max-width: 85% !important;
+.ai-msg-container {
+    animation: bubbleFade 0.4s ease-out;
 }
 
 /* --- SCROLLING & BACKGROUND --- */
