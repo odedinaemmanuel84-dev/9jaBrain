@@ -531,3 +531,40 @@ pre code {
     align-items: center;
     flex-shrink: 0;
 }
+
+/* --- GEMINI STYLE PLUS BUTTON --- */
+.plus-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #222; /* Dark circle background */
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    flex-shrink: 0;
+}
+
+.plus-btn:hover {
+    background: #333;
+    color: var(--accent); /* Glows Green on hover */
+    transform: rotate(90deg); /* Slight rotation for that "pro" feel */
+}
+
+.plus-btn i {
+    font-size: 1rem;
+}
+
+/* Adjust the input container padding to breathe better with the plus button */
+.input-container {
+    background: #111; 
+    border-radius: 28px;
+    display: flex; 
+    align-items: center;
+    padding: 6px 12px; 
+    gap: 8px;
+    min-height: 52px;
+}
