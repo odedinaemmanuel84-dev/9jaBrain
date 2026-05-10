@@ -248,11 +248,63 @@ body {
     margin-top: 4px;
 }
 
+/* --- GEMINI-STYLE AI RESPONSE LAYOUT --- */
 .ai-msg-bubble {
-    line-height: 1.5; 
-    font-size: 1.05rem; 
-    word-wrap: break-word;
-    padding: 10px 0;
+    line-height: 1.7;
+    font-size: 1.05rem;
+    color: #e3e3e3;
+    padding: 15px 0;
+    width: 100%;
+}
+
+/* Make headers look sharp like Gemini */
+.ai-msg-bubble h1, .ai-msg-bubble h2, .ai-msg-bubble h3 {
+    color: var(--accent);
+    margin: 20px 0 10px 0;
+    font-weight: 600;
+}
+
+/* Organized Bullet Points */
+.ai-msg-bubble ul, .ai-msg-bubble ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-msg-bubble li {
+    padding-left: 5px;
+}
+
+/* Bold text highlights */
+.ai-msg-bubble strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* --- THE CHAT CONTAINER STRUCTURE --- */
+.chat-content {
+    max-width: 850px; /* Limits width for better readability */
+    margin: 0 auto;   /* Centers the chat like Gemini */
+    padding: 100px 20px 180px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* More space between turns */
+}
+
+/* User Message - More minimalist */
+.user-msg-bubble {
+    background: #212121;
+    border: 1px solid #333;
+    padding: 12px 20px;
+    border-radius: 24px;
+    max-width: 85% !important;
+}
+
+/* --- SCROLLING & BACKGROUND --- */
+body {
+    background-color: #0e0e0e; /* Slightly softer black */
 }
 
 /* --- THE THINKING INDICATOR (NAIJA PULSE) --- */
