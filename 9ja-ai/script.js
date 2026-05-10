@@ -123,6 +123,20 @@ async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text && !selectedImageBase64) return;
 
+    // --- ADDED: DATE LOGIC START (Does not change your UI) ---
+    const now = new Date();
+    const dateString = now.toLocaleString('en-NG', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    // This adds the date context only for the AI's "Brain"
+    const textWithDate = `[Current Date: ${dateString}] ${text}`;
+    // --- ADDED: DATE LOGIC END ---
+
     if (ui.welcome) ui.welcome.style.display = 'none';
 
     if (currentlyEditingId) {
@@ -146,7 +160,8 @@ async function sendMessage() {
         
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
-            const messageParts = [{ text: text }];
+            // We use the text with the date for the AI's history
+            const messageParts = [{ text: textWithDate }];
             if (selectedImageBase64) {
                 messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
             }
@@ -176,7 +191,8 @@ async function sendMessage() {
 
         appendBubble('user', displayHTML, msgId);
         
-        const messageParts = [{ text: text }];
+        // We push the version with the date into chatHistory for the AI
+        const messageParts = [{ text: textWithDate }];
         if (selectedImageBase64) {
             messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
         }
