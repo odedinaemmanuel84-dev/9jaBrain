@@ -93,7 +93,7 @@ body {
 .chat-content {
     flex: 1; 
     overflow-y: auto;
-    padding: 90px 20px 160px 20px; 
+    padding: 90px 20px 180px 20px; /* Adjusted bottom padding to prevent content clipping */
     display: flex;
     flex-direction: column; 
     gap: 8px; 
@@ -320,10 +320,12 @@ body {
 .rainbow-input-section {
     position: fixed; 
     bottom: 0; 
-    left: 0; 
+    left: 50%; 
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 850px;
     padding: 10px 15px 20px 15px;
-    background: var(--bg); 
+    background: transparent; 
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -333,17 +335,57 @@ body {
     max-height: 40vh;
 }
 
+/* --- GEMINI CONTAINER FOR IMAGE INSIDE BAR --- */
 #imagePreviewContainer {
     width: 100%;
-    max-width: 800px;
     display: flex;
     justify-content: flex-start;
-    padding-left: 10px;
+    padding: 5px 5px 0 5px;
+    align-self: flex-start;
+}
+
+.preview-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+}
+
+/* Constrains preview image size so it sits neatly in the container */
+#imagePreview {
+    width: 64px !important;
+    height: 64px !important;
+    max-width: 64px !important;
+    max-height: 64px !important;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid #333;
+}
+
+/* Tiny Delete Button on the corner of the thumbnail */
+#removeImgBtn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 .rainbow-border-box {
     padding: 2px; 
-    border-radius: 30px;
+    border-radius: 26px; /* Slightly tighter curves to complement the updated inner padding */
     background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     background-size: 400%; 
     animation: moveRainbow 8s linear infinite;
@@ -353,14 +395,24 @@ body {
 
 @keyframes moveRainbow { 0% { background-position: 0%; } 100% { background-position: 400%; } }
 
+/* --- THE CONTAINER THAT EXPANDS UPWARD --- */
 .input-container {
     background: #111; 
-    border-radius: 28px;
+    border-radius: 24px;
     display: flex; 
-    align-items: center;
-    padding: 8px 12px; 
+    flex-direction: column; /* Allows nested image preview to stack vertically above row */
+    padding: 10px 14px; 
     gap: 10px;
-    min-height: 50px;
+    min-height: 52px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* --- THE WRAPPER ROW FOR INTERNAL COMPONENTS --- */
+.input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
 }
 
 #userInput { 
@@ -517,8 +569,8 @@ pre code {
 /* --- IMAGE HANDLING --- */
 .msg-image-container {
     flex-shrink: 0; 
-    width: 60px;    
-    height: 60px;   
+    width: 60px;     
+    height: 60px;    
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -590,15 +642,4 @@ pre code {
 
 .plus-btn i {
     font-size: 1rem;
-}
-
-/* Adjust the input container padding to breathe better with the plus button */
-.input-container {
-    background: #111; 
-    border-radius: 28px;
-    display: flex; 
-    align-items: center;
-    padding: 6px 12px; 
-    gap: 8px;
-    min-height: 52px;
 }
