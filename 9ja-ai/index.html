@@ -9,7 +9,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- FIXED TOP HEADER -->
         <header class="main-interface">
             <div class="top-nav">
                 <div class="nav-left">
@@ -18,7 +17,6 @@
                 </div>
                 <div class="nav-right">
                     <button id="newChatBtn" class="icon-btn action-icon" onclick="window.location.reload()"><i class="far fa-edit"></i></button>
-                    <!-- FIXED PROFILE AREA -->
                     <div class="profile-wrapper">
                         <label for="profilePictureUpload" class="profile-area">
                             <img id="userImg" src="default-avatar.png" class="user-avatar" title="Upload new photo">
@@ -29,10 +27,8 @@
             </div>
         </header>
 
-        <!-- CHAT AREA -->
         <main id="chatDisplay" class="chat-content">
             
-            <!-- Welcome Screen -->
             <div id="welcomeScreen" class="welcome-container">
                 <h1 class="greeting">Hello, <span id="userName">Oga</span></h1>
                 <p class="intro-text">How I fit help you today?</p>
@@ -57,50 +53,48 @@
                 </div>
             </div>
             
-            <!-- Thinking Indicator -->
             <div id="thinkingIndicator" class="thinking-wrapper" style="display: none;">
                 <div class="spinner"></div>
                 <p class="thinking-text">Naija AI dey think...</p>
             </div>
         </main>
 
-        <!-- FIXED BOTTOM SECTION -->
         <footer class="rainbow-input-section">
-            
-            <!-- IMAGE PREVIEW BOX -->
-            <div id="imagePreviewContainer" style="display: none; padding: 10px;">
-                <div class="preview-wrapper" style="position: relative; display: inline-block;">
-                    <img id="imagePreview" src="" alt="Preview" style="max-width: 300px; border-radius: 10px; border: 2px solid #555;">
-                    <button id="removeImgBtn" type="button" style="position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; border: none; cursor: pointer; width: 25px; height: 25px;">&times;</button>
-                </div>
-            </div>
-
             <div class="rainbow-border-box">
-                <div class="input-container">
-                    <!-- Photo/Image Upload Button -->
-    <label for="imageUpload" class="plus-btn" title="Upload image">
-        <i class="fas fa-plus"></i> 
-    </label>
-    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-    
-    <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
-    
-    <div class="button-group">
-        <button class="speak-btn-text" id="voiceBtn">
-            <i class="fas fa-microphone"></i>
-            <span>Speak</span>
-        </button>
-        
-        <button class="arrow-send-btn" id="sendBtn" style="display: none;">
-            <i class="fas fa-arrow-up"></i>
-        </button>
-    </div>
-</div>
+                <div class="input-container" id="expandingContainer">
+                    
+                    <div id="imagePreviewContainer" style="display: none;">
+                        <div class="preview-wrapper">
+                            <img id="imagePreview" src="" alt="Preview">
+                            <button id="removeImgBtn" type="button">&times;</button>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <label for="imageUpload" class="plus-btn" title="Upload image">
+                            <i class="fas fa-plus"></i> 
+                        </label>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                        
+                        <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
+                        
+                        <div class="button-group">
+                            <button class="speak-btn-text" id="voiceBtn">
+                                <i class="fas fa-microphone"></i>
+                                <span>Speak</span>
+                            </button>
+                            
+                            <button class="arrow-send-btn" id="sendBtn" style="display: none;">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
             <p class="disclaimer">Naija AI fit make mistakes. Confirm gist before you carry am go.</p>
         </footer>
         
-        <!-- SIDEBAR MENU -->
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>Senior Features</h3>
@@ -114,8 +108,8 @@
         </div>
     </div>
 
-    <!-- Scripts (Supabase MUST load before script.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>
+                
