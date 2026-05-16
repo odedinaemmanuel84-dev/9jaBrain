@@ -80,8 +80,6 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // --- UPDATED IMAGE PICKER LOGIC ---
-
 // --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
