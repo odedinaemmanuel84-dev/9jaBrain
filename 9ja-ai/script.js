@@ -64,13 +64,16 @@ function activateTriggers() {
         };
     }
 
-    ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
+    if (ui.send) {
+        ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
+    }
 
-    ui.input.onkeydown = (e) => { 
-        if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } 
-    };
-    
-    ui.input.oninput = toggleButtons;
+    if (ui.input) {
+        ui.input.onkeydown = (e) => { 
+            if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } 
+        };
+        ui.input.oninput = toggleButtons;
+    }
 
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
@@ -80,17 +83,19 @@ function activateTriggers() {
     // --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files[0]; // Get the first file picked
+            const file = e.target.files; // Get the first file picked
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     // Store the base64 string for the AI backend
-                    selectedImageBase64 = event.target.result.split(',')[1];
+                    selectedImageBase64 = event.target.result.split(',');
                     selectedImageMime = file.type;
                     
                     // SHOW THE PREVIEW ON SCREEN
-                    ui.previewImg.src = event.target.result;
-                    ui.previewContainer.style.display = 'block';
+                    if (ui.previewImg && ui.previewContainer) {
+                        ui.previewImg.src = event.target.result;
+                        ui.previewContainer.style.display = 'flex'; // Changed to flex for proper container expansion
+                    }
                     
                     toggleButtons();
                 };
@@ -103,9 +108,9 @@ function activateTriggers() {
         ui.removeImg.onclick = () => {
             selectedImageBase64 = null;
             selectedImageMime = null;
-            ui.fileInput.value = "";
-            ui.previewContainer.style.display = 'none';
-            ui.previewImg.src = "";
+            if (ui.fileInput) ui.fileInput.value = "";
+            if (ui.previewContainer) ui.previewContainer.style.display = 'none';
+            if (ui.previewImg) ui.previewImg.src = "";
             toggleButtons();
         };
     }
@@ -163,7 +168,7 @@ async function sendMessage() {
         ui.display.appendChild(ui.think);
         ui.think.style.display = 'flex';
         currentlyEditingId = null;
-        ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        if (ui.send) ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
 
     } else {
         const msgId = 'msg-' + Date.now();
@@ -207,14 +212,13 @@ async function sendMessage() {
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
-    ui.previewContainer.style.display = 'none';
+    if (ui.previewContainer) ui.previewContainer.style.display = 'none';
     toggleButtons();
     ui.display.scrollTop = ui.display.scrollHeight;
 
     try {
         const { data: { user } } = await sb.auth.getUser();
         
-        // CRITICAL FIX HERE: Explicitly mapping the payload to include all part objects (text and inlineData)
         const payload = {
             messages: chatHistory.map(msg => {
                 return {
@@ -286,6 +290,11 @@ function formatAIResponse(text) {
     });
 }
 
+// Support functions for handling markdown/text variations natively
+function formatTextLayout(text) {
+    return text; 
+}
+
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
@@ -333,7 +342,9 @@ function startEditing(id) {
     ui.input.value = textDiv ? textDiv.innerText : container.querySelector('.user-msg-bubble').innerText;
     
     ui.input.focus();
-    ui.send.innerHTML = '<i class="fas fa-check"></i>';
+    if (ui.send) {
+        ui.send.innerHTML = '<i class="fas fa-check"></i>';
+    }
     toggleButtons();
 }
 
