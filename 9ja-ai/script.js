@@ -81,6 +81,8 @@ function activateTriggers() {
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
     // --- UPDATED IMAGE PICKER LOGIC ---
+
+// --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
             const file = e.target.files; // Get the first file picked
@@ -94,7 +96,8 @@ function activateTriggers() {
                     // SHOW THE PREVIEW ON SCREEN
                     if (ui.previewImg && ui.previewContainer) {
                         ui.previewImg.src = event.target.result;
-                        ui.previewContainer.style.display = 'flex'; // Changed to flex for proper container expansion
+                        // FORCE both the container and wrapper to show up cleanly
+                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
                     }
                     
                     toggleButtons();
@@ -109,15 +112,13 @@ function activateTriggers() {
             selectedImageBase64 = null;
             selectedImageMime = null;
             if (ui.fileInput) ui.fileInput.value = "";
-            if (ui.previewContainer) ui.previewContainer.style.display = 'none';
+            if (ui.previewContainer) ui.previewContainer.style.setProperty('display', 'none', 'important');
             if (ui.previewImg) ui.previewImg.src = "";
             toggleButtons();
         };
-    }
-} 
 
-// --- 3. SUGGESTION LOGIC ---
-function useSuggestion(text) {
+    // --- 3. SUGGESTION LOGIC ---
+   function useSuggestion(text) {
     ui.input.value = text;
     toggleButtons();
     sendMessage();
