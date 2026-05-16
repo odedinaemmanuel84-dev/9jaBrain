@@ -114,6 +114,7 @@ function activateTriggers() {
             if (ui.previewImg) ui.previewImg.src = "";
             toggleButtons();
         };
+}
 
     // --- 3. SUGGESTION LOGIC ---
    function useSuggestion(text) {
