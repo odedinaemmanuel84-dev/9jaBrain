@@ -123,19 +123,10 @@ async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text && !selectedImageBase64) return;
 
-    // --- ADDED: DATE LOGIC START (Does not change your UI) ---
+    // --- DATE LOGIC ---
     const now = new Date();
-    const dateString = now.toLocaleString('en-NG', { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    // This adds the date context only for the AI's "Brain"
+    const dateString = now.toLocaleString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const textWithDate = `[Current Date: ${dateString}] ${text}`;
-    // --- ADDED: DATE LOGIC END ---
 
     if (ui.welcome) ui.welcome.style.display = 'none';
 
@@ -160,8 +151,8 @@ async function sendMessage() {
         
         const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
         if (histIndex !== -1) {
-            // We use the text with the date for the AI's history
-            const messageParts = [{ text: textWithDate }];
+            let messageParts = [];
+            messageParts.push({ text: textWithDate });
             if (selectedImageBase64) {
                 messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
             }
@@ -191,10 +182,15 @@ async function sendMessage() {
 
         appendBubble('user', displayHTML, msgId);
         
-        // We push the version with the date into chatHistory for the AI
-        const messageParts = [{ text: textWithDate }];
+        let messageParts = [];
+        messageParts.push({ text: textWithDate });
         if (selectedImageBase64) {
-            messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
+            messageParts.push({ 
+                inlineData: { 
+                    mimeType: selectedImageMime, 
+                    data: selectedImageBase64 
+                } 
+            });
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
 
@@ -202,6 +198,11 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
     }
 
+    // Capture image variables locally before resetting them for the UI box
+    const currentImageBase64 = selectedImageBase64;
+    const currentImageMime = selectedImageMime;
+
+    // Reset UI Inputs
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
@@ -212,8 +213,25 @@ async function sendMessage() {
 
     try {
         const { data: { user } } = await sb.auth.getUser();
+        
+        // CRITICAL FIX HERE: Explicitly mapping the payload to include all part objects (text and inlineData)
         const payload = {
-            messages: chatHistory.map(msg => ({ role: msg.role, parts: msg.parts })),
+            messages: chatHistory.map(msg => {
+                return {
+                    role: msg.role,
+                    parts: msg.parts.map(part => {
+                        if (part.inlineData) {
+                            return {
+                                inlineData: {
+                                    mimeType: part.inlineData.mimeType,
+                                    data: part.inlineData.data
+                                }
+                            };
+                        }
+                        return { text: part.text };
+                    })
+                };
+            }),
             user_id: user.id
         };
 
@@ -247,7 +265,7 @@ async function sendMessage() {
         }
     }
 }
-
+        
 // --- 5. UI BUBBLES & FORMATTING ---
 function formatAIResponse(text) {
     if (!text) return "";
