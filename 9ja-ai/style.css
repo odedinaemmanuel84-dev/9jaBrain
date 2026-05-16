@@ -324,15 +324,34 @@ body {
     transform: translateX(-50%);
     width: 100%;
     max-width: 850px;
-    padding: 10px 15px 20px 15px;
-    background: transparent; 
+    padding: 15px 15px 20px 15px;
+    
+    /* Solid background matching your app layout to completely block out scrolling text */
+    background: var(--bg); 
+    
+    /* Smooth glowing top border/gradient edge to isolate the text field seamlessly */
+    box-shadow: 0 -20px 25px 10px var(--bg);
+    
     z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     height: auto !important; 
-    max-height: 40vh;
+    max-height: 45vh;
+}
+
+/* Adjust your main chat content spacing so the last bubble clears the new solid panel area */
+.chat-content {
+    flex: 1; 
+    overflow-y: auto;
+    padding: 90px 20px 190px 20px; /* Increased bottom padding from 160px/180px to 190px */
+    display: flex;
+    flex-direction: column; 
+    gap: 8px; 
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
 }
 
 /* --- GEMINI CONTAINER FOR IMAGE INSIDE BAR --- */
