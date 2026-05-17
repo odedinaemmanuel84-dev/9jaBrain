@@ -80,35 +80,41 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-// --- UPDATED IMAGE PICKER LOGIC ---
+// --- FORCE-INJECT IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files; // Successfully targets the single selected file
+            const file = e.target.files;
             if (file) {
                 const reader = new FileReader();
                 
                 reader.onload = (event) => {
-                    // 1. Extract the raw base64 string cleanly
                     const dataUrl = event.target.result;
                     selectedImageBase64 = dataUrl.split(',');
                     selectedImageMime = file.type;
                     
-                    // 2. Safely grab elements directly from the DOM
                     const previewImgEl = document.getElementById('imagePreview');
                     const previewContainerEl = document.getElementById('imagePreviewContainer');
+                    const expandingContainer = document.getElementById('expandingContainer');
                     
-                    // 3. Force them to display the image source data
                     if (previewImgEl && previewContainerEl) {
+                        // 1. Assign the image data source
                         previewImgEl.src = dataUrl;
-                        previewContainerEl.style.setProperty('display', 'flex', 'important');
+                        
+                        // 2. FORCE the layouts to be visible using inline styles to override CSS bugs
+                        previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important; background: rgba(255,255,255,0.1) !important;";
+                        previewImgEl.style.cssText = "display: block !important; visibility: visible !important; width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 8px !important; border: 2px solid #fff !important;";
+                        
+                        // 3. FORCE the entire input container bar to break out of any fixed height limit
+                        if (expandingContainer) {
+                            expandingContainer.style.cssText = "height: auto !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; overflow: visible !important;";
+                        }
                     } else {
-                        console.error("Could not find preview elements in the HTML!");
+                        alert("Oga, JavaScript cannot find #imagePreview or #imagePreviewContainer in your HTML file!");
                     }
                     
                     toggleButtons();
                 };
 
-                // Clear any previous error by reading the file properly as a Data URL
                 reader.readAsDataURL(file);
             }
         };
