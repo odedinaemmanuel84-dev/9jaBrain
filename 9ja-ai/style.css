@@ -93,7 +93,7 @@ body {
 .chat-content {
     flex: 1; 
     overflow-y: auto;
-    padding: 90px 20px 180px 20px; /* Adjusted bottom padding to prevent content clipping */
+    padding: 90px 20px 190px 20px;
     display: flex;
     flex-direction: column; 
     gap: 8px; 
@@ -190,10 +190,8 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     margin-left: auto;
-    margin-top: 0;
-    margin-bottom: 0;
-    gap: 10px;
     padding: 5px 0 !important;
+    gap: 10px;
 }
 
 .user-msg-bubble {
@@ -246,26 +244,25 @@ body {
     display: flex;
     flex-direction: column;
     margin-top: 4px;
+    animation: bubbleFade 0.4s ease-out;
 }
 
 /* --- GEMINI-STYLE AI RESPONSE --- */
 .ai-msg-bubble {
-    line-height: 1.8; /* More space between lines */
+    line-height: 1.8;
     font-size: 1.05rem;
-    color: #e8eaed; /* Clean Gemini light grey */
+    color: #e8eaed;
     padding: 12px 0;
     width: 100%;
     word-wrap: break-word;
-    white-space: pre-wrap; /* This makes the AI's line breaks work! */
+    white-space: pre-wrap;
 }
 
-/* Make Bold text stand out */
 .ai-msg-bubble strong, .ai-msg-bubble b {
     color: #ffffff;
     font-weight: 700;
 }
 
-/* Style Lists so they don't look messy */
 .ai-msg-bubble ul, .ai-msg-bubble ol {
     padding-left: 25px;
     margin: 15px 0;
@@ -275,18 +272,9 @@ body {
     margin-bottom: 8px;
 }
 
-/* Add a subtle fade-in so it feels smooth */
 @keyframes bubbleFade {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
-}
-.ai-msg-container {
-    animation: bubbleFade 0.4s ease-out;
-}
-
-/* --- SCROLLING & BACKGROUND --- */
-body {
-    background-color: #0e0e0e; /* Slightly softer black */
 }
 
 /* --- THE THINKING INDICATOR (NAIJA PULSE) --- */
@@ -325,13 +313,8 @@ body {
     width: 100%;
     max-width: 850px;
     padding: 15px 15px 20px 15px;
-    
-    /* Solid background matching your app layout to completely block out scrolling text */
     background: var(--bg); 
-    
-    /* Smooth glowing top border/gradient edge to isolate the text field seamlessly */
     box-shadow: 0 -20px 25px 10px var(--bg);
-    
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -339,77 +322,20 @@ body {
     gap: 8px;
     height: auto !important; 
     max-height: 45vh;
+    overflow: visible !important;
 }
 
-/* Adjust your main chat content spacing so the last bubble clears the new solid panel area */
-.chat-content {
-    flex: 1; 
-    overflow-y: auto;
-    padding: 90px 20px 190px 20px; /* Increased bottom padding from 160px/180px to 190px */
-    display: flex;
-    flex-direction: column; 
-    gap: 8px; 
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
-}
-
-/* --- GEMINI CONTAINER FOR IMAGE INSIDE BAR --- */
-#imagePreviewContainer {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    padding: 5px 5px 0 5px;
-    align-self: flex-start;
-}
-
-.preview-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 64px;
-    height: 64px;
-}
-
-/* Constrains preview image size so it sits neatly in the container */
-#imagePreview {
-    width: 64px !important;
-    height: 64px !important;
-    max-width: 64px !important;
-    max-height: 64px !important;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 1px solid #333;
-}
-
-/* Tiny Delete Button on the corner of the thumbnail */
-#removeImgBtn {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #ef4444;
-    color: white;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
+/* --- THE RAINBOW BOX WRAPPER --- */
 .rainbow-border-box {
     padding: 2px; 
-    border-radius: 26px; /* Slightly tighter curves to complement the updated inner padding */
+    border-radius: 26px;
     background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     background-size: 400%; 
     animation: moveRainbow 8s linear infinite;
     width: 100%;
     max-width: 800px; 
+    height: auto !important;
+    overflow: visible !important;
 }
 
 @keyframes moveRainbow { 0% { background-position: 0%; } 100% { background-position: 400%; } }
@@ -418,19 +344,21 @@ body {
 .input-container {
     background: #111; 
     border-radius: 24px;
-    display: flex; 
-    flex-direction: column; /* Allows nested image preview to stack vertically above row */
-    padding: 10px 14px; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    padding: 8px 12px !important;
     gap: 10px;
-    min-height: 52px;
+    min-height: 50px;
+    height: auto !important;
     transition: all 0.2s ease-in-out;
+    overflow: visible !important;
 }
 
-/* --- THE WRAPPER ROW FOR INTERNAL COMPONENTS --- */
+/* --- CORE COMPONENT ROW --- */
 .input-row {
-    display: flex;
-    align-items: center;
-    width: 100%;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
     gap: 10px;
 }
 
@@ -444,6 +372,54 @@ body {
     padding: 5px 0;
 }
 
+/* --- IMAGE PREVIEW DISPLAY SYSTEM --- */
+#imagePreviewContainer {
+    display: none; /* FIX: Starts hidden, waiting natively for FileReader invocation */
+    width: 100% !important;
+    padding: 6px 0 10px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px !important;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.preview-wrapper {
+    position: relative !important;
+    width: 55px !important;
+    height: 55px !important;
+    display: inline-block !important;
+}
+
+#imagePreview {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+#removeImgBtn {
+    position: absolute !important;
+    top: -6px !important;
+    right: -6px !important;
+    background: #ff4a4a !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
+    z-index: 10;
+}
+
+/* --- ACTIONS & SYSTEM BUTTONS --- */
 .speak-btn, .arrow-send-btn {
     background: #222; 
     border: none; 
@@ -585,7 +561,7 @@ pre code {
     line-height: 1.5;
 }
 
-/* --- IMAGE HANDLING --- */
+/* --- IMAGE HANDLING IN CHAT RESPONSES --- */
 .msg-image-container {
     flex-shrink: 0; 
     width: 60px;     
@@ -645,7 +621,7 @@ pre code {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #222; /* Dark circle background */
+    background: #222;
     color: var(--text-dim);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -655,82 +631,10 @@ pre code {
 
 .plus-btn:hover {
     background: #333;
-    color: var(--accent); /* Glows Green on hover */
-    transform: rotate(90deg); /* Slight rotation for that "pro" feel */
+    color: var(--accent);
+    transform: rotate(90deg);
 }
 
 .plus-btn i {
     font-size: 1rem;
-}
-
-/* --- FIXING THE IMAGE PREVIEW CONTAINER OVERFLOW --- */
-
-/* Allow the parent container to dynamically grow upward when the image appears */
-.input-container {
-    height: auto !important; /* Forces it to break out of a rigid fixed height */
-    min-height: 50px;       /* Keeps your original height when empty */
-    display: flex !important;
-    flex-direction: column !important; /* Stack preview element directly above input row */
-    padding: 8px 12px !important;
-    overflow: visible !important;      /* Stops clipping the thumbnail boundary */
-}
-
-/* Ensure the outer layout wrapping boxes aren't cutting off the expanded content */
-.rainbow-border-box, 
-.rainbow-input-section {
-    height: auto !important;
-    overflow: visible !important;
-}
-
-/* Style the preview display area directly above the typing line */
-#imagePreviewContainer {
-    width: 100% !important;
-    padding: 6px 0 10px 0 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Adds a subtle sleek separation line */
-    margin-bottom: 8px !important;
-}
-
-/* Force the thumbnail wrapper to stay a clean standard square */
-.preview-wrapper {
-    position: relative !important;
-    width: 55px !important;
-    height: 55px !important;
-    display: inline-block !important;
-}
-
-/* Make sure the image fits perfectly inside its border box */
-#imagePreview {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Clean positioning for the little 'x' remove button close to the corner */
-#removeImgBtn {
-    position: absolute !important;
-    top: -6px !important;
-    right: -6px !important;
-    background: #ff4a4a !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 50% !important;
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 12px !important;
-    line-height: 16px !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
-}
-
-/* Keep your text row and button groups aligned perfectly along the bottom hook */
-.input-row {
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
 }
