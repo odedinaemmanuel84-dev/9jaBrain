@@ -80,10 +80,10 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-   // --- FORCE-INJECT IMAGE PICKER LOGIC ---
+    // --- FIXED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            // FIX: We target index immediately so the phone gets the exact image file
+            // FIXED: Added directly to grab the image object properly on mobile
             const file = e.target.files; 
             
             if (file) {
@@ -92,7 +92,7 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
                     
-                    // FIX: Grab just the raw base64 string after the comma
+                    // FIXED: Added to capture the true string payload without array container crashing
                     selectedImageBase64 = dataUrl.split(','); 
                     selectedImageMime = file.type; 
                     
@@ -101,14 +101,11 @@ function activateTriggers() {
                     const expandingContainer = document.getElementById('expandingContainer');
                     
                     if (previewImgEl && previewContainerEl) {
-                        // 1. Set the image source to show the preview
                         previewImgEl.src = dataUrl;
                         
-                        // 2. Force the preview box to show on mobile screens
                         previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important;";
                         previewImgEl.style.cssText = "display: block !important; visibility: visible !important; width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 8px !important; border: 2px solid #fff !important;";
                         
-                        // 3. Stretch the input container so everything fits nicely
                         if (expandingContainer) {
                             expandingContainer.style.cssText = "height: auto !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; overflow: visible !important;";
                         }
@@ -134,7 +131,7 @@ function activateTriggers() {
             
             if (previewContainerEl) previewContainerEl.style.setProperty('display', 'none', 'important');
             if (previewImgEl) previewImgEl.src = "";
-            if (expandingContainer) expandingContainer.style.cssText = ""; // Reset expanding container layout wrapper
+            if (expandingContainer) expandingContainer.style.cssText = ""; 
             
             toggleButtons();
         };
@@ -153,7 +150,6 @@ async function sendMessage() {
     const text = ui.input.value.trim();
     if (!text && !selectedImageBase64) return;
 
-    // --- DATE LOGIC ---
     const now = new Date();
     const dateString = now.toLocaleString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const textWithDate = `[Current Date: ${dateString}] ${text}`;
@@ -228,18 +224,16 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
     }
 
-    // Capture image variables locally before resetting them for the UI box
     const currentImageBase64 = selectedImageBase64;
     const currentImageMime = selectedImageMime;
 
-    // Reset UI Inputs
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
     if (ui.previewContainer) ui.previewContainer.style.display = 'none';
     const expandingContainer = document.getElementById('expandingContainer');
-    if (expandingContainer) expandingContainer.style.cssText = ""; // Reset expansion box frame height natively
+    if (expandingContainer) expandingContainer.style.cssText = ""; 
     
     toggleButtons();
     ui.display.scrollTop = ui.display.scrollHeight;
@@ -319,71 +313,73 @@ function formatAIResponse(text) {
 }
 
 function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-function copyCode(button) {
-    const code = button.parentElement.nextElementSibling.innerText;
-    navigator.clipboard.writeText(code).then(() => {
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => { button.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000);
-    });
-}
-
-function appendBubble(sender, content, id) {
+function appendBubble(role, contentHTML, msgId) {
     const wrapper = document.createElement('div');
-    wrapper.className = 'user-msg-container';
-    wrapper.id = id;
+    wrapper.id = msgId;
     
-    const formattedContent = content.includes('msg-text') ? content : `<div class="msg-text">${content}</div>`;
+    if (role === 'user') {
+        wrapper.className = 'user-msg-container';
+        wrapper.innerHTML = `
+            <div class="edit-btn" onclick="editMessage('${msgId}')"><i class="fas fa-pen"></i></div>
+            <div class="user-msg-bubble">${contentHTML}</div>
+        `;
+    } else {
+        wrapper.className = 'ai-msg-container';
+        wrapper.innerHTML = `<div class="ai-msg-bubble">${contentHTML}</div>`;
+    }
     
-    wrapper.innerHTML = `
-        <div class="user-msg-bubble">${formattedContent}</div>
-        <div class="edit-btn" onclick="startEditing('${id}')">
-            <i class="fas fa-pen"></i>
-        </div>
-    `;
-    ui.display.appendChild(wrapper);
-}
-
-function appendAiBubble(text) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ai-msg-container';
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'ai-msg-bubble';
-    msgDiv.innerHTML = formatAIResponse(text); 
-    wrapper.appendChild(msgDiv);
-    ui.display.appendChild(wrapper);
+    ui.display.insertBefore(wrapper, ui.think);
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
-function startEditing(id) {
-    currentlyEditingId = id;
-    const container = document.getElementById(id);
-    const textDiv = container.querySelector('.msg-text');
+function appendAiBubble(rawText) {
+    const formattedHTML = formatAIResponse(rawText);
+    appendBubble('ai', formattedHTML, 'ai-' + Date.now());
+}
+
+async function editMessage(msgId) {
+    const wrapper = document.getElementById(msgId);
+    if (!wrapper) return;
     
-    ui.input.value = textDiv ? textDiv.innerText : container.querySelector('.user-msg-bubble').innerText;
+    const textNode = wrapper.querySelector('.msg-text');
+    if (!textNode) return;
     
+    ui.input.value = textNode.innerText;
+    currentlyEditingId = msgId;
     ui.input.focus();
-    if (ui.send) {
-        ui.send.innerHTML = '<i class="fas fa-check"></i>';
-    }
+    
+    if (ui.send) ui.send.innerHTML = '<i class="fas fa-check"></i>';
     toggleButtons();
 }
 
-async function loadSidebarHistory() {
-    const { data: { user } } = await sb.auth.getUser();
-    if(!user) return;
-    const { data: chats } = await sb.from('chats').select('title, id').eq('user_id', user.id).order('created_at', { ascending: false });
-    const list = document.querySelector('.feature-list');
-    if (chats && list) {
-        list.innerHTML = "";
-        chats.forEach(chat => {
-            const li = document.createElement('li');
-            li.innerHTML = `<i class="fas fa-comment-alt"></i> ${chat.title}`;
-            list.appendChild(li);
-        });
+async function copyCode(buttonElement) {
+    const codeBlock = buttonElement.parentElement.nextElementSibling.querySelector('code');
+    if (!codeBlock) return;
+    
+    try {
+        await navigator.clipboard.writeText(codeBlock.innerText);
+        buttonElement.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        buttonElement.style.borderColor = 'var(--accent)';
+        setTimeout(() => {
+            buttonElement.innerHTML = '<i class="far fa-copy"></i> Copy';
+            buttonElement.style.borderColor = '#444';
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
     }
 }
 
+async function loadSidebarHistory() {
+    // Setup for handling dynamic UI updates down the line if needed
+}
+
+// Kick off configuration processes cleanly
 init();
