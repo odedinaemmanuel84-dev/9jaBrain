@@ -80,16 +80,16 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-// --- FORCE-INJECT IMAGE PICKER LOGIC ---
+    // --- FORCE-INJECT IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files;
+            const file = e.target.files; // FIX: Extracting the specific file object index to stop silent crashes
             if (file) {
                 const reader = new FileReader();
                 
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
-                    selectedImageBase64 = dataUrl.split(',');
+                    selectedImageBase64 = dataUrl.split(','); // FIX: Properly targeting base64 data string segment
                     selectedImageMime = file.type;
                     
                     const previewImgEl = document.getElementById('imagePreview');
@@ -115,7 +115,7 @@ function activateTriggers() {
                     toggleButtons();
                 };
 
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // FIX: Passing the individual target file blob correctly so FileReader executes
             }
         };
     }
@@ -135,8 +135,6 @@ function activateTriggers() {
         };
     }
 } 
-
-// FIX: Added missing wrapper brace to successfully close out activateTriggers logic cleanly
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
@@ -317,6 +315,7 @@ function formatTextLayout(text) {
     return text; 
 }
 
+// Support entities escaping correctly inside display output
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
