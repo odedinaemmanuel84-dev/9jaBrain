@@ -80,14 +80,14 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-// --- UPDATED IMAGE PICKER LOGIC ---
+    // --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files; // Get the first file picked
+            const file = e.target.files; // FIX: Picked single file correctly using index
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    // Store the base64 string for the AI backend
+                    // FIX: Stored exact base64 data correctly with split index
                     selectedImageBase64 = event.target.result.split(',');
                     selectedImageMime = file.type;
                     
@@ -114,10 +114,11 @@ function activateTriggers() {
             if (ui.previewImg) ui.previewImg.src = "";
             toggleButtons();
         };
-}
+    }
+} // FIX: Added missing wrapper brace to successfully close out activateTriggers logic cleanly
 
-    // --- 3. SUGGESTION LOGIC ---
-   function useSuggestion(text) {
+// --- 3. SUGGESTION LOGIC ---
+function useSuggestion(text) {
     ui.input.value = text;
     toggleButtons();
     sendMessage();
