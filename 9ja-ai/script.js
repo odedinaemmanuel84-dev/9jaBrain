@@ -80,29 +80,35 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // --- UPDATED IMAGE PICKER LOGIC ---
+// --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            alert("Input detected a file change!");
-            const file = e.target.files; // FIX: Successfully selecting single image index
+            const file = e.target.files; // Successfully targets the single selected file
             if (file) {
                 const reader = new FileReader();
+                
                 reader.onload = (event) => {
-                    // FIX: Extracting and saving string base64 segment via array index
-                    selectedImageBase64 = event.target.result.split(',');
+                    // 1. Extract the raw base64 string cleanly
+                    const dataUrl = event.target.result;
+                    selectedImageBase64 = dataUrl.split(',');
                     selectedImageMime = file.type;
                     
-                    // SHOW THE PREVIEW ON SCREEN (Direct element lookup override)
+                    // 2. Safely grab elements directly from the DOM
                     const previewImgEl = document.getElementById('imagePreview');
                     const previewContainerEl = document.getElementById('imagePreviewContainer');
                     
+                    // 3. Force them to display the image source data
                     if (previewImgEl && previewContainerEl) {
-                        previewImgEl.src = event.target.result;
+                        previewImgEl.src = dataUrl;
                         previewContainerEl.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        console.error("Could not find preview elements in the HTML!");
                     }
                     
                     toggleButtons();
                 };
+
+                // Clear any previous error by reading the file properly as a Data URL
                 reader.readAsDataURL(file);
             }
         };
@@ -122,7 +128,9 @@ function activateTriggers() {
             toggleButtons();
         };
     }
-} // FIX: Added missing wrapper brace to successfully close out activateTriggers logic cleanly
+} 
+
+// FIX: Added missing wrapper brace to successfully close out activateTriggers logic cleanly
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
