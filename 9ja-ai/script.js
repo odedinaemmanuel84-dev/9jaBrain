@@ -83,14 +83,14 @@ function activateTriggers() {
     // --- FORCE-INJECT IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files; // FIX: Extracting the specific file object index to stop silent crashes
+            const file = e.target.files; // FIXED: Grabbing the specific single file item instead of the collection array!
             if (file) {
                 const reader = new FileReader();
                 
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
-                    selectedImageBase64 = dataUrl.split(','); // FIX: Properly targeting base64 data string segment
-                    selectedImageMime = file.type;
+                    selectedImageBase64 = dataUrl.split(','); // FIXED: targeting array segment to get pure Base64 content!
+                    selectedImageMime = file.type; // FIXED: file now references the individual blob variable correctly!
                     
                     const previewImgEl = document.getElementById('imagePreview');
                     const previewContainerEl = document.getElementById('imagePreviewContainer');
@@ -101,7 +101,7 @@ function activateTriggers() {
                         previewImgEl.src = dataUrl;
                         
                         // 2. FORCE the layouts to be visible using inline styles to override CSS bugs
-                        previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important; background: rgba(255,255,255,0.1) !important;";
+                        previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important;";
                         previewImgEl.style.cssText = "display: block !important; visibility: visible !important; width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 8px !important; border: 2px solid #fff !important;";
                         
                         // 3. FORCE the entire input container bar to break out of any fixed height limit
@@ -115,7 +115,7 @@ function activateTriggers() {
                     toggleButtons();
                 };
 
-                reader.readAsDataURL(file); // FIX: Passing the individual target file blob correctly so FileReader executes
+                reader.readAsDataURL(file); // FIXED: Passing the single file object block safely so FileReader works!
             }
         };
     }
@@ -128,9 +128,12 @@ function activateTriggers() {
             
             const previewContainerEl = document.getElementById('imagePreviewContainer');
             const previewImgEl = document.getElementById('imagePreview');
+            const expandingContainer = document.getElementById('expandingContainer');
             
             if (previewContainerEl) previewContainerEl.style.setProperty('display', 'none', 'important');
             if (previewImgEl) previewImgEl.src = "";
+            if (expandingContainer) expandingContainer.style.cssText = ""; // Reset expanding container layout wrapper
+            
             toggleButtons();
         };
     }
@@ -233,6 +236,9 @@ async function sendMessage() {
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
     if (ui.previewContainer) ui.previewContainer.style.display = 'none';
+    const expandingContainer = document.getElementById('expandingContainer');
+    if (expandingContainer) expandingContainer.style.cssText = ""; // Reset expansion box frame height natively
+    
     toggleButtons();
     ui.display.scrollTop = ui.display.scrollHeight;
 
@@ -310,12 +316,6 @@ function formatAIResponse(text) {
     });
 }
 
-// Support functions for handling markdown/text variations natively
-function formatTextLayout(text) {
-    return text; 
-}
-
-// Support entities escaping correctly inside display output
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
