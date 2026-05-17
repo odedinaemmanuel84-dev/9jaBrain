@@ -80,46 +80,44 @@ function activateTriggers() {
     if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
     if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
 
-    // --- FORCE-INJECT IMAGE PICKER LOGIC ---
+   // --- FORCE-INJECT IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
-        ui.fileInput.onchange = (e) => { 
-          const file = e.target.files; // FIXED: Grabbing the specific single file item instead of the collection array!
-
-            // 🚨 TEMP MOBILE DEBUG ALERT
-            alert("Oga Emmanuel, the image upload event fired! File found: " + (file ? file.name : "None"));
-           
-          if (file) {
-             const reader = new FileReader();
+        ui.fileInput.onchange = (e) => {
+            // FIX: We target index immediately so the phone gets the exact image file
+            const file = e.target.files; 
+            
+            if (file) {
+                const reader = new FileReader();
                 
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
-                    selectedImageBase64 = dataUrl.split(','); // FIXED: targeting array segment to get pure Base64 content!
-                    selectedImageMime = file.type; // FIXED: file now references the individual blob variable correctly!
+                    
+                    // FIX: Grab just the raw base64 string after the comma
+                    selectedImageBase64 = dataUrl.split(','); 
+                    selectedImageMime = file.type; 
                     
                     const previewImgEl = document.getElementById('imagePreview');
                     const previewContainerEl = document.getElementById('imagePreviewContainer');
                     const expandingContainer = document.getElementById('expandingContainer');
                     
                     if (previewImgEl && previewContainerEl) {
-                        // 1. Assign the image data source
+                        // 1. Set the image source to show the preview
                         previewImgEl.src = dataUrl;
                         
-                        // 2. FORCE the layouts to be visible using inline styles to override CSS bugs
+                        // 2. Force the preview box to show on mobile screens
                         previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important;";
                         previewImgEl.style.cssText = "display: block !important; visibility: visible !important; width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 8px !important; border: 2px solid #fff !important;";
                         
-                        // 3. FORCE the entire input container bar to break out of any fixed height limit
+                        // 3. Stretch the input container so everything fits nicely
                         if (expandingContainer) {
                             expandingContainer.style.cssText = "height: auto !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; overflow: visible !important;";
                         }
-                    } else {
-                        alert("Oga, JavaScript cannot find #imagePreview or #imagePreviewContainer in your HTML file!");
                     }
                     
                     toggleButtons();
                 };
 
-                reader.readAsDataURL(file); // FIXED: Passing the single file object block safely so FileReader works!
+                reader.readAsDataURL(file); 
             }
         };
     }
