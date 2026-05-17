@@ -84,19 +84,21 @@ function activateTriggers() {
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
             alert("Input detected a file change!");
-            const file = e.target.files; // FIX: Picked single file correctly using index
+            const file = e.target.files; // FIX: Successfully selecting single image index
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    // FIX: Stored exact base64 data correctly with split index
+                    // FIX: Extracting and saving string base64 segment via array index
                     selectedImageBase64 = event.target.result.split(',');
                     selectedImageMime = file.type;
                     
-                    // SHOW THE PREVIEW ON SCREEN
-                    if (ui.previewImg && ui.previewContainer) {
-                        ui.previewImg.src = event.target.result;
-                        // FORCE both the container and wrapper to show up cleanly
-                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
+                    // SHOW THE PREVIEW ON SCREEN (Direct element lookup override)
+                    const previewImgEl = document.getElementById('imagePreview');
+                    const previewContainerEl = document.getElementById('imagePreviewContainer');
+                    
+                    if (previewImgEl && previewContainerEl) {
+                        previewImgEl.src = event.target.result;
+                        previewContainerEl.style.setProperty('display', 'flex', 'important');
                     }
                     
                     toggleButtons();
@@ -111,8 +113,12 @@ function activateTriggers() {
             selectedImageBase64 = null;
             selectedImageMime = null;
             if (ui.fileInput) ui.fileInput.value = "";
-            if (ui.previewContainer) ui.previewContainer.style.setProperty('display', 'none', 'important');
-            if (ui.previewImg) ui.previewImg.src = "";
+            
+            const previewContainerEl = document.getElementById('imagePreviewContainer');
+            const previewImgEl = document.getElementById('imagePreview');
+            
+            if (previewContainerEl) previewContainerEl.style.setProperty('display', 'none', 'important');
+            if (previewImgEl) previewImgEl.src = "";
             toggleButtons();
         };
     }
