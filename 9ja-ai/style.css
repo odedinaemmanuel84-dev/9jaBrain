@@ -638,3 +638,15 @@ pre code {
 .plus-btn i {
     font-size: 1rem;
 }
+
+/* Add this at the absolute bottom of style.css */
+#imagePreviewContainer {
+    max-height: 200px;
+    transition: all 0.3s ease-in-out;
+}
+
+#imagePreviewContainer img {
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 8px;
+}
