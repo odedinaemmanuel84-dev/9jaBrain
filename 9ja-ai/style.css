@@ -662,3 +662,75 @@ pre code {
 .plus-btn i {
     font-size: 1rem;
 }
+
+/* --- FIXING THE IMAGE PREVIEW CONTAINER OVERFLOW --- */
+
+/* Allow the parent container to dynamically grow upward when the image appears */
+.input-container {
+    height: auto !important; /* Forces it to break out of a rigid fixed height */
+    min-height: 50px;       /* Keeps your original height when empty */
+    display: flex !important;
+    flex-direction: column !important; /* Stack preview element directly above input row */
+    padding: 8px 12px !important;
+    overflow: visible !important;      /* Stops clipping the thumbnail boundary */
+}
+
+/* Ensure the outer layout wrapping boxes aren't cutting off the expanded content */
+.rainbow-border-box, 
+.rainbow-input-section {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* Style the preview display area directly above the typing line */
+#imagePreviewContainer {
+    width: 100% !important;
+    padding: 6px 0 10px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Adds a subtle sleek separation line */
+    margin-bottom: 8px !important;
+}
+
+/* Force the thumbnail wrapper to stay a clean standard square */
+.preview-wrapper {
+    position: relative !important;
+    width: 55px !important;
+    height: 55px !important;
+    display: inline-block !important;
+}
+
+/* Make sure the image fits perfectly inside its border box */
+#imagePreview {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Clean positioning for the little 'x' remove button close to the corner */
+#removeImgBtn {
+    position: absolute !important;
+    top: -6px !important;
+    right: -6px !important;
+    background: #ff4a4a !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
+}
+
+/* Keep your text row and button groups aligned perfectly along the bottom hook */
+.input-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+}
