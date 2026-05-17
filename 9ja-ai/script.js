@@ -83,6 +83,7 @@ function activateTriggers() {
     // --- UPDATED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
+            alert("Input detected a file change!");
             const file = e.target.files; // FIX: Picked single file correctly using index
             if (file) {
                 const reader = new FileReader();
