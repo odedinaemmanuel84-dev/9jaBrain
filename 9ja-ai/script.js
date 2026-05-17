@@ -82,10 +82,14 @@ function activateTriggers() {
 
     // --- FORCE-INJECT IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
-        ui.fileInput.onchange = (e) => {
-            const file = e.target.files; // FIXED: Grabbing the specific single file item instead of the collection array!
-            if (file) {
-                const reader = new FileReader();
+        ui.fileInput.onchange = (e) => { 
+          const file = e.target.files; // FIXED: Grabbing the specific single file item instead of the collection array!
+
+            // 🚨 TEMP MOBILE DEBUG ALERT
+            alert("Oga Emmanuel, the image upload event fired! File found: " + (file ? file.name : "None"));
+           
+          if (file) {
+             const reader = new FileReader();
                 
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
