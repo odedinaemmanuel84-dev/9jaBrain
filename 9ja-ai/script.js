@@ -83,8 +83,7 @@ function activateTriggers() {
     // --- FIXED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            // FIXED: Added directly to grab the image object properly on mobile
-            const file = e.target.files; 
+            const file = e.target.files; // FIX 1: Single file targeting
             
             if (file) {
                 const reader = new FileReader();
@@ -92,28 +91,20 @@ function activateTriggers() {
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
                     
-                    // FIXED: Added to capture the true string payload without array container crashing
-                    selectedImageBase64 = dataUrl.split(','); 
+                    selectedImageBase64 = dataUrl.split(','); // FIX 2: String extraction
                     selectedImageMime = file.type; 
                     
-                    const previewImgEl = document.getElementById('imagePreview');
-                    const previewContainerEl = document.getElementById('imagePreviewContainer');
-                    const expandingContainer = document.getElementById('expandingContainer');
-                    
-                    if (previewImgEl && previewContainerEl) {
-                        previewImgEl.src = dataUrl;
+                    if (ui.previewImg && ui.previewContainer) {
+                        ui.previewImg.src = dataUrl;
+                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
                         
-                        previewContainerEl.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 60px !important; width: 100% !important;";
-                        previewImgEl.style.cssText = "display: block !important; visibility: visible !important; width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 8px !important; border: 2px solid #fff !important;";
-                        
+                        const expandingContainer = document.getElementById('expandingContainer');
                         if (expandingContainer) {
-                            expandingContainer.style.cssText = "height: auto !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; overflow: visible !important;";
+                            expandingContainer.style.setProperty('min-height', '120px', 'important');
                         }
                     }
-                    
                     toggleButtons();
                 };
-
                 reader.readAsDataURL(file); 
             }
         };
@@ -125,12 +116,10 @@ function activateTriggers() {
             selectedImageMime = null;
             if (ui.fileInput) ui.fileInput.value = "";
             
-            const previewContainerEl = document.getElementById('imagePreviewContainer');
-            const previewImgEl = document.getElementById('imagePreview');
-            const expandingContainer = document.getElementById('expandingContainer');
+            if (ui.previewContainer) ui.previewContainer.style.setProperty('display', 'none', 'important');
+            if (ui.previewImg) ui.previewImg.src = "";
             
-            if (previewContainerEl) previewContainerEl.style.setProperty('display', 'none', 'important');
-            if (previewImgEl) previewImgEl.src = "";
+            const expandingContainer = document.getElementById('expandingContainer');
             if (expandingContainer) expandingContainer.style.cssText = ""; 
             
             toggleButtons();
@@ -224,14 +213,11 @@ async function sendMessage() {
         ui.think.style.display = 'flex';
     }
 
-    const currentImageBase64 = selectedImageBase64;
-    const currentImageMime = selectedImageMime;
-
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
-    if (ui.previewContainer) ui.previewContainer.style.display = 'none';
+    if (ui.previewContainer) ui.previewContainer.style.setProperty('display', 'none', 'important');
     const expandingContainer = document.getElementById('expandingContainer');
     if (expandingContainer) expandingContainer.style.cssText = ""; 
     
@@ -254,7 +240,7 @@ async function sendMessage() {
                                 }
                             };
                         }
-                        return { text: part.text };
+                        return ttt{ text: part.text };
                     })
                 };
             }),
@@ -377,9 +363,6 @@ async function copyCode(buttonElement) {
     }
 }
 
-async function loadSidebarHistory() {
-    // Setup for handling dynamic UI updates down the line if needed
-}
+async function loadSidebarHistory() {}
 
-// Kick off configuration processes cleanly
 init();
