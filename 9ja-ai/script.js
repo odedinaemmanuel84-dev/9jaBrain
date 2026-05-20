@@ -105,11 +105,15 @@ function activateTriggers() {
 
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
+            alert("1. Phone detected file select!");
             if (!e.target.files || e.target.files.length === 0) return;
             const file = e.target.files; 
+
+            alert("2. File loaded: " + file.name + " (" + file.size + " bytes)");
             
             const reader = new FileReader();
             reader.onload = (event) => {
+                alert("3. Image conversion finished perfectly!");
                 const dataUrl = event.target.result;
                 
                 selectedImageBase64 = dataUrl.split(','); 
