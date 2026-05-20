@@ -105,15 +105,24 @@ function activateTriggers() {
 
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            alert("1. Phone detected file select!");
-            if (!e.target.files || e.target.files.length === 0) return;
-            const file = e.target.files; 
-
-            alert("2. File loaded: " + file.name + " (" + file.size + " bytes)");
+            // alert("1. Phone detected file select!"); // Kept for tracking if needed
+            
+            // BULLETPROOF MOBILE FALLBACK: Check event target FIRST, then fall back directly to the element files
+            let files = e.target.files || (ui.fileInput ? ui.fileInput.files : null);
+            
+            if (!files || files.length === 0) {
+                alert("Omo, your phone did not return any file object. Try a different browser app!");
+                return;
+            }
+            
+            const file = files; 
+            
+            // Alert to confirm your phone is now reading the file details correctly!
+            alert("2. SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)"); 
             
             const reader = new FileReader();
             reader.onload = (event) => {
-                alert("3. Image conversion finished perfectly!");
+                alert("3. Image conversion finished perfectly!"); 
                 const dataUrl = event.target.result;
                 
                 selectedImageBase64 = dataUrl.split(','); 
@@ -130,6 +139,7 @@ function activateTriggers() {
                 }
                 toggleButtons();
             };
+            reader.onerror = (err) => { alert("Error reading file: " + err); };
             reader.readAsDataURL(file); 
         };
     }
