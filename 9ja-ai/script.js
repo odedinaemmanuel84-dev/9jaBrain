@@ -103,25 +103,24 @@ function activateTriggers() {
         closeBtn.onclick = () => ui.sidebar.classList.remove('active');
     }
 
-    // --- NEW BULLETPROOF DYNAMIC MOBILE PICKER FOR PLUS BUTTON ---
+ // --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM ---
     const plusButtonElement = document.querySelector('.plus-btn');
     if (plusButtonElement) {
         plusButtonElement.onclick = (e) => {
             e.preventDefault();
             
-            // 1. Force phone memory to spawn a clean input channel
+            // 1. Initialize pristine native phone file input channel
             const nativePicker = document.createElement('input');
             nativePicker.type = 'file';
             nativePicker.accept = 'image/*';
             
-            // 2. Immediate capture stream setup
             nativePicker.onchange = (event) => {
                 const filesList = event.target.files;
                 if (!filesList || filesList.length === 0) return;
                 
                 const file = filesList;
                 
-                // Confirming extraction directly from OS layer
+                // Alert confirming that the system container reads the real binary size!
                 alert("2. NEW NATIVE SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)");
                 
                 const reader = new FileReader();
@@ -129,16 +128,22 @@ function activateTriggers() {
                     alert("3. Image conversion finished perfectly!");
                     const dataUrl = fileEvent.target.result;
                     
+                    // Assign global state safely
                     selectedImageBase64 = dataUrl.split(',');
                     selectedImageMime = file.type || "image/jpeg";
                     
-                    if (ui.previewImg && ui.previewContainer) {
-                        ui.previewImg.src = dataUrl;
-                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
+                    // Direct target lookup bypassing variable cache
+                    const targetPreview = document.getElementById('imagePreview');
+                    const targetContainer = document.getElementById('imagePreviewContainer');
+                    const targetWrapper = document.getElementById('expandingContainer');
+                    
+                    if (targetPreview && targetContainer) {
+                        targetPreview.src = dataUrl;
+                        // Use string clean pass to remove standard layout limits
+                        targetContainer.style.display = "flex";
                         
-                        const expandingContainer = document.getElementById('expandingContainer');
-                        if (expandingContainer) {
-                            expandingContainer.style.setProperty('min-height', '120px', 'important');
+                        if (targetWrapper) {
+                            targetWrapper.style.minHeight = "120px";
                         }
                     }
                     toggleButtons();
@@ -147,7 +152,6 @@ function activateTriggers() {
                 reader.readAsDataURL(file);
             };
             
-            // 3. Fire the mobile system panel picker window
             nativePicker.click();
         };
     }
