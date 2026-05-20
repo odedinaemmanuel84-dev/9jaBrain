@@ -103,56 +103,55 @@ function activateTriggers() {
         closeBtn.onclick = () => ui.sidebar.classList.remove('active');
     }
 
-   if (ui.fileInput) {
-        ui.fileInput.onchange = function(e) {
-            // DIRECT ELEMENT REGISTRY ACCESS FOR MOBILE
-            const directInput = document.getElementById('imageUpload');
+   // FORCE-FIX: We hijack the click to create a pure, native mobile file picker
+    const plusButtonElement = document.querySelector('.plus-btn');
+    if (plusButtonElement) {
+        plusButtonElement.onclick = (e) => {
+            e.preventDefault();
             
-            if (!directInput || !directInput.files || directInput.files.length === 0) {
-                alert("Omo, the browser completely hid the file array. Let's try raw extraction...");
-                // Emergency fallback 2
-                if (!e.target || !e.target.files || e.target.files.length === 0) {
-                    alert("Fatal: Mobile file stream blocked by device privacy settings.");
+            // 1. Create an invisible input element on the fly
+            const nativePicker = document.createElement('input');
+            nativePicker.type = 'file';
+            nativePicker.accept = 'image/*';
+            
+            // 2. Set up the change listener directly on this clean native element
+            nativePicker.onchange = (event) => {
+                const filesList = event.target.files;
+                if (!filesList || filesList.length === 0) {
+                    alert("No file was picked by the system.");
                     return;
                 }
-            }
-            
-            // Extract using whatever reference exists securely
-            const mobileFilesArray = (directInput && directInput.files && directInput.files.length > 0) 
-                ? directInput.files 
-                : e.target.files;
                 
-            const file = mobileFilesArray; 
-            
-            if (!file) {
-                alert("File object is still slipping away!");
-                return;
-            }
-            
-            // This MUST read out the details now!
-            alert("2. BIG SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)"); 
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                alert("3. Image conversion finished perfectly!"); 
-                const dataUrl = event.target.result;
+                const file = filesList;
                 
-                selectedImageBase64 = dataUrl.split(','); 
-                selectedImageMime = file.type || "image/jpeg"; 
+                // THIS WILL SHOW THE TRUE VALUE NOW
+                alert("2. NEW NATIVE SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)");
                 
-                if (ui.previewImg && ui.previewContainer) {
-                    ui.previewImg.src = dataUrl;
-                    ui.previewContainer.style.setProperty('display', 'flex', 'important');
+                const reader = new FileReader();
+                reader.onload = (fileEvent) => {
+                    alert("3. Image conversion finished perfectly!");
+                    const dataUrl = fileEvent.target.result;
                     
-                    const expandingContainer = document.getElementById('expandingContainer');
-                    if (expandingContainer) {
-                        expandingContainer.style.setProperty('min-height', '120px', 'important');
+                    selectedImageBase64 = dataUrl.split(',');
+                    selectedImageMime = file.type || "image/jpeg";
+                    
+                    if (ui.previewImg && ui.previewContainer) {
+                        ui.previewImg.src = dataUrl;
+                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
+                        
+                        const expandingContainer = document.getElementById('expandingContainer');
+                        if (expandingContainer) {
+                            expandingContainer.style.setProperty('min-height', '120px', 'important');
+                        }
                     }
-                }
-                toggleButtons();
+                    toggleButtons();
+                };
+                reader.onerror = (err) => { alert("Reader error: " + err); };
+                reader.readAsDataURL(file);
             };
-            reader.onerror = (err) => { alert("Error reading file: " + err); };
-            reader.readAsDataURL(file); 
+            
+            // 3. Trigger the phone's native file selection window instantly
+            nativePicker.click();
         };
     }
 
