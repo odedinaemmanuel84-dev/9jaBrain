@@ -96,7 +96,7 @@ body {
     padding: 90px 20px 190px 20px;
     display: flex;
     flex-direction: column; 
-    gap: 8px; 
+    gap: 12px; 
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     position: relative;
@@ -196,14 +196,14 @@ body {
 
 .user-msg-bubble {
     background: #2a2a2a;
-    padding: 10px 16px; 
+    padding: 12px 16px; 
     border-radius: 18px 18px 4px 18px; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     color: white;
-    display: inline-flex !important;
-    flex-direction: row !important;
+    display: flex !important;
+    flex-direction: column !important; /* Stack image above text cleanly */
     align-items: flex-start !important;
-    gap: 12px;
+    gap: 8px;
     width: auto !important;
     min-width: 50px !important;
     max-width: 80% !important;
@@ -348,9 +348,9 @@ body {
     flex-direction: column !important; 
     padding: 8px 12px !important;
     gap: 10px;
-    min-height: 50px;
+    min-height: 52px;
     height: auto !important;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.25s ease-in-out;
     overflow: visible !important;
 }
 
@@ -372,22 +372,23 @@ body {
     padding: 5px 0;
 }
 
-/* --- IMAGE PREVIEW DISPLAY SYSTEM --- */
+/* --- CLEANED IMAGE PREVIEW DISPLAY SYSTEM --- */
 #imagePreviewContainer {
-    display: none; /* FIX: Starts hidden, waiting natively for FileReader invocation */
+    display: none; 
     width: 100% !important;
     padding: 6px 0 10px 0 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 8px !important;
+    align-items: center;
     justify-content: flex-start;
-    align-self: flex-start;
+    transition: all 0.3s ease-in-out;
 }
 
 .preview-wrapper {
     position: relative !important;
-    width: 55px !important;
-    height: 55px !important;
-    display: inline-block !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: block !important;
 }
 
 #imagePreview {
@@ -395,28 +396,26 @@ body {
     height: 100% !important;
     object-fit: cover !important;
     border-radius: 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border: 2px solid var(--accent) !important;
 }
 
 #removeImgBtn {
     position: absolute !important;
-    top: -6px !important;
-    right: -6px !important;
-    background: #ff4a4a !important;
+    top: -5px !important;
+    right: -5px !important;
+    background: #ff4d4d !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 50% !important;
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 12px !important;
-    line-height: 16px !important;
-    text-align: center !important;
-    cursor: pointer !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 14px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
-    z-index: 10;
+    cursor: pointer !important;
+    z-index: 100;
 }
 
 /* --- ACTIONS & SYSTEM BUTTONS --- */
@@ -561,21 +560,22 @@ pre code {
     line-height: 1.5;
 }
 
-/* --- IMAGE HANDLING IN CHAT RESPONSES --- */
+/* --- FIXED IMAGE HANDLING IN CHAT RESPONSES --- */
 .msg-image-container {
-    flex-shrink: 0; 
-    width: 60px;     
-    height: 60px;    
-    border-radius: 8px;
+    width: 100%;
+    max-width: 240px; /* Expands to show the user a proper sized photo */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     background: #111;
 }
 
 .msg-image-container img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     display: block;
 }
 
@@ -637,68 +637,4 @@ pre code {
 
 .plus-btn i {
     font-size: 1rem;
-}
-
-/* Add this at the absolute bottom of style.css */
-#imagePreviewContainer {
-    max-height: 200px;
-    transition: all 0.3s ease-in-out;
-}
-
-#imagePreviewContainer img {
-    max-width: 80px;
-    max-height: 80px;
-    border-radius: 8px;
-}
-
-/* --- FIXED MOBILE PREVIEW LAYOUT OVERRIDES --- */
-.input-container {
-    height: auto !important;
-    min-height: 52px;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center;
-    transition: all 0.25s ease-in-out;
-}
-
-#imagePreviewContainer {
-    width: 100% !important;
-    margin-bottom: 5px !important;
-    padding-bottom: 5px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.preview-wrapper {
-    position: relative !important;
-    width: 60px !important;
-    height: 60px !important;
-    display: block !important;
-}
-
-#imagePreview {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid var(--accent) !important;
-}
-
-#removeImgBtn {
-    position: absolute !important;
-    top: -5px !important;
-    right: -5px !important;
-    background: #ff4d4d !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 50% !important;
-    width: 20px !important;
-    height: 20px !important;
-    font-size: 14px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    z-index: 100;
 }
