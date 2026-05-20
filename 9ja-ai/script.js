@@ -48,7 +48,6 @@ async function init() {
     } catch (err) { 
         console.error("Initialization error:", err); 
     }
-    // Ensures listeners activate even if auth details have a delay
     activateTriggers(); 
 }
 
@@ -104,7 +103,6 @@ function activateTriggers() {
         closeBtn.onclick = () => ui.sidebar.classList.remove('active');
     }
 
-    // --- SAFELY WRAPPED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
             if (!e.target.files || e.target.files.length === 0) return;
@@ -157,7 +155,7 @@ function useSuggestion(text) {
     sendMessage();
 }
 
-// --- 4. MESSAGE TRANSMISSION ---
+// --- 4. MESSAGE TRANSMISSION (ROUTING INTRODUCED HERE) ---
 async function sendMessage() {
     if (!ui.input) return;
     const text = ui.input.value.trim();
@@ -176,7 +174,7 @@ async function sendMessage() {
             if (selectedImageBase64) {
                 newContent = `
                     <div class="msg-image-container">
-                        <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+                        <img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:8px;">
                     </div>
                     <div class="msg-text">${text}</div>
                 `;
@@ -216,7 +214,7 @@ async function sendMessage() {
         if (selectedImageBase64) {
             displayHTML = `
                 <div class="msg-image-container">
-                    <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+                    <img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:8px;">
                 </div>
                 <div class="msg-text">${text}</div>
             `;
@@ -243,6 +241,10 @@ async function sendMessage() {
         }
     }
 
+    // Capture values needed for submission before clearing frontend UI fields
+    const sendingImage = selectedImageBase64;
+    const sendingMime = selectedImageMime;
+
     // Clean input states completely
     ui.input.value = "";
     selectedImageBase64 = null;
@@ -258,30 +260,47 @@ async function sendMessage() {
 
     try {
         const { data: { user } } = await sb.auth.getUser();
-        
-        const payload = {
-            messages: chatHistory.map(msg => ({
-                role: msg.role,
-                parts: msg.parts.map(part => {
-                    if (part.inlineData) {
-                        return {
-                            inlineData: {
-                                mimeType: part.inlineData.mimeType,
-                                data: part.inlineData.data
-                            }
-                        };
-                    }
-                    return { text: part.text };
-                })
-            })),
-            user_id: user.id
-        };
+        let response;
 
-        const response = await fetch(`${BACKEND_URL}/api/chat`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        // MATCH FRONTEND PAYLOAD DIRECTLY TO YOUR BACKEND ROUTING LOGIC
+        if (sendingImage) {
+            // Target the Gemini Vision endpoint
+            const visionPayload = {
+                image_data: `data:${sendingMime};base64,${sendingImage}`,
+                prompt: text || "Explain wetin dey inside this image in Pidgin."
+            };
+
+            response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(visionPayload)
+            });
+        } else {
+            // Target text-only Groq Llama route
+            const chatPayload = {
+                messages: chatHistory.map(msg => ({
+                    role: msg.role,
+                    parts: msg.parts.map(part => {
+                        if (part.inlineData) {
+                            return {
+                                inlineData: {
+                                    mimeType: part.inlineData.mimeType,
+                                    data: part.inlineData.data
+                                }
+                            };
+                        }
+                        return { text: part.text };
+                    })
+                })),
+                user_id: user.id
+            };
+
+            response = await fetch(`${BACKEND_URL}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(chatPayload)
+            });
+        }
 
         if (ui.think) ui.think.style.display = 'none';
 
@@ -312,7 +331,6 @@ async function sendMessage() {
 function formatAIResponse(text) {
     if (!text) return "";
     
-    // Process markdown code blocks with syntax highlighting layouts
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
     let formatted = text.replace(codeRegex, (match, lang, code) => {
         const language = lang || 'code';
@@ -329,9 +347,7 @@ function formatAIResponse(text) {
         `;
     });
 
-    // Simple markdown parsing for inline bold (**text**)
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
     return formatted;
 }
 
@@ -416,10 +432,8 @@ async function loadSidebarHistory() {
         const historyList = document.getElementById('chatHistoryList');
         if (!historyList) return;
 
-        // Clear existing sidebar items smoothly
         historyList.innerHTML = '';
 
-        // Real-time dynamic listener or query can be populated right here
         const listItem = document.createElement('div');
         listItem.className = 'history-item active';
         listItem.innerHTML = `<i class="far fa-comments"></i> <span>Current Conversation</span>`;
@@ -430,5 +444,4 @@ async function loadSidebarHistory() {
     }
 }
 
-// Initialize application lifecycle cleanly
 init();
