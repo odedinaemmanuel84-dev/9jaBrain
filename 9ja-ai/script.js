@@ -30,19 +30,32 @@ const ui = {
 async function init() {
     try {
         const { data: { user } } = await sb.auth.getUser();
-        if (!user) { window.location.href = "auth.html"; return; }
+        if (!user) { 
+            window.location.href = "auth.html"; 
+            return; 
+        }
         
-        if (user.user_metadata?.avatar_url) ui.pfp.src = user.user_metadata.avatar_url;
+        if (user.user_metadata?.avatar_url && ui.pfp) {
+            ui.pfp.src = user.user_metadata.avatar_url;
+        }
+        
         const name = user.user_metadata?.full_name || "Oga";
-        if (ui.userName) ui.userName.innerText = name.split(' ');
+        if (ui.userName) {
+            ui.userName.innerText = name.split(' ');
+        }
 
-        loadSidebarHistory();
-    } catch (err) { console.error(err); }
+        await loadSidebarHistory();
+    } catch (err) { 
+        console.error("Initialization error:", err); 
+    }
+    // Ensures listeners activate even if auth details have a delay
     activateTriggers(); 
 }
 
 // --- 2. ACTIVATION & BUTTON LOGIC ---
 function toggleButtons() {
+    if (!ui.input || !ui.voice || !ui.send) return;
+    
     const hasText = ui.input.value.trim() !== "";
     const hasImage = selectedImageBase64 !== null;
     
@@ -65,48 +78,57 @@ function activateTriggers() {
     }
 
     if (ui.send) {
-        ui.send.onclick = (e) => { e.preventDefault(); sendMessage(); };
+        ui.send.onclick = (e) => { 
+            e.preventDefault(); 
+            sendMessage(); 
+        };
     }
 
     if (ui.input) {
         ui.input.onkeydown = (e) => { 
-            if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } 
+            if (e.key === 'Enter') { 
+                e.preventDefault(); 
+                sendMessage(); 
+            } 
         };
         ui.input.oninput = toggleButtons;
     }
 
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
-    if (menuBtn) menuBtn.onclick = () => ui.sidebar.classList.add('active');
-    if (closeBtn) closeBtn.onclick = () => ui.sidebar.classList.remove('active');
+    
+    if (menuBtn && ui.sidebar) {
+        menuBtn.onclick = () => ui.sidebar.classList.add('active');
+    }
+    if (closeBtn && ui.sidebar) {
+        closeBtn.onclick = () => ui.sidebar.classList.remove('active');
+    }
 
-    // --- FIXED IMAGE PICKER LOGIC ---
+    // --- SAFELY WRAPPED IMAGE PICKER LOGIC ---
     if (ui.fileInput) {
         ui.fileInput.onchange = (e) => {
-            const file = e.target.files; // FIX 1: Single file targeting
+            if (!e.target.files || e.target.files.length === 0) return;
+            const file = e.target.files; 
             
-            if (file) {
-                const reader = new FileReader();
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
                 
-                reader.onload = (event) => {
-                    const dataUrl = event.target.result;
+                selectedImageBase64 = dataUrl.split(','); 
+                selectedImageMime = file.type; 
+                
+                if (ui.previewImg && ui.previewContainer) {
+                    ui.previewImg.src = dataUrl;
+                    ui.previewContainer.style.setProperty('display', 'flex', 'important');
                     
-                    selectedImageBase64 = dataUrl.split(','); // FIX 2: String extraction
-                    selectedImageMime = file.type; 
-                    
-                    if (ui.previewImg && ui.previewContainer) {
-                        ui.previewImg.src = dataUrl;
-                        ui.previewContainer.style.setProperty('display', 'flex', 'important');
-                        
-                        const expandingContainer = document.getElementById('expandingContainer');
-                        if (expandingContainer) {
-                            expandingContainer.style.setProperty('min-height', '120px', 'important');
-                        }
+                    const expandingContainer = document.getElementById('expandingContainer');
+                    if (expandingContainer) {
+                        expandingContainer.style.setProperty('min-height', '120px', 'important');
                     }
-                    toggleButtons();
-                };
-                reader.readAsDataURL(file); 
-            }
+                }
+                toggleButtons();
+            };
+            reader.readAsDataURL(file); 
         };
     }
 
@@ -129,13 +151,15 @@ function activateTriggers() {
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
+    if (!ui.input) return;
     ui.input.value = text;
     toggleButtons();
     sendMessage();
 }
 
-// --- 4. THE BRAIN ---
+// --- 4. MESSAGE TRANSMISSION ---
 async function sendMessage() {
+    if (!ui.input) return;
     const text = ui.input.value.trim();
     if (!text && !selectedImageBase64) return;
 
@@ -147,36 +171,41 @@ async function sendMessage() {
 
     if (currentlyEditingId) {
         const userWrapper = document.getElementById(currentlyEditingId);
-        
-        let newContent = "";
-        if (selectedImageBase64) {
-            newContent = `
-                <div class="msg-image-container">
-                    <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
-                </div>
-                <div class="msg-text">${text}</div>
-            `;
-        } else {
-            newContent = `<div class="msg-text">${text}</div>`;
-        }
-
-        userWrapper.querySelector('.user-msg-bubble').innerHTML = newContent;
-        
-        while (userWrapper.nextElementSibling) userWrapper.nextElementSibling.remove();
-        
-        const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
-        if (histIndex !== -1) {
-            let messageParts = [];
-            messageParts.push({ text: textWithDate });
+        if (userWrapper) {
+            let newContent = "";
             if (selectedImageBase64) {
-                messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
+                newContent = `
+                    <div class="msg-image-container">
+                        <img src="data:${selectedImageMime};base64,${selectedImageBase64}">
+                    </div>
+                    <div class="msg-text">${text}</div>
+                `;
+            } else {
+                newContent = `<div class="msg-text">${text}</div>`;
             }
-            chatHistory[histIndex].parts = messageParts;
-            chatHistory = chatHistory.slice(0, histIndex + 1);
+
+            const bubble = userWrapper.querySelector('.user-msg-bubble');
+            if (bubble) bubble.innerHTML = newContent;
+            
+            while (userWrapper.nextElementSibling && userWrapper.nextElementSibling !== ui.think) {
+                userWrapper.nextElementSibling.remove();
+            }
+            
+            const histIndex = chatHistory.findIndex(m => m.id === currentlyEditingId);
+            if (histIndex !== -1) {
+                let messageParts = [{ text: textWithDate }];
+                if (selectedImageBase64) {
+                    messageParts.push({ inlineData: { mimeType: selectedImageMime, data: selectedImageBase64 } });
+                }
+                chatHistory[histIndex].parts = messageParts;
+                chatHistory = chatHistory.slice(0, histIndex + 1);
+            }
         }
         
-        ui.display.appendChild(ui.think);
-        ui.think.style.display = 'flex';
+        if (ui.think) {
+            ui.display.appendChild(ui.think);
+            ui.think.style.display = 'flex';
+        }
         currentlyEditingId = null;
         if (ui.send) ui.send.innerHTML = '<i class="fas fa-arrow-up"></i>';
 
@@ -197,8 +226,7 @@ async function sendMessage() {
 
         appendBubble('user', displayHTML, msgId);
         
-        let messageParts = [];
-        messageParts.push({ text: textWithDate });
+        let messageParts = [{ text: textWithDate }];
         if (selectedImageBase64) {
             messageParts.push({ 
                 inlineData: { 
@@ -209,41 +237,43 @@ async function sendMessage() {
         }
         chatHistory.push({ role: "user", parts: messageParts, id: msgId });
 
-        ui.display.appendChild(ui.think); 
-        ui.think.style.display = 'flex';
+        if (ui.think) {
+            ui.display.appendChild(ui.think); 
+            ui.think.style.display = 'flex';
+        }
     }
 
+    // Clean input states completely
     ui.input.value = "";
     selectedImageBase64 = null;
     selectedImageMime = null;
     if (ui.fileInput) ui.fileInput.value = "";
     if (ui.previewContainer) ui.previewContainer.style.setProperty('display', 'none', 'important');
+    
     const expandingContainer = document.getElementById('expandingContainer');
     if (expandingContainer) expandingContainer.style.cssText = ""; 
     
     toggleButtons();
-    ui.display.scrollTop = ui.display.scrollHeight;
+    if (ui.display) ui.display.scrollTop = ui.display.scrollHeight;
 
     try {
         const { data: { user } } = await sb.auth.getUser();
         
         const payload = {
-            messages: chatHistory.map(msg => {
-                return {
-                    role: msg.role,
-                    parts: msg.parts.map(part => {
-                        if (part.inlineData) {
-                            return {
-                                inlineData: {
-                                    mimeType: part.inlineData.mimeType,
-                                    data: part.inlineData.data
-                                }
-                            };
-                        }
-                        return ttt{ text: part.text };
-                    })
-                };
-            }),
+            messages: chatHistory.map(msg => ({
+                role: msg.role,
+                parts: msg.parts.map(part => {
+                    if (part.inlineData) {
+                        return {
+                            inlineData: {
+                                mimeType: part.inlineData.mimeType,
+                                data: part.inlineData.data
+                            }
+                        };
+                    }
+                    return { text: part.text };
+                })
+            })),
             user_id: user.id
         };
 
@@ -253,7 +283,7 @@ async function sendMessage() {
             body: JSON.stringify(payload)
         });
 
-        ui.think.style.display = 'none';
+        if (ui.think) ui.think.style.display = 'none';
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -269,7 +299,7 @@ async function sendMessage() {
         }
     } catch (e) {
         console.error("Fetch Error:", e);
-        ui.think.style.display = 'none';
+        if (ui.think) ui.think.style.display = 'none';
         if (e.message.includes("Failed to fetch")) {
             appendAiBubble("Omo, Render is still waking up the server. Give it 30 seconds and try again!");
         } else {
@@ -278,11 +308,13 @@ async function sendMessage() {
     }
 }
         
-// --- 5. UI BUBBLES & FORMATTING ---
+// --- 5. UI BUBBLES & TEXT PROCESSING ---
 function formatAIResponse(text) {
     if (!text) return "";
+    
+    // Process markdown code blocks with syntax highlighting layouts
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    return text.replace(codeRegex, (match, lang, code) => {
+    let formatted = text.replace(codeRegex, (match, lang, code) => {
         const language = lang || 'code';
         return `
             <div class="code-container">
@@ -296,6 +328,11 @@ function formatAIResponse(text) {
             </div>
         `;
     });
+
+    // Simple markdown parsing for inline bold (**text**)
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    return formatted;
 }
 
 function escapeHtml(text) {
@@ -308,6 +345,8 @@ function escapeHtml(text) {
 }
 
 function appendBubble(role, contentHTML, msgId) {
+    if (!ui.display) return;
+    
     const wrapper = document.createElement('div');
     wrapper.id = msgId;
     
@@ -322,7 +361,12 @@ function appendBubble(role, contentHTML, msgId) {
         wrapper.innerHTML = `<div class="ai-msg-bubble">${contentHTML}</div>`;
     }
     
-    ui.display.insertBefore(wrapper, ui.think);
+    if (ui.think) {
+        ui.display.insertBefore(wrapper, ui.think);
+    } else {
+        ui.display.appendChild(wrapper);
+    }
+    
     ui.display.scrollTop = ui.display.scrollHeight;
 }
 
@@ -333,7 +377,7 @@ function appendAiBubble(rawText) {
 
 async function editMessage(msgId) {
     const wrapper = document.getElementById(msgId);
-    if (!wrapper) return;
+    if (!wrapper || !ui.input) return;
     
     const textNode = wrapper.querySelector('.msg-text');
     if (!textNode) return;
@@ -363,6 +407,28 @@ async function copyCode(buttonElement) {
     }
 }
 
-async function loadSidebarHistory() {}
+// --- 6. SIDEBAR HISTORY MANAGEMENT ---
+async function loadSidebarHistory() {
+    try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
 
+        const historyList = document.getElementById('chatHistoryList');
+        if (!historyList) return;
+
+        // Clear existing sidebar items smoothly
+        historyList.innerHTML = '';
+
+        // Real-time dynamic listener or query can be populated right here
+        const listItem = document.createElement('div');
+        listItem.className = 'history-item active';
+        listItem.innerHTML = `<i class="far fa-comments"></i> <span>Current Conversation</span>`;
+        historyList.appendChild(listItem);
+
+    } catch (err) {
+        console.error("Error building sidebar tree:", err);
+    }
+}
+
+// Initialize application lifecycle cleanly
 init();
