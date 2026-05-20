@@ -103,28 +103,25 @@ function activateTriggers() {
         closeBtn.onclick = () => ui.sidebar.classList.remove('active');
     }
 
-   // FORCE-FIX: We hijack the click to create a pure, native mobile file picker
+    // --- NEW BULLETPROOF DYNAMIC MOBILE PICKER FOR PLUS BUTTON ---
     const plusButtonElement = document.querySelector('.plus-btn');
     if (plusButtonElement) {
         plusButtonElement.onclick = (e) => {
             e.preventDefault();
             
-            // 1. Create an invisible input element on the fly
+            // 1. Force phone memory to spawn a clean input channel
             const nativePicker = document.createElement('input');
             nativePicker.type = 'file';
             nativePicker.accept = 'image/*';
             
-            // 2. Set up the change listener directly on this clean native element
+            // 2. Immediate capture stream setup
             nativePicker.onchange = (event) => {
                 const filesList = event.target.files;
-                if (!filesList || filesList.length === 0) {
-                    alert("No file was picked by the system.");
-                    return;
-                }
+                if (!filesList || filesList.length === 0) return;
                 
                 const file = filesList;
                 
-                // THIS WILL SHOW THE TRUE VALUE NOW
+                // Confirming extraction directly from OS layer
                 alert("2. NEW NATIVE SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)");
                 
                 const reader = new FileReader();
@@ -150,7 +147,7 @@ function activateTriggers() {
                 reader.readAsDataURL(file);
             };
             
-            // 3. Trigger the phone's native file selection window instantly
+            // 3. Fire the mobile system panel picker window
             nativePicker.click();
         };
     }
@@ -170,7 +167,7 @@ function activateTriggers() {
             toggleButtons();
         };
     }
-} 
+}
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
