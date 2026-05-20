@@ -103,22 +103,34 @@ function activateTriggers() {
         closeBtn.onclick = () => ui.sidebar.classList.remove('active');
     }
 
-    if (ui.fileInput) {
-        ui.fileInput.onchange = (e) => {
-            // alert("1. Phone detected file select!"); // Kept for tracking if needed
+   if (ui.fileInput) {
+        ui.fileInput.onchange = function(e) {
+            // DIRECT ELEMENT REGISTRY ACCESS FOR MOBILE
+            const directInput = document.getElementById('imageUpload');
             
-            // BULLETPROOF MOBILE FALLBACK: Check event target FIRST, then fall back directly to the element files
-            let files = e.target.files || (ui.fileInput ? ui.fileInput.files : null);
+            if (!directInput || !directInput.files || directInput.files.length === 0) {
+                alert("Omo, the browser completely hid the file array. Let's try raw extraction...");
+                // Emergency fallback 2
+                if (!e.target || !e.target.files || e.target.files.length === 0) {
+                    alert("Fatal: Mobile file stream blocked by device privacy settings.");
+                    return;
+                }
+            }
             
-            if (!files || files.length === 0) {
-                alert("Omo, your phone did not return any file object. Try a different browser app!");
+            // Extract using whatever reference exists securely
+            const mobileFilesArray = (directInput && directInput.files && directInput.files.length > 0) 
+                ? directInput.files 
+                : e.target.files;
+                
+            const file = mobileFilesArray; 
+            
+            if (!file) {
+                alert("File object is still slipping away!");
                 return;
             }
             
-            const file = files; 
-            
-            // Alert to confirm your phone is now reading the file details correctly!
-            alert("2. SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)"); 
+            // This MUST read out the details now!
+            alert("2. BIG SUCCESS! File loaded: " + file.name + " (" + file.size + " bytes)"); 
             
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -126,7 +138,7 @@ function activateTriggers() {
                 const dataUrl = event.target.result;
                 
                 selectedImageBase64 = dataUrl.split(','); 
-                selectedImageMime = file.type; 
+                selectedImageMime = file.type || "image/jpeg"; 
                 
                 if (ui.previewImg && ui.previewContainer) {
                     ui.previewImg.src = dataUrl;
