@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "9ja-ai",
+  "compatibility_date": "2026-05-21",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "9ja-ai"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
