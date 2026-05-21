@@ -240,24 +240,13 @@ body {
     color: #ececec;
 
     font-size: 16px;
-    line-height: 1.9;
+    line-height: 1.85;
 
-    white-space: normal; /* FIXED */
+    white-space: pre-wrap;
     word-break: break-word;
     overflow-wrap: break-word;
 
     text-align: left;
-
-    display: block;
-}
-
-/* FIX AI TEXT PARAGRAPH FLOW */
-.ai-msg-bubble p,
-.ai-msg-bubble div,
-.ai-msg-bubble span {
-    display: inline;
-    margin: 0;
-    padding: 0;
 }
 
 /* USER MESSAGE */
