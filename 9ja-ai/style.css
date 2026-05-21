@@ -229,9 +229,16 @@ body {
 
 /* AI MESSAGE */
 .ai-msg-bubble {
-    max-width: 80%;
-    padding: 14px 18px;
-    margin-left: 10px;
+  max-width: 80%;
+  padding: 14px 18px;
+  margin-left: 10px;
+  text-indent: 0;
+}
+
+.ai-msg-bubble p {
+  margin: 0;
+  padding: 0;
+}
 
     background: #111111;
     color: #ffffff;
