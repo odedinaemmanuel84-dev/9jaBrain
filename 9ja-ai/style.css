@@ -800,3 +800,52 @@ pre code {
         font-size: 1rem;
     }
     }
+
+/* --- SEND BUTTON FIX --- */
+.arrow-send-btn,
+#sendBtn {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+
+    border-radius: 50% !important;
+    border: none !important;
+
+    background: linear-gradient(135deg, #00ff88, #00bfff) !important;
+    color: #000 !important;
+
+    display: none; /* JS controls visibility */
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    cursor: pointer !important;
+
+    font-size: 18px !important;
+    font-weight: bold !important;
+
+    transition: all 0.25s ease !important;
+
+    flex-shrink: 0 !important;
+
+    box-shadow: 0 0 12px rgba(0,255,136,0.35);
+}
+
+.arrow-send-btn:hover,
+#sendBtn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 18px rgba(0,255,136,0.55);
+}
+
+/* ICON FIX */
+.arrow-send-btn i,
+#sendBtn i {
+    color: #000 !important;
+    font-size: 16px !important;
+}
+
+/* ACTIVE STATE */
+.arrow-send-btn:active,
+#sendBtn:active {
+    transform: scale(0.96);
+}
