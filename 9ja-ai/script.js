@@ -126,7 +126,7 @@ function activateTriggers() {
         };
     }
 
-    /* --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM --- */
+// --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM ---
 const plusButtonElement = document.querySelector('.plus-btn');
 
 if (plusButtonElement) {
@@ -141,29 +141,18 @@ if (plusButtonElement) {
 
         nativePicker.accept = 'image/*';
 
-        nativePicker.click();
-
         nativePicker.onchange = (event) => {
 
             const filesList = event.target.files;
 
             if (!filesList || filesList.length === 0) return;
 
-            /* FIXED */
+            // ✅ REAL FILE
             const file = filesList[0];
 
             if (!file) return;
 
-            console.log("Image Loaded:", file.name);
-
-            /* OPTIONAL SIZE LIMIT */
-            if (file.size > 5 * 1024 * 1024) {
-
-                appendAiBubble("Oga, image too big. Upload image under 5MB.");
-
-                return;
-
-            }
+            console.log("REAL IMAGE:", file.name, file.size);
 
             const reader = new FileReader();
 
@@ -171,11 +160,18 @@ if (plusButtonElement) {
 
                 const dataUrl = fileEvent.target.result;
 
-                /* FIXED BASE64 */
+                if (!dataUrl) {
+                    alert("Image conversion failed");
+                    return;
+                }
+
+                // ✅ PURE BASE64 ONLY
                 selectedImageBase64 = dataUrl.split(',')[1];
 
-                /* FIXED MIME */
+                // ✅ MIME TYPE
                 selectedImageMime = file.type || "image/jpeg";
+
+                console.log("MIME:", selectedImageMime);
 
                 const targetPreview = document.getElementById('imagePreview');
 
@@ -190,33 +186,25 @@ if (plusButtonElement) {
                     targetContainer.style.display = "flex";
 
                     if (targetWrapper) {
-
                         targetWrapper.style.minHeight = "120px";
-
                     }
-
                 }
 
                 toggleButtons();
-
             };
 
             reader.onerror = (err) => {
-
-                console.error("Reader error:", err);
-
-                appendAiBubble("Omo, image processing fail.");
-
+                console.error("Reader Error:", err);
+                alert("Image failed to load");
             };
 
             reader.readAsDataURL(file);
-
         };
 
+        nativePicker.click();
     };
-
 }
-
+    
     // REMOVE IMAGE
     if (ui.removeImg) {
 
