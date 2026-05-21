@@ -319,7 +319,7 @@ body {
     transition: opacity 0.2s ease;
 
     position: absolute;
-    left: -10px;
+    left: -8px;
     top: 50%;
     transform: translateY(-50%);
 
