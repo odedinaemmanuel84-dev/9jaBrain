@@ -238,45 +238,97 @@ body {
 
 .user-msg-container:hover .edit-btn { opacity: 1; }
 
+ /* AI MESSAGE CONTAINER */
 .ai-msg-container {
-    align-self: flex-start;
-    max-width: 90%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin: 18px 0;
+    animation: fadeIn 0.25s ease;
+}
+
+/* AI MESSAGE BUBBLE */
+.ai-msg-bubble {
+    max-width: 78%;
+    padding: 14px 18px;
+    border-radius: 18px;
+    
+    background: #111111;
+    color: #ffffff;
+
+    font-size: 16px;
+    line-height: 1.7;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+
+    margin-left: 12px;
+
+    text-align: left;
+
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* USER MESSAGE */
+.user-msg-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin: 18px 0;
+}
+
+.user-msg-bubble {
+    max-width: 78%;
+    padding: 14px 18px;
+    border-radius: 18px;
+
+    background: #2b2b2b;
+    color: #fff;
+
+    font-size: 16px;
+    line-height: 1.6;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+
+    margin-right: 12px;
+}
+
+/* CHAT DISPLAY */
+#chatDisplay {
     display: flex;
     flex-direction: column;
-    margin-top: 4px;
-    animation: bubbleFade 0.4s ease-out;
+    padding: 18px 10px 140px;
+    overflow-y: auto;
 }
 
-/* --- GEMINI-STYLE AI RESPONSE --- */
-.ai-msg-bubble {
-    line-height: 1.8;
-    font-size: 1.05rem;
-    color: #e8eaed;
-    padding: 12px 0;
-    width: 100%;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+/* MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+
+    .ai-msg-bubble,
+    .user-msg-bubble {
+        max-width: 88%;
+        font-size: 15px;
+        line-height: 1.6;
+    }
 }
 
-.ai-msg-bubble strong, .ai-msg-bubble b {
-    color: #ffffff;
-    font-weight: 700;
-}
+/* SMOOTH FADE */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
 
-.ai-msg-bubble ul, .ai-msg-bubble ol {
-    padding-left: 25px;
-    margin: 15px 0;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-
-.ai-msg-bubble li {
-    margin-bottom: 8px;
-}
-
-@keyframes bubbleFade {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 /* --- THE THINKING INDICATOR (NAIJA PULSE) --- */
 #thinkingIndicator {
     display: none;
