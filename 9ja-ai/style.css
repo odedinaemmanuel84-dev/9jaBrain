@@ -219,19 +219,21 @@ body {
 /* ================= CHATGPT STYLE MESSAGES ================= */
 /* ========================================================= */
 
-/* AI MESSAGE */
+/* AI MESSAGE CONTAINER */
 .ai-msg-container {
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    animation: fadeIn 0.25s ease;
+    margin: 8px 0;
 }
 
+/* AI MESSAGE */
 .ai-msg-bubble {
     width: 100%;
     max-width: 850px;
 
-    padding: 0 8px 0 2px;
+    padding: 0;
+    margin: 0;
 
     background: transparent;
     border: none;
@@ -240,13 +242,13 @@ body {
     color: #ececec;
 
     font-size: 16px;
-    line-height: 1.85;
+    line-height: 1.9;
+
+    text-align: left;
 
     white-space: pre-wrap;
     word-break: break-word;
     overflow-wrap: break-word;
-
-    text-align: left;
 }
 
 /* USER MESSAGE */
