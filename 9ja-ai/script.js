@@ -570,12 +570,8 @@ function appendBubble(role, contentHTML, msgId) {
         `;
 
     } else {
-
-wrapper.innerHTML = `
-    <div class="ai-msg-bubble">
-        <div class="msg-text">${contentHTML}</div>
-    </div>
-`;
+>
+wrapper.innerHTML = `<div class="ai-msg-bubble">${contentHTML}</div>`;
 
     if (ui.think) {
         ui.display.insertBefore(wrapper, ui.think);
