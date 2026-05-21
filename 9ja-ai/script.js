@@ -126,74 +126,96 @@ function activateTriggers() {
         };
     }
 
-    // --- IMAGE PICKER ---
-    const plusButtonElement = document.querySelector('.plus-btn');
+    /* --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM --- */
+const plusButtonElement = document.querySelector('.plus-btn');
 
-    if (plusButtonElement) {
+if (plusButtonElement) {
 
-        plusButtonElement.onclick = (e) => {
-            e.preventDefault();
+    plusButtonElement.onclick = (e) => {
 
-            const nativePicker = document.createElement('input');
+        e.preventDefault();
 
-            nativePicker.type = 'file';
-            nativePicker.accept = 'image/*';
+        const nativePicker = document.createElement('input');
 
-            nativePicker.onchange = (event) => {
+        nativePicker.type = 'file';
 
-                const filesList = event.target.files;
+        nativePicker.accept = 'image/*';
 
-                if (!filesList || filesList.length === 0) return;
+        nativePicker.click();
 
-                // FIXED: Must use first file object
-                const file = filesList[0];
+        nativePicker.onchange = (event) => {
 
-                if (!file) return;
+            const filesList = event.target.files;
 
-                console.log("Image Loaded:", file.name);
+            if (!filesList || filesList.length === 0) return;
 
-                const reader = new FileReader();
+            /* FIXED */
+            const file = filesList[0];
 
-                reader.onload = (fileEvent) => {
+            if (!file) return;
 
-                    const dataUrl = fileEvent.target.result;
+            console.log("Image Loaded:", file.name);
 
-                    if (!dataUrl) return;
+            /* OPTIONAL SIZE LIMIT */
+            if (file.size > 5 * 1024 * 1024) {
 
-                    // FIXED: PURE BASE64 ONLY
-                    selectedImageBase64 = dataUrl.split(',')[1];
+                appendAiBubble("Oga, image too big. Upload image under 5MB.");
 
-                    // FIXED: MIME TYPE
-                    selectedImageMime = file.type || "image/jpeg";
+                return;
 
-                    const targetPreview = document.getElementById('imagePreview');
-                    const targetContainer = document.getElementById('imagePreviewContainer');
-                    const targetWrapper = document.getElementById('expandingContainer');
+            }
 
-                    if (targetPreview && targetContainer) {
+            const reader = new FileReader();
 
-                        targetPreview.src = dataUrl;
-                        targetContainer.style.display = "flex";
+            reader.onload = (fileEvent) => {
 
-                        if (targetWrapper) {
-                            targetWrapper.style.minHeight = "120px";
-                        }
+                const dataUrl = fileEvent.target.result;
+
+                /* FIXED BASE64 */
+                selectedImageBase64 = dataUrl.split(',')[1];
+
+                /* FIXED MIME */
+                selectedImageMime = file.type || "image/jpeg";
+
+                const targetPreview = document.getElementById('imagePreview');
+
+                const targetContainer = document.getElementById('imagePreviewContainer');
+
+                const targetWrapper = document.getElementById('expandingContainer');
+
+                if (targetPreview && targetContainer) {
+
+                    targetPreview.src = dataUrl;
+
+                    targetContainer.style.display = "flex";
+
+                    if (targetWrapper) {
+
+                        targetWrapper.style.minHeight = "120px";
+
                     }
 
-                    toggleButtons();
-                };
+                }
 
-                reader.onerror = (err) => {
-                    console.error("Reader error:", err);
-                    alert("Image failed to load!");
-                };
+                toggleButtons();
 
-                reader.readAsDataURL(file);
             };
 
-            nativePicker.click();
+            reader.onerror = (err) => {
+
+                console.error("Reader error:", err);
+
+                appendAiBubble("Omo, image processing fail.");
+
+            };
+
+            reader.readAsDataURL(file);
+
         };
-    }
+
+    };
+
+}
 
     // REMOVE IMAGE
     if (ui.removeImg) {
