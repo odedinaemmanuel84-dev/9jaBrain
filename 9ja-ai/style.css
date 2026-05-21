@@ -229,26 +229,39 @@ body {
 
 /* AI MESSAGE */
 .ai-msg-bubble {
-    width: 100%;
-    max-width: 850px;
+    max-width: 80%;
+    padding: 14px 18px;
+    margin-left: 10px;
 
-    padding: 0;
-    margin: 0;
+    background: #111111;
+    color: #ffffff;
 
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    color: #ececec;
+    border-radius: 18px;
 
     font-size: 16px;
-    line-height: 1.9;
+    line-height: 1.8;
+
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 
     text-align: left;
 
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    border: 1px solid rgba(255,255,255,0.05);
+
+    /* FIXED TEXT ALIGNMENT */
+    display: block;
+}
+
+/* REMOVE EXTRA INDENT/SPACING */
+.ai-msg-bubble *,
+.ai-msg-bubble p,
+.ai-msg-bubble div,
+.ai-msg-bubble span {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    text-indent: 0 !important;
+    margin-top: 0 !important;
 }
 
 /* USER MESSAGE */
