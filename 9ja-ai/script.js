@@ -156,43 +156,85 @@ if (plusButtonElement) {
 
             const reader = new FileReader();
 
-            reader.onload = (fileEvent) => {
+           reader.onload = (fileEvent) => {
 
-                const dataUrl = fileEvent.target.result;
+    const dataUrl = fileEvent.target.result;
 
-                if (!dataUrl) {
-                    alert("Image conversion failed");
-                    return;
-                }
+    if (!dataUrl) {
+        alert("Image conversion failed");
+        return;
+    }
 
-                // ✅ PURE BASE64 ONLY
-                selectedImageBase64 = dataUrl.split(',')[1];
+    const targetPreview =
+        document.getElementById('imagePreview');
 
-                // ✅ MIME TYPE
-                selectedImageMime = file.type || "image/jpeg";
+    const targetContainer =
+        document.getElementById('imagePreviewContainer');
 
-                console.log("MIME:", selectedImageMime);
+    const targetWrapper =
+        document.getElementById('expandingContainer');
 
-                const targetPreview = document.getElementById('imagePreview');
+    // ✅ IMAGE COMPRESSION SYSTEM
+    const img = new Image();
 
-                const targetContainer = document.getElementById('imagePreviewContainer');
+    img.onload = () => {
 
-                const targetWrapper = document.getElementById('expandingContainer');
+        const canvas =
+            document.createElement("canvas");
 
-                if (targetPreview && targetContainer) {
+        const maxWidth = 1200;
 
-                    targetPreview.src = dataUrl;
+        let width = img.width;
+        let height = img.height;
 
-                    targetContainer.style.display = "flex";
+        if (width > maxWidth) {
 
-                    if (targetWrapper) {
-                        targetWrapper.style.minHeight = "120px";
-                    }
-                }
+            height *= maxWidth / width;
 
-                toggleButtons();
-            };
+            width = maxWidth;
+        }
 
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // ✅ COMPRESS IMAGE
+        const compressedDataUrl =
+            canvas.toDataURL("image/jpeg", 0.7);
+
+        // ✅ STORE CLEAN BASE64
+        selectedImageBase64 =
+            compressedDataUrl.split(',')[1];
+
+        selectedImageMime = "image/jpeg";
+
+        console.log(
+            "Compressed Image Ready"
+        );
+
+        if (targetPreview && targetContainer) {
+
+            targetPreview.src =
+                compressedDataUrl;
+
+            targetContainer.style.display =
+                "flex";
+
+            if (targetWrapper) {
+                targetWrapper.style.minHeight =
+                    "120px";
+            }
+        }
+
+        toggleButtons();
+    };
+
+    img.src = dataUrl;
+}; 
+           
             reader.onerror = (err) => {
                 console.error("Reader Error:", err);
                 alert("Image failed to load");
