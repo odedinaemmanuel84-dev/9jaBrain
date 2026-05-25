@@ -40,7 +40,7 @@ async function init() {
             ui.pfp.src = user.user_metadata.avatar_url;
         }
 
-        const name = user.user_metadata?.full_name || "Oga";
+        const name = user.user_metadata?.first_name || "Oga";
 
         if (ui.userName) {
             ui.userName.innerText = name;
