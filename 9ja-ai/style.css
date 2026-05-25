@@ -871,25 +871,3 @@ pre code {
 #sendBtn:active {
     transform: scale(0.96);
 }
-
-.ai-message-content::after {
-content: "";
-display: inline-block;
-width: 6px;
-height: 16px;
-margin-left: 4px;
-background: var(--accent);
-animation: blinkCursor 0.8s infinite;
-vertical-align: middle;
-}
-
-@keyframes blinkCursor {
-0%, 50% {
-opacity: 1;
-}
-
-51%, 100% {
-    opacity: 0;
-}
-
-}
