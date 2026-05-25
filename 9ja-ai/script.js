@@ -529,44 +529,47 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
             );
         }
 
-        const data = await response.json();
+       // STREAMING CHATGPT STYLE
+const reader = response.body.getReader();
 
-        if (data.reply) {
+const decoder = new TextDecoder("utf-8");
 
-            chatHistory.push({
-                role: "assistant",
-                parts: [{ text: data.reply }]
-            });
+let aiText = "";
 
-            appendAiBubble(data.reply);
+const aiId = 'ai-' + Date.now();
 
-        } else {
+appendBubble(
+'ai',
+"<div class="msg-text" id="${aiId}"></div>",
+aiId
+);
 
-            appendAiBubble("Omo, Naija AI is speechless. Try refreshing?");
-        }
+const aiTextElement = document.getElementById(aiId);
 
-    } catch (e) {
+while (true) {
 
-        console.error("Fetch Error:", e);
+const { done, value } = await reader.read();
 
-        if (ui.think) {
-            ui.think.style.display = 'none';
-        }
+if (done) break;
 
-        if (e.message.includes("Failed to fetch")) {
+const chunk = decoder.decode(value);
 
-            appendAiBubble(
-                "Omo, Render is still waking up the server. Give it 30 seconds and try again!"
-            );
+aiText += chunk;
 
-        } else {
-
-            appendAiBubble(
-                `Error: ${e.message}. Check your Render logs, Oga.`
-            );
-        }
-    }
+if (aiTextElement) {
+    aiTextElement.innerHTML =
+        formatAIResponse(aiText);
 }
+
+ui.display.scrollTop =
+    ui.display.scrollHeight;
+
+}
+
+chatHistory.push({
+role: "assistant",
+parts: [{ text: aiText }]
+}); 
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 function formatAIResponse(text) {
@@ -635,13 +638,7 @@ function appendBubble(role, contentHTML, msgId) {
 
     } else {
 
-        wrapper.className = 'ai-msg-container';
-
-        wrapper.innerHTML = `
-            <div class="ai-msg-bubble">
-                ${contentHTML}
-            </div>
-        `;
+        wrapper.innerHTML = "<div class="ai-msg-bubble"> <div class="ai-message-content"> ${contentHTML} </div> </div>";
     }
 
     if (ui.think) {
