@@ -529,47 +529,45 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
             );
         }
 
-       // STREAMING CHATGPT STYLE
-const reader = response.body.getReader();
+const data = await response.json();
 
-const decoder = new TextDecoder("utf-8");
+if (data.reply) {  
 
-let aiText = "";
+        chatHistory.push({  
+            role: "assistant",  
+            parts: [{ text: data.reply }]  
+        });  
 
-const aiId = 'ai-' + Date.now();
+        appendAiBubble(data.reply);  
 
-appendBubble(
-'ai',
-"<div class="msg-text" id="${aiId}"></div>",
-aiId
-);
+    } else {  
 
-const aiTextElement = document.getElementById(aiId);
+        appendAiBubble("Omo, Naija AI is speechless. Try refreshing?");  
+    }  
 
-while (true) {
+} catch (e) {  
 
-const { done, value } = await reader.read();
+    console.error("Fetch Error:", e);  
 
-if (done) break;
+    if (ui.think) {  
+        ui.think.style.display = 'none';  
+    }  
 
-const chunk = decoder.decode(value);
+    if (e.message.includes("Failed to fetch")) {  
 
-aiText += chunk;
+        appendAiBubble(  
+            "Omo, Render is still waking up the server. Give it 30 seconds and try again!"  
+        );  
 
-if (aiTextElement) {
-    aiTextElement.innerHTML =
-        formatAIResponse(aiText);
+    } else {  
+
+        appendAiBubble(  
+            `Error: ${e.message}. Check your Render logs, Oga.`  
+        );  
+    }  
 }
 
-ui.display.scrollTop =
-    ui.display.scrollHeight;
-
 }
-
-chatHistory.push({
-role: "assistant",
-parts: [{ text: aiText }]
-}); 
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 function formatAIResponse(text) {
@@ -638,7 +636,11 @@ function appendBubble(role, contentHTML, msgId) {
 
     } else {
 
-        wrapper.innerHTML = "<div class="ai-msg-bubble"> <div class="ai-message-content"> ${contentHTML} </div> </div>";
+        wrapper.innerHTML = `
+    <div class="ai-msg-bubble">
+        ${contentHTML}
+    </div>
+`;
     }
 
     if (ui.think) {
