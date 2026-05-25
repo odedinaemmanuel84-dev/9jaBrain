@@ -471,20 +471,32 @@ async function sendMessage() {
         // --- IMAGE ROUTE ---
         if (sendingImage) {
 
-            const visionPayload = {
-                image_data: `data:${sendingMime};base64,${sendingImage}`,
-                prompt: text || "Explain wetin dey inside this image in Pidgin."
-            };
+// SAVE IMAGE TO CHAT MEMORY
+chatHistory.push({
+    role: "user",
+    parts: [
+        {
+            text: text || "Analyze this image"
+        },
+        {
+            image_url: `data:${sendingMime};base64,${sendingImage}`
+        }
+    ]
+});
 
-            response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(visionPayload)
-            });
+const visionPayload = {
+    messages: chatHistory
+};
 
-        } else {
+response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(visionPayload)
+});
+
+} else {
 
             // --- CHAT ROUTE ---
             const chatPayload = {
