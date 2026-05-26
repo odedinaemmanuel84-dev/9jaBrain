@@ -469,23 +469,24 @@ async function sendMessage() {
         let response;
 
         // --- IMAGE ROUTE ---
-        if (sendingImage) {
+     if (sendingImage) {
 
-// SAVE IMAGE TO CHAT MEMORY
+// SAVE IMAGE INSIDE CHAT HISTORY
 chatHistory.push({
     role: "user",
     parts: [
         {
-            text: text || "Analyze this image"
+            text: text || "Explain this image"
         },
         {
-            image_url: `data:${sendingMime};base64,${sendingImage}`
+            image: `data:${sendingMime};base64,${sendingImage}`
         }
     ]
 });
 
 const visionPayload = {
-    messages: chatHistory
+    messages: chatHistory,
+    prompt: text || "Explain wetin dey inside this image in Pidgin."
 };
 
 response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
@@ -496,9 +497,9 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
     body: JSON.stringify(visionPayload)
 });
 
-} else {
-
-            // --- CHAT ROUTE ---
+     } else {
+            
+         // --- CHAT ROUTE ---
             const chatPayload = {
                 messages: chatHistory.map(msg => ({
                     role: msg.role,
