@@ -626,22 +626,72 @@ function appendBubble(role, contentHTML, msgId) {
         wrapper.className = 'user-msg-container';
 
         wrapper.innerHTML = `
-            <div class="edit-btn" onclick="editMessage('${msgId}')">
-                <i class="fas fa-pen"></i>
-            </div>
+            <div class="user-message-wrapper">
 
-            <div class="user-msg-bubble">
-                ${contentHTML}
+                <div class="user-msg-bubble">
+                    ${contentHTML}
+                </div>
+
+                <div class="message-actions user-actions">
+
+                    <button class="msg-action-btn"
+                        onclick="copyUserMessage(this)"
+                        title="Copy">
+                        <i class="far fa-copy"></i>
+                    </button>
+
+                    <button class="msg-action-btn"
+                        onclick="editMessage('${msgId}')"
+                        title="Edit">
+                        <i class="fas fa-pen"></i>
+                    </button>
+
+                </div>
+
             </div>
         `;
 
     } else {
 
+        wrapper.className = 'ai-msg-container';
+
         wrapper.innerHTML = `
-    <div class="ai-msg-bubble">
-        ${contentHTML}
-    </div>
-`;
+            <div class="ai-message-wrapper">
+
+                <div class="ai-msg-bubble">
+                    ${contentHTML}
+                </div>
+
+                <div class="message-actions ai-actions">
+
+                    <button class="msg-action-btn"
+                        onclick="copyAiMessage(this)"
+                        title="Copy">
+                        <i class="far fa-copy"></i>
+                    </button>
+
+                    <button class="msg-action-btn"
+                        onclick="shareMessage(this)"
+                        title="Share">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+
+                    <button class="msg-action-btn"
+                        onclick="likeMessage(this)"
+                        title="Like">
+                        <i class="far fa-thumbs-up"></i>
+                    </button>
+
+                    <button class="msg-action-btn"
+                        onclick="dislikeMessage(this)"
+                        title="Dislike">
+                        <i class="far fa-thumbs-down"></i>
+                    </button>
+
+                </div>
+
+            </div>
+        `;
     }
 
     if (ui.think) {
@@ -718,6 +768,100 @@ async function copyCode(buttonElement) {
 
         console.error('Failed to copy text:', err);
     }
+}
+
+async function copyAiMessage(button) {
+
+    const bubble = button
+        .closest('.ai-message-wrapper')
+        .querySelector('.ai-msg-bubble');
+
+    if (!bubble) return;
+
+    try {
+
+        await navigator.clipboard.writeText(bubble.innerText);
+
+        const old = button.innerHTML;
+
+        button.innerHTML = '<i class="fas fa-check"></i>';
+
+        setTimeout(() => {
+            button.innerHTML = old;
+        }, 2000);
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
+
+async function copyUserMessage(button) {
+
+    const bubble = button
+        .closest('.user-message-wrapper')
+        .querySelector('.user-msg-bubble');
+
+    if (!bubble) return;
+
+    try {
+
+        await navigator.clipboard.writeText(bubble.innerText);
+
+        const old = button.innerHTML;
+
+        button.innerHTML = '<i class="fas fa-check"></i>';
+
+        setTimeout(() => {
+            button.innerHTML = old;
+        }, 2000);
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
+
+async function shareMessage(button) {
+
+    const bubble = button
+        .closest('.ai-message-wrapper')
+        .querySelector('.ai-msg-bubble');
+
+    if (!bubble) return;
+
+    const text = bubble.innerText;
+
+    try {
+
+        if (navigator.share) {
+
+            await navigator.share({
+                title: "Naija AI",
+                text
+            });
+
+        } else {
+
+            await navigator.clipboard.writeText(text);
+
+            alert("Message copied. You can now share it.");
+        }
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
+
+function likeMessage(button) {
+
+    button.classList.toggle('active-like');
+}
+
+function dislikeMessage(button) {
+
+    button.classList.toggle('active-dislike');
 }
 
 // --- 6. SIDEBAR HISTORY MANAGEMENT ---
