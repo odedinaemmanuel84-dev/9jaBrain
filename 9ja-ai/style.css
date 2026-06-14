@@ -871,3 +871,69 @@ pre code {
 #sendBtn:active {
     transform: scale(0.96);
 }
+
+/* ChatGPT-style message actions */
+
+.user-message-wrapper,
+.ai-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 100%;
+}
+
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.ai-message-wrapper:hover .message-actions,
+.user-message-wrapper:hover .message-actions {
+    opacity: 1;
+}
+
+.msg-action-btn {
+    width: 30px;
+    height: 30px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #9ca3af;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.msg-action-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+}
+
+.active-like {
+    color: #10b981 !important;
+}
+
+.active-dislike {
+    color: #ff4d4d !important;
+}
+
+@media (max-width: 768px) {
+
+    .message-actions {
+        opacity: 1;
+    }
+
+    .msg-action-btn {
+        width: 28px;
+        height: 28px;
+    }
+}
