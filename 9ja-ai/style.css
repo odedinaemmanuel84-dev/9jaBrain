@@ -890,24 +890,27 @@ pre code {
 .message-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
 
-.ai-message-wrapper:hover .message-actions,
-.user-message-wrapper:hover .message-actions {
+    gap: 4px;
+
     opacity: 1;
+
+    margin-top: 2px;
+
+    transition: all 0.2s ease;
+
+    flex-wrap: wrap;
 }
 
 .msg-action-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
 
     border: none;
     border-radius: 8px;
 
     background: transparent;
+
     color: #9ca3af;
 
     display: flex;
@@ -915,6 +918,7 @@ pre code {
     justify-content: center;
 
     cursor: pointer;
+
     transition: all 0.2s ease;
 }
 
