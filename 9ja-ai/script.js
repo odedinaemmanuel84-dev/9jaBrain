@@ -669,13 +669,13 @@ function appendBubble(role, contentHTML, msgId) {
                     <i class="fas fa-share"></i>
                 </button>
 
-                <button class="msg-action-btn like-btn"
-    onclick="sendFeedback(this,'like'); likeMessage(this)">
+                 <button class="msg-action-btn like-btn"
+                    onclick="sendFeedback(this,'like')"
                     <i class="far fa-thumbs-up"></i>
                 </button>
 
                 <button class="msg-action-btn dislike-btn"
-    onclick="sendFeedback(this,'dislike'); dislikeMessage(this)">
+                     onclick="sendFeedback(this,'dislike')"
                     <i class="far fa-thumbs-down"></i>
                 </button>
 
@@ -815,28 +815,24 @@ async function copyUserMessage(button) {
 
 async function sendFeedback(btn, type) {
 
-    const wrapper = btn.closest(
-        '.ai-message-wrapper'
-    );
+    const wrapper = btn.closest('.ai-message-wrapper');
 
     if (!wrapper) return;
 
-    const message =
-        wrapper.querySelector('.ai-msg-bubble')
+    const message = wrapper
+        .querySelector('.ai-msg-bubble')
         ?.innerText || "";
 
-    const actions =
-        wrapper.querySelectorAll('.msg-action-btn');
+    // Reset buttons
+    wrapper.querySelectorAll('.like-btn, .dislike-btn')
+        .forEach(button => {
+            button.classList.remove(
+                'active-like',
+                'active-dislike'
+            );
+        });
 
-    // Reset icons
-    actions.forEach(action => {
-        action.classList.remove(
-            'active-like',
-            'active-dislike'
-        );
-    });
-
-    // Activate selected icon
+    // Activate selected button
     if (type === 'like') {
         btn.classList.add('active-like');
     } else {
@@ -845,43 +841,42 @@ async function sendFeedback(btn, type) {
 
     try {
 
-    const response = await fetch(
-        `${BACKEND_URL}/api/feedback`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type,
-                message
-            })
+        const response = await fetch(
+            `${BACKEND_URL}/api/feedback`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type,
+                    message
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            const icon = btn.querySelector('i');
+
+            const original = icon.className;
+
+            icon.className = 'fas fa-check';
+
+            setTimeout(() => {
+                icon.className = original;
+            }, 1500);
         }
-    );
 
-    const data = await response.json();
+    } catch (err) {
 
-    if (data.success) {
+        console.error("Feedback failed:", err);
 
-        const old = btn.innerHTML;
-
-        btn.innerHTML =
-            '<i class="fas fa-check"></i>';
-
-        setTimeout(() => {
-            btn.innerHTML = old;
-        }, 1500);
+        alert("Feedback failed to send.");
     }
-
-} catch (err) {
-
-    console.error(
-        'Feedback failed:',
-        err
-    );
-
-    alert('Feedback failed to send.');
-    }
+}
 
 async function shareMessage(button) {
 
