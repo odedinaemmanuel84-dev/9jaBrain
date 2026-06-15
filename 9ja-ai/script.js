@@ -646,44 +646,44 @@ function appendBubble(role, contentHTML, msgId) {
             </div>
         `;
 
-    } else {
+  } else {
 
-        wrapper.className = 'ai-msg-container';
+    wrapper.className = 'ai-msg-container';
 
-        wrapper.innerHTML = `
-            <div class="ai-message-wrapper">
+    wrapper.innerHTML = `
+        <div class="ai-message-wrapper">
 
-                <div class="ai-msg-bubble">
-                    ${contentHTML}
-                </div>
+            <div class="ai-msg-bubble">
+                ${contentHTML}
+            </div>
 
-                <div class="message-actions">
+            <div class="message-actions">
 
-                    <button class="msg-action-btn"
-                        onclick="copyMessage(this)">
-                        <i class="far fa-copy"></i>
-                    </button>
+                <button class="msg-action-btn"
+                    onclick="copyMessage(this)">
+                    <i class="far fa-copy"></i>
+                </button>
 
-                    <button class="msg-action-btn"
-                        onclick="shareMessage(this)">
-                        <i class="fas fa-share-alt"></i>
-                    </button>
+                <button class="msg-action-btn"
+                    onclick="shareMessage(this)">
+                    <i class="fas fa-share"></i>
+                </button>
 
-                    <button class="msg-action-btn"
-                        onclick="toggleLike(this)">
-                        <i class="far fa-thumbs-up"></i>
-                    </button>
+                <button class="msg-action-btn"
+                    onclick="toggleLike(this)">
+                    <i class="far fa-thumbs-up"></i>
+                </button>
 
-                    <button class="msg-action-btn"
-                        onclick="toggleDislike(this)">
-                        <i class="far fa-thumbs-down"></i>
-                    </button>
-
-                </div>
+                <button class="msg-action-btn"
+                    onclick="toggleDislike(this)">
+                    <i class="far fa-thumbs-down"></i>
+                </button>
 
             </div>
-        `;
-    }
+
+        </div>
+    `;
+    }      
 
     if (ui.think) {
         ui.display.insertBefore(wrapper, ui.think);
