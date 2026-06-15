@@ -660,7 +660,7 @@ function appendBubble(role, contentHTML, msgId) {
             <div class="message-actions">
 
                 <button class="msg-action-btn"
-                    onclick="copyMessage(this)">
+                    onclick="copyAiMessage(this)">
                     <i class="far fa-copy"></i>
                 </button>
 
