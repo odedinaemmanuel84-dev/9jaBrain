@@ -845,29 +845,43 @@ async function sendFeedback(btn, type) {
 
     try {
 
-        await fetch(
-            `${BACKEND_URL}/api/feedback`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type':
-                        'application/json'
-                },
-                body: JSON.stringify({
-                    type,
-                    message
-                })
-            }
-        );
+    const response = await fetch(
+        `${BACKEND_URL}/api/feedback`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type,
+                message
+            })
+        }
+    );
 
-    } catch (err) {
+    const data = await response.json();
 
-        console.error(
-            'Feedback failed:',
-            err
-        );
+    if (data.success) {
+
+        const old = btn.innerHTML;
+
+        btn.innerHTML =
+            '<i class="fas fa-check"></i>';
+
+        setTimeout(() => {
+            btn.innerHTML = old;
+        }, 1500);
     }
-}
+
+} catch (err) {
+
+    console.error(
+        'Feedback failed:',
+        err
+    );
+
+    alert('Feedback failed to send.');
+    }
 
 async function shareMessage(button) {
 
