@@ -669,13 +669,13 @@ function appendBubble(role, contentHTML, msgId) {
                     <i class="fas fa-share"></i>
                 </button>
 
-                <button class="msg-action-btn"
-                    onclick="toggleLike(this)">
+                <button class="msg-action-btn like-btn"
+    onclick="sendFeedback(this,'like'); likeMessage(this)">
                     <i class="far fa-thumbs-up"></i>
                 </button>
 
-                <button class="msg-action-btn"
-                    onclick="toggleDislike(this)">
+                <button class="msg-action-btn dislike-btn"
+    onclick="sendFeedback(this,'dislike'); dislikeMessage(this)">
                     <i class="far fa-thumbs-down"></i>
                 </button>
 
@@ -903,12 +903,32 @@ async function shareMessage(button) {
 
 function likeMessage(button) {
 
-    button.classList.toggle('active-like');
+    const wrapper = button.closest('.message-actions');
+
+    if (!wrapper) return;
+
+    wrapper.querySelectorAll('.like-btn')
+        .forEach(btn => btn.classList.remove('active-like'));
+
+    wrapper.querySelectorAll('.dislike-btn')
+        .forEach(btn => btn.classList.remove('active-dislike'));
+
+    button.classList.add('active-like');
 }
 
 function dislikeMessage(button) {
 
-    button.classList.toggle('active-dislike');
+    const wrapper = button.closest('.message-actions');
+
+    if (!wrapper) return;
+
+    wrapper.querySelectorAll('.like-btn')
+        .forEach(btn => btn.classList.remove('active-like'));
+
+    wrapper.querySelectorAll('.dislike-btn')
+        .forEach(btn => btn.classList.remove('active-dislike'));
+
+    button.classList.add('active-dislike');
 }
 
 // --- 6. SIDEBAR HISTORY MANAGEMENT ---
