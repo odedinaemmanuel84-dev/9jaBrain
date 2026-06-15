@@ -670,12 +670,12 @@ function appendBubble(role, contentHTML, msgId) {
                 </button>
 
                  <button class="msg-action-btn like-btn"
-                    onclick="sendFeedback(this,'like')"
+                    onclick="sendFeedback(this,'like')">
                     <i class="far fa-thumbs-up"></i>
                 </button>
 
                 <button class="msg-action-btn dislike-btn"
-                     onclick="sendFeedback(this,'dislike')"
+                     onclick="sendFeedback(this,'dislike')">
                     <i class="far fa-thumbs-down"></i>
                 </button>
 
