@@ -618,7 +618,6 @@ function appendBubble(role, contentHTML, msgId) {
     if (!ui.display) return;
 
     const wrapper = document.createElement('div');
-
     wrapper.id = msgId;
 
     if (role === 'user') {
@@ -632,20 +631,16 @@ function appendBubble(role, contentHTML, msgId) {
                     ${contentHTML}
                 </div>
 
-                <div class="message-actions user-actions">
-
+                <div class="message-actions">
                     <button class="msg-action-btn"
-                        onclick="copyUserMessage(this)"
-                        title="Copy">
+                        onclick="copyMessage(this)">
                         <i class="far fa-copy"></i>
                     </button>
 
                     <button class="msg-action-btn"
-                        onclick="editMessage('${msgId}')"
-                        title="Edit">
+                        onclick="editMessage('${msgId}')">
                         <i class="fas fa-pen"></i>
                     </button>
-
                 </div>
 
             </div>
@@ -662,29 +657,25 @@ function appendBubble(role, contentHTML, msgId) {
                     ${contentHTML}
                 </div>
 
-                <div class="message-actions ai-actions">
+                <div class="message-actions">
 
                     <button class="msg-action-btn"
-                        onclick="copyAiMessage(this)"
-                        title="Copy">
+                        onclick="copyMessage(this)">
                         <i class="far fa-copy"></i>
                     </button>
 
                     <button class="msg-action-btn"
-                        onclick="shareMessage(this)"
-                        title="Share">
+                        onclick="shareMessage(this)">
                         <i class="fas fa-share-alt"></i>
                     </button>
 
                     <button class="msg-action-btn"
-                        onclick="likeMessage(this)"
-                        title="Like">
+                        onclick="toggleLike(this)">
                         <i class="far fa-thumbs-up"></i>
                     </button>
 
                     <button class="msg-action-btn"
-                        onclick="dislikeMessage(this)"
-                        title="Dislike">
+                        onclick="toggleDislike(this)">
                         <i class="far fa-thumbs-down"></i>
                     </button>
 
@@ -701,7 +692,7 @@ function appendBubble(role, contentHTML, msgId) {
     }
 
     ui.display.scrollTop = ui.display.scrollHeight;
-}
+    }
 
 function appendAiBubble(rawText) {
 
@@ -819,6 +810,62 @@ async function copyUserMessage(button) {
     } catch (err) {
 
         console.error(err);
+    }
+}
+
+async function sendFeedback(btn, type) {
+
+    const wrapper = btn.closest(
+        '.ai-message-wrapper'
+    );
+
+    if (!wrapper) return;
+
+    const message =
+        wrapper.querySelector('.ai-msg-bubble')
+        ?.innerText || "";
+
+    const actions =
+        wrapper.querySelectorAll('.msg-action-btn');
+
+    // Reset icons
+    actions.forEach(action => {
+        action.classList.remove(
+            'active-like',
+            'active-dislike'
+        );
+    });
+
+    // Activate selected icon
+    if (type === 'like') {
+        btn.classList.add('active-like');
+    } else {
+        btn.classList.add('active-dislike');
+    }
+
+    try {
+
+        await fetch(
+            `${BACKEND_URL}/api/feedback`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+                body: JSON.stringify({
+                    type,
+                    message
+                })
+            }
+        );
+
+    } catch (err) {
+
+        console.error(
+            'Feedback failed:',
+            err
+        );
     }
 }
 
