@@ -819,27 +819,44 @@ async function sendFeedback(btn, type) {
 
     if (!wrapper) return;
 
-    const message = wrapper
-        .querySelector('.ai-msg-bubble')
-        ?.innerText || "";
+    // Get both feedback buttons
+    const likeBtn = wrapper.querySelector('.like-btn');
+    const dislikeBtn = wrapper.querySelector('.dislike-btn');
 
-    // Reset buttons
-    wrapper.querySelectorAll('.like-btn, .dislike-btn')
-        .forEach(button => {
-            button.classList.remove(
-                'active-like',
-                'active-dislike'
-            );
-        });
+    // Reset buttons to normal state
+    if (likeBtn) {
+        likeBtn.classList.remove('active-like');
+        likeBtn.innerHTML =
+            '<i class="fas fa-thumbs-up"></i>';
+    }
+
+    if (dislikeBtn) {
+        dislikeBtn.classList.remove('active-dislike');
+        dislikeBtn.innerHTML =
+            '<i class="fas fa-thumbs-down"></i>';
+    }
 
     // Activate selected button
-    if (type === 'like') {
-        btn.classList.add('active-like');
-    } else {
-        btn.classList.add('active-dislike');
+    if (type === 'like' && likeBtn) {
+
+        likeBtn.classList.add('active-like');
+
+        likeBtn.innerHTML =
+            '<i class="fas fa-check"></i>';
+
+    } else if (type === 'dislike' && dislikeBtn) {
+
+        dislikeBtn.classList.add('active-dislike');
+
+        dislikeBtn.innerHTML =
+            '<i class="fas fa-check"></i>';
     }
 
     try {
+
+        const message = wrapper
+            .querySelector('.ai-msg-bubble')
+            ?.innerText || "";
 
         const response = await fetch(
             `${BACKEND_URL}/api/feedback`,
@@ -859,25 +876,30 @@ async function sendFeedback(btn, type) {
 
         if (data.success) {
 
-            const icon = btn.querySelector('i');
+            showFeedbackToast(
+                "Thanks for your feedback."
+            );
 
-            const original = icon.className;
+        } else {
 
-            icon.className = 'fas fa-check';
-
-            setTimeout(() => {
-                icon.className = original;
-            }, 1500);
+            showFeedbackToast(
+                "Feedback could not be saved."
+            );
         }
 
     } catch (err) {
 
-        console.error("Feedback failed:", err);
+        console.error(
+            'Feedback failed:',
+            err
+        );
 
-        alert("Feedback failed to send.");
+        showFeedbackToast(
+            "Failed to send feedback."
+        );
     }
 }
-
+    
 async function shareMessage(button) {
 
     const bubble = button
