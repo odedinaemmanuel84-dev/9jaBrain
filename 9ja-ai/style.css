@@ -299,40 +299,40 @@ body {
 .user-msg-container {
     width: 100%;
     display: flex;
-    justify-content: flex-end;   /* keep whole wrapper on the right */
-    align-items: flex-start;     /* avoid vertical stretching */
+    justify-content: flex-end;   /* keep the whole wrapper pinned to the right */
+    align-items: flex-start;
     margin: 6px 0;
     animation: fadeIn 0.25s ease;
 }
 
-/* put bubble and actions on one horizontal line (shrink to content) */
+/* wrapper stacks bubble above actions, but stays right aligned */
 .user-message-wrapper {
     display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;      /* bubble on top, actions below */
+    align-items: flex-end;       /* right-align bubble and actions inside wrapper */
     width: auto;
-    max-width: 85%;
+    max-width: 75%;
     margin-left: auto;
+    gap: 6px;
 }
 
-/* bubble: not too tiny, but will grow and wrap for long messages */
+/* bubble stays compact and will wrap for long text */
 .user-msg-bubble {
     background: #2a2a2a;
     color: #fff;
 
-    padding: 10px 14px;         /* comfortable padding */
+    padding: 10px 14px;
     border-radius: 18px;
 
     display: inline-block;
     width: auto;
-    min-width: 56px;            /* prevents super tiny bubbles for single chars */
-    max-width: calc(85vw - 120px); /* leaves room for actions on small screens */
+    min-width: 56px;             /* avoid collapsing to tiny bubble */
+    max-width: 100%;
 
     line-height: 1.45;
     font-size: 15px;
 
-    white-space: normal;        /* allow wrapping when necessary */
+    white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
 
@@ -340,18 +340,19 @@ body {
     vertical-align: middle;
 }
 
-/* keep action buttons in a single horizontal row */
+/* actions sit below the bubble in a single horizontal row */
 .user-message-wrapper .message-actions {
     display: flex;
     flex-direction: row;
     gap: 8px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-end;   /* keep the actions right-aligned under bubble */
     flex-shrink: 0;
-    white-space: nowrap;        /* avoid wrapping into column */
+    margin-top: 0;
+    padding: 0;
 }
 
-/* action buttons - keep compact */
+/* compact icon button style */
 .user-message-wrapper .msg-action-btn {
     width: 32px;
     height: 32px;
@@ -361,17 +362,17 @@ body {
     justify-content: center;
 }
 
-/* ensure images inside user bubbles don't force height */
+/* prevent images inside bubble from increasing height */
 .user-msg-bubble img {
     max-width: 100%;
     height: auto;
     display: block;
 }
 
-/* responsive tweak: on very small screens allow actions to move below if absolutely necessary */
+/* tiny-screen fallback: allow actions to break below if absolutely necessary */
 @media (max-width: 360px) {
     .user-message-wrapper {
-        gap: 6px;
+        max-width: 85%;
     }
     .user-msg-bubble {
         padding: 8px 10px;
