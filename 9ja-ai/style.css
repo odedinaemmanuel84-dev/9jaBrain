@@ -298,73 +298,58 @@ body {
 /* USER MESSAGE */
 .user-msg-container {
     width: 100%;
-
     display: flex;
     justify-content: flex-end;
-
+    align-items: flex-start;     /* prevent vertical stretching */
     margin: 6px 0;
-
     animation: fadeIn 0.25s ease;
+}
+
+.user-message-wrapper {
+    display: inline-flex;        /* shrink to content */
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+    max-width: 75%;
+    margin-left: auto;
+    gap: 4px;
 }
 
 .user-msg-bubble {
     background: #2a2a2a;
     color: #fff;
 
-    padding: 8px 12px;
-
+    padding: 8px 12px;           /* tighter padding so bubble matches text */
     border-radius: 18px;
 
-    width: fit-content;
-    max-width: 75%;
-
     display: inline-block;
+    width: auto;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
 
-    line-height: 1.5;
+    line-height: 1.4;            /* compact line-height for short messages */
     font-size: 15px;
 
-    white-space: pre-wrap;
+    white-space: nowrap;         /* keep short messages on one line */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+/* allow wrapping on longer messages but keep compact for single words */
+@media (min-width: 420px) {
+  .user-msg-bubble {
+    white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
-
-    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
 }
 
-.user-msg-bubble .msg-text {
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-}
-
-/* USER MESSAGE WRAPPER */
-.user-message-wrapper {
-    display: flex;
-    flex-direction: column;
-
-    align-items: flex-end;
-
-    width: fit-content;
-    max-width: 75%;
-
-    margin-left: auto;
-
-    gap: 4px;
-}
-
-/* USER ACTIONS */
-.user-message-wrapper .message-actions {
-    display: flex;
-    align-items: center;
-
-    gap: 4px;
-
-    margin-top: 4px;
-
-    opacity: 1;
-
-    flex-wrap: wrap;
-
-    justify-content: flex-end;
+/* ensure images inside user bubbles don't force height */
+.user-msg-bubble img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* MESSAGE TEXT */
