@@ -572,153 +572,58 @@ if (data.reply) {
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 
-// Replace your existing formatAIResponse(text) with this function.
-// It uses marked + DOMPurify when available, otherwise falls back to a safer minimal renderer.
-// It also post-processes fenced code blocks into your .code-container UI and calls copyCode(this)
-// so your existing copy handler will keep working.
-
 function formatAIResponse(text) {
-  if (!text) return "";
+    if (!text) return "";
 
-  // Helper: escape HTML for fallback code blocks
-  function escapeHtml(s) {
-    return (s || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+    // Helper: local escape (safe even if your escapeHtml exists elsewhere)
+    function _escape(s) {
+        if (s === null || s === undefined) return "";
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-  // If marked + DOMPurify are available, use them (recommended)
-  if (window.marked && window.DOMPurify) {
-    // Configure marked for GitHub-flavored markdown
-    marked.setOptions({
-      gfm: true,
-      breaks: false,
-      smartLists: true,
-      smartypants: false
+    // 1) Convert fenced code blocks to your code-container (simple, safe)
+    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    let out = text.replace(codeRegex, (match, lang, code) => {
+        const language = (lang || "code").toUpperCase();
+        const safeCode = _escape(code.trim());
+        // Use copyCode(this) if available; if not, fallback handler (no error)
+        const copyOnclick = "if(typeof copyCode==='function'){copyCode(this);}else{try{navigator.clipboard.writeText(this.nextElementSibling?.innerText||'');}catch(e){}}";
+        return `
+            <div class="code-container">
+                <div class="code-header">
+                    <span>${language}</span>
+                    <button class="copy-btn" type="button" onclick="${copyOnclick}">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <pre><code>${safeCode}</code></pre>
+            </div>
+        `;
     });
 
-    // Convert markdown -> HTML
-    const dirty = marked.parse(text);
+    // 2) Inline code (single backticks)
+    out = out.replace(/`([^`]+)`/g, (m, c) => `<code>${_escape(c)}</code>`);
 
-    // Sanitize the produced HTML
-    const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ["target"] });
+    // 3) Bold **text**
+    out = out.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-    // Post-process HTML to wrap <pre><code> blocks into your code-container markup
-    const tmp = document.createElement("div");
-    tmp.innerHTML = clean;
+    // 4) Newlines -> <br> (keeps plain paragraphs too)
+    // Convert double newlines into paragraph separation for readability
+    const parts = out.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+    out = parts.map(p => {
+        // Don't double-wrap if it already looks like block markup
+        if (/^<(div|p|pre|h\d|ul|ol|blockquote)/i.test(p)) return p;
+        return "<p>" + p.replace(/\n/g, "<br>") + "</p>";
+    }).join("");
 
-    tmp.querySelectorAll("pre > code").forEach((codeEl, i) => {
-      const pre = codeEl.closest("pre");
-      const langClass = codeEl.className || "";
-      const langMatch = langClass.match(/language-(\w+)/);
-      const lang = (langMatch && langMatch[1]) ? langMatch[1] : "";
-
-      // Build container
-      const container = document.createElement("div");
-      container.className = "code-container";
-
-      const header = document.createElement("div");
-      header.className = "code-header";
-      const langLabel = document.createElement("span");
-      langLabel.textContent = (lang || "code").toUpperCase();
-      header.appendChild(langLabel);
-
-      const copyBtn = document.createElement("button");
-      copyBtn.className = "copy-btn";
-      copyBtn.type = "button";
-      // Use your existing copyCode function when available
-      if (typeof copyCode === "function") {
-        copyBtn.setAttribute("onclick", "copyCode(this)");
-      } else {
-        // fallback copy handler uses navigator API
-        copyBtn.addEventListener("click", () => {
-          const codeText = codeEl.textContent || "";
-          navigator.clipboard && navigator.clipboard.writeText(codeText).catch(()=>{});
-        });
-      }
-      copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-      header.appendChild(copyBtn);
-
-      container.appendChild(header);
-
-      // Clone the pre/code and append
-      const clonedPre = pre.cloneNode(true);
-      container.appendChild(clonedPre);
-
-      // Replace the original pre with the new container
-      pre.replaceWith(container);
-    });
-
-    return tmp.innerHTML;
-  }
-
-  // Fallback minimal renderer (no external libs) - supports headings, bold, italics, lists, blockquotes, inline code, fenced code
-  // This fallback is conservative and escapes code blocks properly.
-  // 1) Extract fenced code blocks first
-  const codeBlocks = [];
-  text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (m, lang, code) => {
-    const id = codeBlocks.length;
-    codeBlocks.push({ lang: lang || "", code: code });
-    return `@@CODE_BLOCK_${id}@@`;
-  });
-
-  // Headings
-  text = text.replace(/^###### (.*$)/gm, "<h6>$1</h6>");
-  text = text.replace(/^##### (.*$)/gm, "<h5>$1</h5>");
-  text = text.replace(/^#### (.*$)/gm, "<h4>$1</h4>");
-  text = text.replace(/^### (.*$)/gm, "<h3>$1</h3>");
-  text = text.replace(/^## (.*$)/gm, "<h2>$1</h2>");
-  text = text.replace(/^# (.*$)/gm, "<h1>$1</h1>");
-
-  // Blockquotes
-  text = text.replace(/^\> (.*$)/gm, "<blockquote>$1</blockquote>");
-
-  // Bold & italics
-  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
-
-  // Inline code
-  text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // Links
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-
-  // Unordered lists (naive)
-  text = text.replace(/(^|\n)(?:\s*[-\*\+]\s+.+)+/g, (m) => {
-    return m.replace(/(?:\n|^)\s*[-\*\+]\s+(.+)/g, "\n<li>$1</li>").replace(/^\n/, "").replace(/\n/g, "");
-  }).replace(/(<li>.*<\/li>)/, "<ul>$1</ul>");
-
-  // Ordered lists (naive)
-  text = text.replace(/(^|\n)(?:\s*\d+\.\s+.+)+/g, (m) => {
-    return m.replace(/(?:\n|^)\s*\d+\.\s+(.+)/g, "\n<li>$1</li>").replace(/^\n/, "").replace(/\n/g, "");
-  }).replace(/(<li>.*<\/li>)/, "<ol>$1</ol>");
-
-  // Paragraphs: split on double-newline
-  const parts = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
-  const html = parts.map(p => {
-    if (/^<(h\d|ul|ol|blockquote|pre|div|p|code)/.test(p)) return p;
-    return `<p>${p.replace(/\n/g, "<br>")}</p>`;
-  }).join("");
-
-  // Restore code blocks into .code-container markup
-  const out = html.replace(/@@CODE_BLOCK_(\d+)@@/g, (m, idx) => {
-    const cb = codeBlocks[Number(idx)];
-    const safe = escapeHtml(cb.code);
-    // Keep the copy button which will call copyCode(this) if exists; otherwise navigator fallback
-    return `<div class="code-container">
-      <div class="code-header">
-        <span>${(cb.lang || 'code').toUpperCase()}</span>
-        <button class="copy-btn" type="button" onclick="(typeof copyCode==='function'?copyCode(this):(function(btn){const pre=btn.nextElementSibling;const t=pre?pre.innerText:'';navigator.clipboard&&navigator.clipboard.writeText(t);})(this));"><i class="far fa-copy"></i> Copy</button>
-      </div>
-      <pre><code>${safe}</code></pre>
-    </div>`;
-  });
-
-  return out;
+    return out;
 }
+
 
 function appendBubble(role, contentHTML, msgId) {
 
