@@ -613,7 +613,7 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-function appendUserBubble(role, contentHTML, msgId) {
+function appendBubble(role, contentHTML, msgId) {
 
     if (!ui.display) return;
 
