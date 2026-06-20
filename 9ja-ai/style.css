@@ -981,35 +981,27 @@ pre code {
     }
 }
 
-/* ChatGPT-style feedback toast */
+/* Feedback toast: ensure visible and above other UI */
 #feedbackToast {
-
-    position: fixed;
-
-    bottom: 100px;
-
-    left: 50%;
-
-    transform: translateX(-50%) translateY(20px);
-
-    background: #202123;
-
-    color: #ffffff;
-
-    padding: 12px 18px;
-
-    border-radius: 12px;
-
-    font-size: 14px;
-
-    border: 1px solid rgba(255,255,255,0.1);
-
-    opacity: 0;
-
-    transition: opacity 0.3s ease;
+  position: fixed;
+  bottom: 120px;                     /* sits above the input section */
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #202123;
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;                     /* make sure it's on top */
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
+/* show -> visible & clickable */
 #feedbackToast.show {
-    opacity: 1;
-    }
-    
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
