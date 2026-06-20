@@ -9,29 +9,46 @@ let currentlyEditingId = null;
 let selectedImageBase64 = null;
 let selectedImageMime = null;
 
-const ui = {
-    input: document.getElementById('userInput'),
-    display: document.getElementById('chatDisplay'),
-    think: document.getElementById('thinkingIndicator'),
-    voice: document.getElementById('voiceBtn'),
-    send: document.getElementById('sendBtn'),
-    pfp: document.getElementById('userImg'),
-    sidebar: document.getElementById('sidebar'),
-    logout: document.getElementById('logoutBtn'),
-    welcome: document.getElementById('welcomeScreen'),
-    userName: document.getElementById('userName'),
-    fileInput: document.getElementById('imageUpload'),
-    previewContainer: document.getElementById('imagePreviewContainer'),
-    previewImg: document.getElementById('imagePreview'),
-    removeImg: document.getElementById('removeImgBtn')
-};
-
 // --- UTILITY: ESCAPE HTML ---
 function escapeHtml(text) {
     if (!text) return "";
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+const ui = {
+    input: null,
+    display: null,
+    think: null,
+    voice: null,
+    send: null,
+    pfp: null,
+    sidebar: null,
+    logout: null,
+    welcome: null,
+    userName: null,
+    fileInput: null,
+    previewContainer: null,
+    previewImg: null,
+    removeImg: null
+};
+
+function initializeUI() {
+    ui.input = document.getElementById('userInput');
+    ui.display = document.getElementById('chatDisplay');
+    ui.think = document.getElementById('thinkingIndicator');
+    ui.voice = document.getElementById('voiceBtn');
+    ui.send = document.getElementById('sendBtn');
+    ui.pfp = document.getElementById('userImg');
+    ui.sidebar = document.getElementById('sidebar');
+    ui.logout = document.getElementById('logoutBtn');
+    ui.welcome = document.getElementById('welcomeScreen');
+    ui.userName = document.getElementById('userName');
+    ui.fileInput = document.getElementById('imageUpload');
+    ui.previewContainer = document.getElementById('imagePreviewContainer');
+    ui.previewImg = document.getElementById('imagePreview');
+    ui.removeImg = document.getElementById('removeImgBtn');
 }
 
 // --- 1. INITIALIZATION ---
@@ -115,7 +132,10 @@ function activateTriggers() {
             }
         };
 
-        ui.input.oninput = toggleButtons;
+        ui.input.oninput = () => {
+            console.log("Input changed:", ui.input.value);
+            toggleButtons();
+        };
     }
 
     // SIDEBAR
@@ -1042,4 +1062,6 @@ function showFeedbackToast(message) {
     }, 2500);
 }
 
+// Initialize UI elements and start the app
+initializeUI();
 init();
