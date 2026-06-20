@@ -299,50 +299,66 @@ body {
 .user-msg-container {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;     /* prevent vertical stretching */
+    justify-content: flex-end;   /* keep whole wrapper on the right */
+    align-items: flex-start;     /* avoid vertical stretching */
     margin: 6px 0;
     animation: fadeIn 0.25s ease;
 }
 
+/* put bubble and actions on one horizontal line (shrink to content) */
 .user-message-wrapper {
-    display: inline-flex;        /* shrink to content */
-    flex-direction: column;
-    align-items: flex-end;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     width: auto;
-    max-width: 75%;
+    max-width: 85%;
     margin-left: auto;
-    gap: 4px;
 }
 
+/* bubble: not too tiny, but will grow and wrap for long messages */
 .user-msg-bubble {
     background: #2a2a2a;
     color: #fff;
 
-    padding: 8px 12px;           /* tighter padding so bubble matches text */
+    padding: 10px 14px;         /* comfortable padding */
     border-radius: 18px;
 
     display: inline-block;
     width: auto;
-    max-width: 100%;
-    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    min-width: 56px;            /* prevents super tiny bubbles for single chars */
+    max-width: calc(85vw - 120px); /* leaves room for actions on small screens */
 
-    line-height: 1.4;            /* compact line-height for short messages */
+    line-height: 1.45;
     font-size: 15px;
 
-    white-space: nowrap;         /* keep short messages on one line */
-    text-overflow: ellipsis;
-    overflow: hidden;
+    white-space: normal;        /* allow wrapping when necessary */
+    word-break: break-word;
+    overflow-wrap: break-word;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
     vertical-align: middle;
 }
 
-/* allow wrapping on longer messages but keep compact for single words */
-@media (min-width: 420px) {
-  .user-msg-bubble {
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
+/* keep action buttons in a single horizontal row */
+.user-message-wrapper .message-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    white-space: nowrap;        /* avoid wrapping into column */
+}
+
+/* action buttons - keep compact */
+.user-message-wrapper .msg-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ensure images inside user bubbles don't force height */
@@ -350,6 +366,17 @@ body {
     max-width: 100%;
     height: auto;
     display: block;
+}
+
+/* responsive tweak: on very small screens allow actions to move below if absolutely necessary */
+@media (max-width: 360px) {
+    .user-message-wrapper {
+        gap: 6px;
+    }
+    .user-msg-bubble {
+        padding: 8px 10px;
+        min-width: 48px;
+    }
 }
 
 /* MESSAGE TEXT */
