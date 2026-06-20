@@ -262,6 +262,34 @@ body {
     line-height: 1.7 !important;
 }
 
+/* AI MESSAGE WRAPPER */
+.ai-message-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    max-width: 100%;
+
+    gap: 4px;
+
+    width: 100%;
+}
+
+/* AI ACTIONS */
+.ai-message-wrapper .message-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
+    margin-top: 4px;
+
+    opacity: 1;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-start;
+}
+
 /* USER MESSAGE */
 .user-msg-container {
     width: 100%;
@@ -301,6 +329,37 @@ body {
     margin: 0;
     padding: 0;
     line-height: 1.6;
+}
+
+/* USER MESSAGE WRAPPER */
+.user-message-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    width: fit-content;
+    max-width: 75%;
+
+    margin-left: auto;
+
+    gap: 4px;
+}
+
+/* USER ACTIONS */
+.user-message-wrapper .message-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
+    margin-top: 4px;
+
+    opacity: 1;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
 }
 
 /* MESSAGE TEXT */
@@ -865,56 +924,6 @@ pre code {
 .arrow-send-btn:active,
 #sendBtn:active {
     transform: scale(0.96);
-}
-
-/* ============================= */
-/* CHATGPT-STYLE MESSAGE ACTIONS */
-/* ============================= */
-
-.user-message-wrapper {
-    display: flex;
-    flex-direction: column;
-
-    align-items: flex-end;
-
-    width: fit-content;
-    max-width: 75%;
-
-    margin-left: auto;
-
-    gap: 4px;
-}
-
-.ai-message-wrapper {
-    display: flex;
-    flex-direction: column;
-
-    max-width: 100%;
-
-    gap: 4px;
-}
-
-/* Actions row */
-.message-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    margin-top: 4px;
-
-    opacity: 1;
-
-    flex-wrap: wrap;
-}
-
-/* User actions align right */
-.user-message-wrapper .message-actions {
-    justify-content: flex-end;
-}
-
-/* AI actions align left */
-.ai-message-wrapper .message-actions {
-    justify-content: flex-start;
 }
 
 /* Buttons */
