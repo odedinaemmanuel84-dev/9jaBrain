@@ -571,6 +571,7 @@ if (data.reply) {
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
+
 // Replace your existing formatAIResponse(text) with this function.
 // It uses marked + DOMPurify when available, otherwise falls back to a safer minimal renderer.
 // It also post-processes fenced code blocks into your .code-container UI and calls copyCode(this)
