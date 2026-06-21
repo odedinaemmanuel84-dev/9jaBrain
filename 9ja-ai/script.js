@@ -573,57 +573,52 @@ if (data.reply) {
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 
 function formatAIResponse(text) {
+
     if (!text) return "";
 
-    // Helper: local escape (safe even if your escapeHtml exists elsewhere)
-    function _escape(s) {
-        if (s === null || s === undefined) return "";
-        return String(s)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+    // Remove extra spaces/newlines at beginning
+    text = text.trim();
 
-    // 1) Convert fenced code blocks to your code-container (simple, safe)
     const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    let out = text.replace(codeRegex, (match, lang, code) => {
-        const language = (lang || "code").toUpperCase();
-        const safeCode = _escape(code.trim());
-        // Use copyCode(this) if available; if not, fallback handler (no error)
-        const copyOnclick = "if(typeof copyCode==='function'){copyCode(this);}else{try{navigator.clipboard.writeText(this.nextElementSibling?.innerText||'');}catch(e){}}";
+
+    let formatted = text.replace(codeRegex, (match, lang, code) => {
+
+        const language = lang || 'code';
+
         return `
             <div class="code-container">
                 <div class="code-header">
-                    <span>${language}</span>
-                    <button class="copy-btn" type="button" onclick="${copyOnclick}">
+                    <span>${language.toUpperCase()}</span>
+
+                    <button class="copy-btn"
+                        onclick="copyCode(this)">
                         <i class="far fa-copy"></i> Copy
                     </button>
                 </div>
-                <pre><code>${safeCode}</code></pre>
+
+                <pre><code>${escapeHtml(code.trim())}</code></pre>
             </div>
         `;
     });
 
-    // 2) Inline code (single backticks)
-    out = out.replace(/`([^`]+)`/g, (m, c) => `<code>${_escape(c)}</code>`);
+    // Bold text
+    formatted = formatted.replace(
+        /\*\*(.*?)\*\*/g,
+        '<strong>$1</strong>'
+    );
 
-    // 3) Bold **text**
-    out = out.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    // Convert line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
 
-    // 4) Newlines -> <br> (keeps plain paragraphs too)
-    // Convert double newlines into paragraph separation for readability
-    const parts = out.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
-    out = parts.map(p => {
-        // Don't double-wrap if it already looks like block markup
-        if (/^<(div|p|pre|h\d|ul|ol|blockquote)/i.test(p)) return p;
-        return "<p>" + p.replace(/\n/g, "<br>") + "</p>";
-    }).join("");
+    // Remove leading <br> tags that cause AI messages
+    // to start lower like a paragraph
+    formatted = formatted.replace(
+        /^(<br\s*\/?>)+/i,
+        ''
+    );
 
-    return out;
+    return formatted;
 }
-
 
 function appendBubble(role, contentHTML, msgId) {
 
