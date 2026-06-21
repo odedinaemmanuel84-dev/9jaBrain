@@ -574,33 +574,44 @@ if (data.reply) {
 
 function formatAIResponse(text) {
 
-if (!text) return "";  
+    if (!text) return "";
 
-const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;  
+    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
 
-let formatted = text.replace(codeRegex, (match, lang, code) => {  
+    let formatted = text.replace(codeRegex, (match, lang, code) => {
 
-    const language = lang || 'code';  
+        const language = lang || 'code';
 
-    return `  
-        <div class="code-container">  
-            <div class="code-header">  
-                <span>${language.toUpperCase()}</span>  
-                <button class="copy-btn" onclick="copyCode(this)">  
-                    <i class="far fa-copy"></i> Copy  
-                </button>  
-            </div>  
-            <pre><code>${escapeHtml(code.trim())}</code></pre>  
-        </div>  
-    `;  
-});  
+        return `
+            <div class="code-container">
+                <div class="code-header">
+                    <span>${language.toUpperCase()}</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <pre><code>${escapeHtml(code.trim())}</code></pre>
+            </div>
+        `;
+    });
 
-formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');  
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-formatted = formatted.replace(/\n/g, '<br>');  
+    formatted = formatted.replace(/\n/g, '<br>');
 
-return formatted;
+    return formatted;
+}
 
+function escapeHtml(text) {
+
+    if (!text) return "";
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 function appendBubble(role, contentHTML, msgId) {
