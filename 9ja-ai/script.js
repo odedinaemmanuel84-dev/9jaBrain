@@ -571,6 +571,7 @@ if (data.reply) {
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
+
 function formatAIResponse(text) {
 
 if (!text) return "";  
