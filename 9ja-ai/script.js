@@ -571,53 +571,35 @@ if (data.reply) {
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
-
 function formatAIResponse(text) {
 
-    if (!text) return "";
+if (!text) return "";  
 
-    // Remove extra spaces/newlines at beginning
-    text = text.trim();
+const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;  
 
-    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
+let formatted = text.replace(codeRegex, (match, lang, code) => {  
 
-    let formatted = text.replace(codeRegex, (match, lang, code) => {
+    const language = lang || 'code';  
 
-        const language = lang || 'code';
+    return `  
+        <div class="code-container">  
+            <div class="code-header">  
+                <span>${language.toUpperCase()}</span>  
+                <button class="copy-btn" onclick="copyCode(this)">  
+                    <i class="far fa-copy"></i> Copy  
+                </button>  
+            </div>  
+            <pre><code>${escapeHtml(code.trim())}</code></pre>  
+        </div>  
+    `;  
+});  
 
-        return `
-            <div class="code-container">
-                <div class="code-header">
-                    <span>${language.toUpperCase()}</span>
+formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');  
 
-                    <button class="copy-btn"
-                        onclick="copyCode(this)">
-                        <i class="far fa-copy"></i> Copy
-                    </button>
-                </div>
+formatted = formatted.replace(/\n/g, '<br>');  
 
-                <pre><code>${escapeHtml(code.trim())}</code></pre>
-            </div>
-        `;
-    });
+return formatted;
 
-    // Bold text
-    formatted = formatted.replace(
-        /\*\*(.*?)\*\*/g,
-        '<strong>$1</strong>'
-    );
-
-    // Convert line breaks
-    formatted = formatted.replace(/\n/g, '<br>');
-
-    // Remove leading <br> tags that cause AI messages
-    // to start lower like a paragraph
-    formatted = formatted.replace(
-        /^(<br\s*\/?>)+/i,
-        ''
-    );
-
-    return formatted;
 }
 
 function appendBubble(role, contentHTML, msgId) {
