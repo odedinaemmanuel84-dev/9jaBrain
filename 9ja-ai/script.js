@@ -571,7 +571,6 @@ if (data.reply) {
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
-
 function formatAIResponse(text) {
 
     if (!text) return "";
@@ -612,7 +611,7 @@ function escapeHtml(text) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-}
+                 }
 
 function appendBubble(role, contentHTML, msgId) {
 
