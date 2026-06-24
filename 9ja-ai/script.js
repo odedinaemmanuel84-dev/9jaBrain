@@ -521,31 +521,14 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
             ui.think.style.display = 'none';
         }
 
-        console.log("Response Status:", response.status);
+        if (!response.ok) {
 
-const rawResponse = await response.text();
+    const errorData = await response.json().catch(() => ({}));
 
-console.log("RAW RESPONSE:", rawResponse);
-
-let data;
-
-try {
-    data = JSON.parse(rawResponse);
-} catch (e) {
-
-    appendAiBubble(
-        "Backend returned invalid JSON:\n" +
-        rawResponse
-    );
-
-    return;
-}
-
-if (!response.ok) {
     throw new Error(
-        data.error || `Server status: ${response.status}`
+        errorData.error || `Server status: ${response.status}`
     );
-}
+        }
 
 const data = await response.json();
 
