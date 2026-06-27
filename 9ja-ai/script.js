@@ -556,45 +556,35 @@ if (data.reply) {
 
     let message = "Omo, something no work. Try again small.";
 
-    if (e.message.includes("Failed to fetch")) {
+    // User has no internet
+    if (!navigator.onLine) {
 
-        message =
-            "Naija AI dey wake up. Give am about 30 seconds and try again.";
+        message = "Omo, network wahala. Check your internet connection and try again.";
 
-    } else if (
-        e.message.includes("busy") ||
-        e.message.includes("429")
+    }
+
+    // Render server is sleeping
+    else if (e.message.includes("Failed to fetch")) {
+
+        message = "Naija AI dey wake up. Give am about 30 seconds and try again.";
+
+    }
+
+    // Server busy
+    else if (
+        e.message.includes("429") ||
+        e.message.toLowerCase().includes("busy")
     ) {
 
-        message =
-            "Naija AI dey busy right now. Try again in a few seconds.";
+        message = "Naija AI dey busy. Try again in a few seconds.";
 
-    } else if (
-        e.message.includes("Authentication") ||
-        e.message.includes("401")
-    ) {
+    }
 
-        message =
-            "Authentication problem. Please contact support.";
+    // Show backend message if available
+    else if (e.message) {
 
-    } else if (
-        e.message.includes("403")
-    ) {
-
-        message =
-            "This AI model isn't available right now.";
-
-    } else if (
-        e.message.includes("Connection interrupted")
-    ) {
-
-        message =
-            "Network interrupted. Please try again.";
-
-    } else if (e.message) {
-
-        // Show backend's friendly message
         message = e.message;
+
     }
 
     appendAiBubble(message);
@@ -602,7 +592,7 @@ if (data.reply) {
     }
 
 }
-
+    
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 function formatAIResponse(text) {
 
