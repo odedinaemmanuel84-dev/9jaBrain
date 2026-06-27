@@ -299,19 +299,6 @@ async function sendMessage() {
 
     if (!text && !selectedImageBase64) return;
 
-    const now = new Date();
-
-    const dateString = now.toLocaleString('en-NG', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-
-    const textWithDate = `[Current Date: ${dateString}] ${text}`;
-
     if (ui.welcome) {
         ui.welcome.style.display = 'none';
     }
@@ -356,7 +343,7 @@ async function sendMessage() {
 
             if (histIndex !== -1) {
 
-                let messageParts = [{ text: textWithDate }];
+                let messageParts = [{ text: text }];
 
                 if (selectedImageBase64) {
                     messageParts.push({
@@ -407,7 +394,7 @@ async function sendMessage() {
 
         appendBubble('user', displayHTML, msgId);
 
-        let messageParts = [{ text: textWithDate }];
+        let messageParts = [{ text: text }];
 
         if (selectedImageBase64) {
 
