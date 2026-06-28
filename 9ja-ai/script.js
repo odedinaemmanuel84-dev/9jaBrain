@@ -516,27 +516,7 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
         errorData.error || `Server status: ${response.status}`
     );
         }
-    
-// Handle image response        
-if (sendingImage) {
-
-    const data = await response.json();
-
-    if (data.reply) {
-
-        await streamAiResponse(data.reply);
-
-        chatHistory.push({
-            role: "assistant",
-            parts: [
-                {
-                    text: data.reply
-                }
-            ]
-        });
-
-    } else {
-        
+          
 const reader = response.body.getReader();
 
 const decoder = new TextDecoder();
