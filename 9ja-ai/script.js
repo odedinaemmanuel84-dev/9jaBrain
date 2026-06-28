@@ -516,7 +516,32 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
         errorData.error || `Server status: ${response.status}`
     );
         }
+    
+// Handle image response        
+if (sendingImage) {
 
+    const data = await response.json();
+
+    if (data.reply) {
+
+        await streamAiResponse(data.reply);
+
+        chatHistory.push({
+            role: "assistant",
+            parts: [
+                {
+                    text: data.reply
+                }
+            ]
+        });
+
+    } else {
+
+        appendAiBubble("I couldn't analyze the image.");
+    }
+
+} else {
+        
 const reader = response.body.getReader();
 
 const decoder = new TextDecoder();
@@ -639,28 +664,96 @@ function formatAIResponse(text) {
 
     if (!text) return "";
 
-    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    // Escape HTML first
+    let formatted = escapeHtml(text);
 
-    let formatted = text.replace(codeRegex, (match, lang, code) => {
+    // Code blocks
+    formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
 
-        const language = lang || 'code';
+        const language = lang || "TEXT";
 
         return `
-            <div class="code-container">
-                <div class="code-header">
-                    <span>${language.toUpperCase()}</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                        <i class="far fa-copy"></i> Copy
-                    </button>
-                </div>
-                <pre><code>${escapeHtml(code.trim())}</code></pre>
+        <div class="code-container">
+            <div class="code-header">
+                <span>${language.toUpperCase()}</span>
+
+                <button class="copy-btn"
+                    onclick="copyCode(this)">
+                    <i class="far fa-copy"></i>
+                    Copy
+                </button>
             </div>
+
+            <pre><code>${code.trim()}</code></pre>
+        </div>
         `;
     });
 
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Inline code
+    formatted = formatted.replace(
+        /`([^`]+)`/g,
+        "<code>$1</code>"
+    );
 
-    formatted = formatted.replace(/\n/g, '<br>');
+    // Bold
+    formatted = formatted.replace(
+        /\*\*(.*?)\*\*/g,
+        "<strong>$1</strong>"
+    );
+
+    // Italic
+    formatted = formatted.replace(
+        /\*(.*?)\*/g,
+        "<em>$1</em>"
+    );
+
+    // Headings
+    formatted = formatted.replace(
+        /^### (.*)$/gm,
+        "<h3>$1</h3>"
+    );
+
+    formatted = formatted.replace(
+        /^## (.*)$/gm,
+        "<h2>$1</h2>"
+    );
+
+    formatted = formatted.replace(
+        /^# (.*)$/gm,
+        "<h1>$1</h1>"
+    );
+
+    // Blockquotes
+    formatted = formatted.replace(
+        /^> (.*)$/gm,
+        "<blockquote>$1</blockquote>"
+    );
+
+    // Bullet lists
+    formatted = formatted.replace(
+        /^[-*] (.*)$/gm,
+        "<li>$1</li>"
+    );
+
+    formatted = formatted.replace(
+        /(<li>.*<\/li>)/gs,
+        "<ul>$1</ul>"
+    );
+
+    // Numbered lists
+    formatted = formatted.replace(
+        /^\d+\.\s(.*)$/gm,
+        "<li>$1</li>"
+    );
+
+    // Links
+    formatted = formatted.replace(
+        /(https?:\/\/[^\s<]+)/g,
+        '<a href="$1" target="_blank">$1</a>'
+    );
+
+    // Line breaks
+    formatted = formatted.replace(/\n/g, "<br>");
 
     return formatted;
 }
