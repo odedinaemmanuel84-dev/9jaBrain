@@ -561,18 +561,24 @@ while (true) {
 
             aiReply += json.token;
 
-            aiBubble.innerHTML =
-                formatAIResponse(aiReply);
+await smoothType(
+    aiBubble,
+    aiReply
+);
 
-            ui.display.scrollTop =
-                ui.display.scrollHeight;
+ui.display.scrollTop =
+    ui.display.scrollHeight;
 
         } catch (err) {}
     }
 }
 
 // Save to memory
-chatHistory.push({
+
+        aiBubble.innerHTML =
+    formatAIResponse(aiReply);
+        
+        chatHistory.push({
     role: "assistant",
     parts: [
         {
@@ -657,6 +663,36 @@ function formatAIResponse(text) {
     formatted = formatted.replace(/\n/g, '<br>');
 
     return formatted;
+}
+
+let typingQueue = [];
+let typingRunning = false;
+
+async function smoothType(element, fullText) {
+
+    typingQueue.push({
+        element,
+        fullText
+    });
+
+    if (typingRunning) return;
+
+    typingRunning = true;
+
+    while (typingQueue.length > 0) {
+
+        const item = typingQueue.shift();
+
+        item.element.innerHTML =
+            formatAIResponse(item.fullText) +
+            '<span class="typing-cursor">▋</span>';
+
+        await new Promise(resolve =>
+            requestAnimationFrame(resolve)
+        );
+    }
+
+    typingRunning = false;
 }
 
 function escapeHtml(text) {
