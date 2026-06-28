@@ -267,6 +267,45 @@ body {
     display: block !important;
 }
 
+.ai-msg-bubble h1,
+.ai-msg-bubble h2,
+.ai-msg-bubble h3{
+    margin:14px 0 8px;
+    font-weight:700;
+}
+
+.ai-msg-bubble ul{
+    padding-left:22px;
+    margin:8px 0;
+}
+
+.ai-msg-bubble li{
+    margin:6px 0;
+}
+
+.ai-msg-bubble blockquote{
+    border-left:4px solid #10a37f;
+    padding-left:12px;
+    margin:12px 0;
+    opacity:.9;
+}
+
+.ai-msg-bubble code{
+    background:#2d2d2d;
+    padding:2px 5px;
+    border-radius:4px;
+    font-family:monospace;
+}
+
+.ai-msg-bubble a{
+    color:#4ea3ff;
+    text-decoration:none;
+}
+
+.ai-msg-bubble a:hover{
+    text-decoration:underline;
+}
+
 .typing-cursor{
 
 display:inline-block;
