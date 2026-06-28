@@ -267,6 +267,28 @@ body {
     display: block !important;
 }
 
+.typing-cursor{
+
+display:inline-block;
+
+margin-left:2px;
+
+animation:blink 1s infinite;
+
+font-weight:bold;
+
+}
+
+@keyframes blink{
+
+0%{opacity:1;}
+
+50%{opacity:0;}
+
+100%{opacity:1;}
+
+}
+
 /* AI MESSAGE WRAPPER */
 .ai-message-wrapper {
     display: flex;
