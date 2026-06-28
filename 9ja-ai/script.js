@@ -517,21 +517,69 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
     );
         }
 
-const data = await response.json();
+const reader = response.body.getReader();
 
-if (data.reply) {  
+const decoder = new TextDecoder();
 
-        chatHistory.push({  
-            role: "assistant",  
-            parts: [{ text: data.reply }]  
-        });  
+let aiReply = "";
 
-        appendAiBubble(data.reply);  
+const aiId = "ai-" + Date.now();
 
-    } else {  
+// Create an empty AI message first
+appendBubble("ai", "", aiId);
 
-        appendAiBubble("Omo, Naija AI is speechless. Try refreshing?");  
-    }  
+const aiBubble = document
+    .getElementById(aiId)
+    .querySelector(".ai-msg-bubble");
+
+while (true) {
+
+    const { done, value } =
+        await reader.read();
+
+    if (done) break;
+
+    const chunk =
+        decoder.decode(value);
+
+    const lines =
+        chunk.split("\n");
+
+    for (const line of lines) {
+
+        if (!line.startsWith("data: ")) continue;
+
+        const text =
+            line.replace("data: ", "");
+
+        if (text === "[DONE]") continue;
+
+        try {
+
+            const json =
+                JSON.parse(text);
+
+            aiReply += json.token;
+
+            aiBubble.innerHTML =
+                formatAIResponse(aiReply);
+
+            ui.display.scrollTop =
+                ui.display.scrollHeight;
+
+        } catch (err) {}
+    }
+}
+
+// Save to memory
+chatHistory.push({
+    role: "assistant",
+    parts: [
+        {
+            text: aiReply
+        }
+    ]
+});
 
 } catch (e) {
 
