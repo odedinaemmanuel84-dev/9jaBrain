@@ -536,11 +536,6 @@ if (sendingImage) {
         });
 
     } else {
-
-        appendAiBubble("I couldn't analyze the image.");
-    }
-
-} else {
         
 const reader = response.body.getReader();
 
