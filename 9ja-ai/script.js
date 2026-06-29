@@ -536,19 +536,36 @@ const aiBubble = document
 
 await smoothType(aiBubble, data.reply);
 
-aiBubble.innerHTML = formatAIResponse(data.reply);
+aiBubble.innerHTML = formatAIResponse(aiReply);
 
-const wrapper = document.getElementById(aiId);
+const actions = document.createElement("div");
 
-if (wrapper) {
+actions.className = "message-actions";
 
-    const actions = wrapper.querySelector(".message-actions");
+actions.innerHTML = `
+<button class="msg-action-btn" onclick="copyAiMessage(this)">
+<i class="far fa-copy"></i>
+</button>
 
-    if (actions) {
-        actions.style.display = "flex";
-    }
+<button class="msg-action-btn" onclick="shareMessage(this)">
+<i class="fas fa-share"></i>
+</button>
 
-}
+<button class="msg-action-btn like-btn"
+onclick="sendFeedback(this,'like')">
+<i class="far fa-thumbs-up"></i>
+</button>
+
+<button class="msg-action-btn dislike-btn"
+onclick="sendFeedback(this,'dislike')">
+<i class="far fa-thumbs-down"></i>
+</button>
+`;
+
+document
+.getElementById(aiId)
+.querySelector(".ai-message-wrapper")
+.appendChild(actions);
         
         chatHistory.push({
             role: "assistant",
