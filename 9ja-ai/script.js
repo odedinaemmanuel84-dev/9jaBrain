@@ -522,34 +522,34 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
 // ------------------------------
 if (sendingImage) {
 
-    const data = await response.json();
+const data = await response.json();  
 
-    if (data.reply) {
+if (data.reply) {  
 
-        const aiId = "ai-" + Date.now();
+    const aiId = "ai-" + Date.now();
 
 appendBubble("ai", "", aiId);
 
 const aiBubble = document
-    .getElementById(aiId)
-    .querySelector(".ai-msg-bubble");
+.getElementById(aiId)
+.querySelector(".ai-msg-bubble");
 
 await smoothType(aiBubble, data.reply);
 
 aiBubble.innerHTML = formatAIResponse(aiReply);
 
 addAiActions(aiId);
-        
-        chatHistory.push({
-            role: "assistant",
-            parts: [
-                {
-                    text: data.reply
-                }
-            ]
-        });
 
-    } else {
+chatHistory.push({  
+        role: "assistant",  
+        parts: [  
+            {  
+                text: data.reply  
+            }  
+        ]  
+    });  
+
+} else {  
 
         appendAiBubble("I couldn't analyze the image.");
 
