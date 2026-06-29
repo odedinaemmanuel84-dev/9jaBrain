@@ -624,7 +624,7 @@ const wrapper = document.getElementById(aiId);
 const actions = wrapper.querySelector(".ai-actions");
 
 if (actions) {
-    actions.style.display = "flex";
+    actions.style.display = "none";
 }
         
         chatHistory.push({
