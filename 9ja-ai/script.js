@@ -537,18 +537,6 @@ const aiBubble = document
 await smoothType(aiBubble, data.reply);
 
 aiBubble.innerHTML = formatAIResponse(aiReply);
-
-const wrapper = document.getElementById(aiId);
-
-console.log(wrapper);
-
-const actions = wrapper.querySelector(".message-actions");
-
-console.log(actions);
-
-if (actions) {
-    actions.style.display = "flex";
-}
         
         chatHistory.push({
             role: "assistant",
@@ -628,6 +616,16 @@ ui.display.scrollTop =
 
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
+
+aiBubble.innerHTML = formatAIResponse(aiReply);
+
+const wrapper = document.getElementById(aiId);
+
+const actions = wrapper.querySelector(".ai-actions");
+
+if (actions) {
+    actions.style.display = "flex";
+}
         
         chatHistory.push({
     role: "assistant",
@@ -777,7 +775,7 @@ function appendBubble(role, contentHTML, msgId) {
                     ${contentHTML}
                 </div>
 
-                <div class="message-actions">
+                <div class="message-actions ai-actions" style="display:none;">
                     <button class="msg-action-btn"
                         onclick="copyUserMessage(this)">
                         <i class="far fa-copy"></i>
