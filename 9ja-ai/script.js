@@ -536,10 +536,8 @@ const aiBubble = document
 
 await smoothType(aiBubble, data.reply);
 
-// Format the final message
 aiBubble.innerHTML = formatAIResponse(aiReply);
 
-// Show action buttons
 addAiActions(aiId);
         
         chatHistory.push({
