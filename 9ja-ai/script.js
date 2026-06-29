@@ -537,6 +537,8 @@ const aiBubble = document
 await smoothType(aiBubble, data.reply);
 
 aiBubble.innerHTML = formatAIResponse(aiReply);
+
+addAiActions(aiId);
         
         chatHistory.push({
             role: "assistant",
@@ -616,6 +618,8 @@ ui.display.scrollTop =
 
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
+
+addAiActions(aiId);
         
         chatHistory.push({
     role: "assistant",
@@ -782,42 +786,18 @@ function appendBubble(role, contentHTML, msgId) {
 
 } else {
 
-wrapper.className = 'ai-msg-container';  
+    wrapper.className = 'ai-msg-container';
 
-wrapper.innerHTML = `  
-    <div class="ai-message-wrapper">  
+    wrapper.innerHTML = `
+        <div class="ai-message-wrapper">
 
-        <div class="ai-msg-bubble">  
-            ${contentHTML}  
-        </div>  
+            <div class="ai-msg-bubble">
+                ${contentHTML}
+            </div>
 
-        <div class="message-actions">  
-
-            <button class="msg-action-btn"  
-                onclick="copyAiMessage(this)">  
-                <i class="far fa-copy"></i>  
-            </button>  
-
-            <button class="msg-action-btn"  
-                onclick="shareMessage(this)">  
-                <i class="fas fa-share"></i>  
-            </button>  
-
-             <button class="msg-action-btn like-btn"  
-                onclick="sendFeedback(this,'like')">  
-                <i class="far fa-thumbs-up"></i>  
-            </button>  
-
-            <button class="msg-action-btn dislike-btn"  
-                 onclick="sendFeedback(this,'dislike')">  
-                <i class="far fa-thumbs-down"></i>  
-            </button>  
-
-        </div>  
-
-    </div>  
-`;  
-}    
+        </div>
+    `;
+    }
 
     if (ui.think) {
         ui.display.insertBefore(wrapper, ui.think);
@@ -827,6 +807,45 @@ wrapper.innerHTML = `
 
     ui.display.scrollTop = ui.display.scrollHeight;
     }
+
+// 👇 Put it here (outside appendBubble)
+
+function addAiActions(aiId) {
+
+    const wrapper = document.getElementById(aiId);
+
+    if (!wrapper) return;
+
+    const messageWrapper = wrapper.querySelector(".ai-message-wrapper");
+
+    const actions = document.createElement("div");
+
+    actions.className = "message-actions";
+
+    actions.innerHTML = `
+        <button class="msg-action-btn"
+            onclick="copyAiMessage(this)">
+            <i class="far fa-copy"></i>
+        </button>
+
+        <button class="msg-action-btn"
+            onclick="shareMessage(this)">
+            <i class="fas fa-share"></i>
+        </button>
+
+        <button class="msg-action-btn like-btn"
+            onclick="sendFeedback(this,'like')">
+            <i class="far fa-thumbs-up"></i>
+        </button>
+
+        <button class="msg-action-btn dislike-btn"
+            onclick="sendFeedback(this,'dislike')">
+            <i class="far fa-thumbs-down"></i>
+        </button>
+    `;
+
+    messageWrapper.appendChild(actions);
+}
 
 function appendAiBubble(rawText) {
 
