@@ -616,16 +616,6 @@ ui.display.scrollTop =
 
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
-
-aiBubble.innerHTML = formatAIResponse(aiReply);
-
-const wrapper = document.getElementById(aiId);
-
-const actions = wrapper.querySelector(".ai-actions");
-
-if (actions) {
-    actions.style.display = "none";
-}
         
         chatHistory.push({
     role: "assistant",
