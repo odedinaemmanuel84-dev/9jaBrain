@@ -538,12 +538,16 @@ await smoothType(aiBubble, data.reply);
 
 aiBubble.innerHTML = formatAIResponse(data.reply);
 
-const actions = document
-    .getElementById(aiId)
-    .querySelector(".message-actions");
+const wrapper = document.getElementById(aiId);
 
-if (actions) {
-    actions.style.display = "flex";
+if (wrapper) {
+
+    const actions = wrapper.querySelector(".message-actions");
+
+    if (actions) {
+        actions.style.display = "flex";
+    }
+
 }
         
         chatHistory.push({
