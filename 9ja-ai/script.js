@@ -11,7 +11,7 @@ let selectedImageMime = null;
 
 const ui = {
     input: document.getElementById('userInput'),
-    display: document.getElementById('chatDisplay'),
+    display: docu7ment.getElementById('chatDisplay'),
     think: document.getElementById('thinkingIndicator'),
     voice: document.getElementById('voiceBtn'),
     send: document.getElementById('sendBtn'),
@@ -536,8 +536,10 @@ const aiBubble = document
 
 await smoothType(aiBubble, data.reply);
 
-aiBubble.innerHTML = formatAIResponse(aiReply);
+// Format the final message
+aiBubble.innerHTML = formatAIResponse(data.reply);
 
+// Show action buttons
 addAiActions(aiId);
         
         chatHistory.push({
