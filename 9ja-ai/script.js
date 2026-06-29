@@ -538,6 +538,14 @@ await smoothType(aiBubble, data.reply);
 
 aiBubble.innerHTML = formatAIResponse(data.reply);
 
+const actions = document
+    .getElementById(aiId)
+    .querySelector(".message-actions");
+
+if (actions) {
+    actions.style.display = "flex";
+}
+        
         chatHistory.push({
             role: "assistant",
             parts: [
@@ -791,7 +799,8 @@ function appendBubble(role, contentHTML, msgId) {
                 ${contentHTML}
             </div>
 
-            <div class="message-actions">
+            <div class="message-actions"
+                 style="display:none;">
 
                 <button class="msg-action-btn"
                     onclick="copyAiMessage(this)">
@@ -803,13 +812,13 @@ function appendBubble(role, contentHTML, msgId) {
                     <i class="fas fa-share"></i>
                 </button>
 
-                 <button class="msg-action-btn like-btn"
+                <button class="msg-action-btn like-btn"
                     onclick="sendFeedback(this,'like')">
                     <i class="far fa-thumbs-up"></i>
                 </button>
 
                 <button class="msg-action-btn dislike-btn"
-                     onclick="sendFeedback(this,'dislike')">
+                    onclick="sendFeedback(this,'dislike')">
                     <i class="far fa-thumbs-down"></i>
                 </button>
 
@@ -817,7 +826,7 @@ function appendBubble(role, contentHTML, msgId) {
 
         </div>
     `;
-    }      
+    } 
 
     if (ui.think) {
         ui.display.insertBefore(wrapper, ui.think);
