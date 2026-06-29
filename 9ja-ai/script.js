@@ -526,7 +526,17 @@ if (sendingImage) {
 
     if (data.reply) {
 
-        await streamAiResponse(data.reply);
+        const aiId = "ai-" + Date.now();
+
+appendBubble("ai", "", aiId);
+
+const aiBubble = document
+    .getElementById(aiId)
+    .querySelector(".ai-msg-bubble");
+
+await smoothType(aiBubble, data.reply);
+
+aiBubble.innerHTML = formatAIResponse(data.reply);
 
         chatHistory.push({
             role: "assistant",
