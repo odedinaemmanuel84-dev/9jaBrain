@@ -537,7 +537,7 @@ const aiBubble = document
 await smoothType(aiBubble, data.reply);
 
 // Format the final message
-aiBubble.innerHTML = formatAIResponse(data.reply);
+aiBubble.innerHTML = formatAIResponse(aiReply);
 
 // Show action buttons
 addAiActions(aiId);
