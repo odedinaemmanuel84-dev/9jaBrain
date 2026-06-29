@@ -517,6 +517,35 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
     );
         }
 
+// ------------------------------
+// IMAGE RESPONSE (JSON)
+// ------------------------------
+if (sendingImage) {
+
+    const data = await response.json();
+
+    if (data.reply) {
+
+        await streamAiResponse(data.reply);
+
+        chatHistory.push({
+            role: "assistant",
+            parts: [
+                {
+                    text: data.reply
+                }
+            ]
+        });
+
+    } else {
+
+        appendAiBubble("I couldn't analyze the image.");
+
+    }
+
+    return; // Stop here so it won't try streaming
+}
+        
 const reader = response.body.getReader();
 
 const decoder = new TextDecoder();
