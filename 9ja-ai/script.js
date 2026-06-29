@@ -522,40 +522,28 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
 // ------------------------------
 if (sendingImage) {
 
-const data = await response.json();  
+    const data = await response.json();
 
-if (data.reply) {  
+    if (data.reply) {
 
-    const aiId = "ai-" + Date.now();
+        appendAiBubble(data.reply);
 
-appendBubble("ai", "", aiId);
+        chatHistory.push({
+            role: "assistant",
+            parts: [
+                {
+                    text: data.reply
+                }
+            ]
+        });
 
-const aiBubble = document
-.getElementById(aiId)
-.querySelector(".ai-msg-bubble");
-
-await smoothType(aiBubble, data.reply);
-
-aiBubble.innerHTML = formatAIResponse(aiReply);
-
-addAiActions(aiId);
-
-chatHistory.push({  
-        role: "assistant",  
-        parts: [  
-            {  
-                text: data.reply  
-            }  
-        ]  
-    });  
-
-} else {  
+    } else {
 
         appendAiBubble("I couldn't analyze the image.");
 
     }
 
-    return; // Stop here so it won't try streaming
+    return;
 }
         
 const reader = response.body.getReader();
