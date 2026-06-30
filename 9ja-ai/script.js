@@ -9,8 +9,6 @@ let currentlyEditingId = null;
 let selectedImageBase64 = null;
 let selectedImageMime = null;
 
-let stopGeneration = false;
-
 const ui = {
     input: document.getElementById('userInput'),
     display: document.getElementById('chatDisplay'),
