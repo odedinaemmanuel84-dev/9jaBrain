@@ -416,7 +416,9 @@ let displayHTML = "";
         ui.display.appendChild(ui.think);  
         ui.think.style.display = 'flex';  
     }  
-   
+
+}
+        
     // SAVE BEFORE RESET
     const sendingImage = selectedImageBase64;
     const sendingMime = selectedImageMime;
@@ -428,8 +430,9 @@ let displayHTML = "";
     selectedImageMime = null;
 
     if (ui.fileInput) {
-    ui.input.value = "";
-    
+    ui.fileInput.value = "";
+    }
+   
     if (ui.previewContainer) {
         ui.previewContainer.style.setProperty('display', 'none', 'important');
     }
