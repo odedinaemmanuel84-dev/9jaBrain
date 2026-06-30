@@ -576,9 +576,7 @@ while (true) {
 
     }
 
-}
-
-  // Save to memory      
+} 
 
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
