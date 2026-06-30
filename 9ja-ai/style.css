@@ -253,10 +253,10 @@ body {
 
 /* REMOVE EXTRA SPACING */
 .ai-msg-bubble *{
-    margin: 0; !important;
-    padding: 0; !important;
-    text-indent: 0; !important;
-    line-height: 1.7; !important;
+margin: 0 !important;
+padding: 0 !important;
+text-indent: 0 !important;
+line-height: 1.7 !important;
 }
 
 .ai-msg-bubble p {
