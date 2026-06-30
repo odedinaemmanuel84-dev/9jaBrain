@@ -682,30 +682,107 @@ function formatAIResponse(text) {
 
     if (!text) return "";
 
-    const codeRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    // --------------------------
+    // CODE BLOCKS
+    // --------------------------
 
-    let formatted = text.replace(codeRegex, (match, lang, code) => {
+    text = text.replace(
+        /```(\w+)?\n([\s\S]*?)```/g,
+        (match, lang, code) => {
 
-        const language = lang || 'code';
+            const id =
+                "code-" +
+                Math.random().toString(36).slice(2);
 
-        return `
-            <div class="code-container">
-                <div class="code-header">
-                    <span>${language.toUpperCase()}</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                        <i class="far fa-copy"></i> Copy
-                    </button>
-                </div>
-                <pre><code>${escapeHtml(code.trim())}</code></pre>
-            </div>
-        `;
-    });
+            return `
+<div class="code-block">
 
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    <div class="code-header">
 
-    formatted = formatted.replace(/\n/g, '<br>');
+        <span>${(lang || "Code").toUpperCase()}</span>
 
-    return formatted;
+        <button
+            class="copy-code-btn"
+            onclick="copyCode('${id}')">
+
+            <i class="far fa-copy"></i>
+            Copy
+
+        </button>
+
+    </div>
+
+<pre><code
+id="${id}"
+class="language-${lang || ""}">
+${escapeHtml(code.trim())}
+</code></pre>
+
+</div>
+`;
+
+        }
+    );
+
+    // --------------------------
+    // HEADINGS
+    // --------------------------
+
+    text = text.replace(/^### (.*)$/gm, "<h3>$1</h3>");
+    text = text.replace(/^## (.*)$/gm, "<h2>$1</h2>");
+    text = text.replace(/^# (.*)$/gm, "<h1>$1</h1>");
+
+    // --------------------------
+    // BOLD
+    // --------------------------
+
+    text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+    // --------------------------
+    // ITALIC
+    // --------------------------
+
+    text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+    // --------------------------
+    // INLINE CODE
+    // --------------------------
+
+    text = text.replace(
+        /`([^`]+)`/g,
+        "<code>$1</code>"
+    );
+
+    // --------------------------
+    // LINKS
+    // --------------------------
+
+    text = text.replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<a href="$1" target="_blank">$1</a>'
+    );
+
+    // --------------------------
+    // BULLET LISTS
+    // --------------------------
+
+    text = text.replace(
+        /^\- (.*)$/gm,
+        "<li>$1</li>"
+    );
+
+    text = text.replace(
+        /(<li>.*<\/li>)/gs,
+        "<ul>$1</ul>"
+    );
+
+    // --------------------------
+    // LINE BREAKS
+    // --------------------------
+
+    text = text.replace(/\n/g, "<br>");
+
+    return text;
 }
 
 let typingQueue = [];
@@ -885,37 +962,46 @@ async function editMessage(msgId) {
     toggleButtons();
 }
 
-async function copyCode(buttonElement) {
+async function copyCode(id) {
 
-    const codeBlock = buttonElement
-        .parentElement
-        .nextElementSibling
-        .querySelector('code');
+    const codeBlock =
+        document.getElementById(id);
 
     if (!codeBlock) return;
 
+    const button = event.currentTarget;
+
     try {
 
-        await navigator.clipboard.writeText(codeBlock.innerText);
+        await navigator.clipboard.writeText(
+            codeBlock.innerText
+        );
 
-        buttonElement.innerHTML =
+        button.innerHTML =
             '<i class="fas fa-check"></i> Copied!';
 
-        buttonElement.style.borderColor = 'var(--accent)';
+        button.style.borderColor =
+            'var(--accent)';
 
         setTimeout(() => {
 
-            buttonElement.innerHTML =
+            button.innerHTML =
                 '<i class="far fa-copy"></i> Copy';
 
-            buttonElement.style.borderColor = '#444';
+            button.style.borderColor =
+                '#444';
 
         }, 2000);
 
     } catch (err) {
 
-        console.error('Failed to copy text:', err);
+        console.error(
+            "Failed to copy:",
+            err
+        );
+
     }
+
 }
 
 async function copyAiMessage(button) {
