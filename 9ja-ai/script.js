@@ -9,6 +9,8 @@ let currentlyEditingId = null;
 let selectedImageBase64 = null;
 let selectedImageMime = null;
 
+let stopGeneration = false;
+
 const ui = {
     input: document.getElementById('userInput'),
     display: document.getElementById('chatDisplay'),
@@ -517,6 +519,13 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
     );
         }
 
+stopGeneration = false;
+
+ui.send.innerHTML =
+    '<i class="fas fa-stop"></i>';
+
+ui.send.onclick = stopStreaming;
+        
     const reader = response.body.getReader();
 
 const decoder = new TextDecoder();
@@ -532,6 +541,14 @@ const aiBubble = document
     .querySelector(".ai-msg-bubble");
 
 while (true) {
+
+    if (stopGeneration) {
+
+        await reader.cancel();
+
+        break;
+
+    }
 
     const { done, value } =
         await reader.read();
@@ -585,6 +602,11 @@ aiBubble.classList.remove("typing");
 
 addAiActions(aiId);
 
+ui.send.innerHTML =
+    '<i class="fas fa-arrow-up"></i>';
+
+ui.send.onclick = sendMessage;
+        
 chatHistory.push({
     role: "assistant",
     parts: [
@@ -1137,6 +1159,12 @@ function showFeedbackToast(message) {
         toast.classList.remove('show');
 
     }, 2500);
+}
+
+function stopStreaming() {
+
+    stopGeneration = true;
+
 }
 
 init();
