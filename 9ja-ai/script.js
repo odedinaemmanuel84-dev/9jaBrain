@@ -424,6 +424,13 @@ window.lastAiId = aiId;
     const sendingImage = selectedImageBase64;
     const sendingMime = selectedImageMime;
 
+// Save last prompt for Regenerate
+window.lastPrompt = {
+    text,
+    sendingImage,
+    sendingMime
+};
+    
     // RESET UI
     ui.input.value = "";
 
@@ -450,13 +457,6 @@ window.lastAiId = aiId;
         ui.display.scrollTop = ui.display.scrollHeight;
     }
 
-// Save last prompt for Regenerate
-window.lastPrompt = {
-    text,
-    sendingImage,
-    sendingMime
-};
-    
     // --- API REQUEST ---
     try {
 
