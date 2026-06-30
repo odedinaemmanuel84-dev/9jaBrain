@@ -445,7 +445,9 @@ let displayHTML = "";
     if (ui.display) {
         ui.display.scrollTop = ui.display.scrollHeight;
     }
-
+   
+}
+        
     // --- API REQUEST ---
     try {
 
