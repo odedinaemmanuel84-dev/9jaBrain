@@ -682,105 +682,59 @@ function formatAIResponse(text) {
 
     if (!text) return "";
 
-    // --------------------------
-    // CODE BLOCKS
-    // --------------------------
+    // Save code blocks first
+    const codeBlocks = [];
 
-    text = text.replace(
-        /```(\w+)?\n([\s\S]*?)```/g,
-        (match, lang, code) => {
+    text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
 
-            const id =
-                "code-" +
-                Math.random().toString(36).slice(2);
+        const id = "code-" + Math.random().toString(36).substring(2);
 
-            return `
+        codeBlocks.push(`
 <div class="code-block">
 
     <div class="code-header">
-
-        <span>${(lang || "Code").toUpperCase()}</span>
+        <span>${(lang || "CODE").toUpperCase()}</span>
 
         <button
             class="copy-code-btn"
-            onclick="copyCode('${id}')">
-
-            <i class="far fa-copy"></i>
-            Copy
-
+            onclick="copyCode('${id}', this)">
+            <i class="far fa-copy"></i> Copy
         </button>
-
     </div>
 
-<pre><code
-id="${id}"
-class="language-${lang || ""}">
-${escapeHtml(code.trim())}
-</code></pre>
+<pre><code id="${id}">${escapeHtml(code.trim())}</code></pre>
 
 </div>
-`;
+`);
 
-        }
-    );
+        return `%%CODEBLOCK${codeBlocks.length - 1}%%`;
+    });
 
-    // --------------------------
-    // HEADINGS
-    // --------------------------
-
+    // Headings
     text = text.replace(/^### (.*)$/gm, "<h3>$1</h3>");
     text = text.replace(/^## (.*)$/gm, "<h2>$1</h2>");
     text = text.replace(/^# (.*)$/gm, "<h1>$1</h1>");
 
-    // --------------------------
-    // BOLD
-    // --------------------------
-
+    // Bold
     text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-    // --------------------------
-    // ITALIC
-    // --------------------------
-
+    // Italic
     text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-    // --------------------------
-    // INLINE CODE
-    // --------------------------
+    // Inline code
+    text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
 
-    text = text.replace(
-        /`([^`]+)`/g,
-        "<code>$1</code>"
-    );
-
-    // --------------------------
-    // LINKS
-    // --------------------------
-
+    // Links
     text = text.replace(
         /(https?:\/\/[^\s]+)/g,
         '<a href="$1" target="_blank">$1</a>'
     );
 
-    // --------------------------
-    // BULLET LISTS
-    // --------------------------
-
-    text = text.replace(
-        /^\- (.*)$/gm,
-        "<li>$1</li>"
-    );
-
-    text = text.replace(
-        /(<li>.*<\/li>)/gs,
-        "<ul>$1</ul>"
-    );
-
-    // --------------------------
-    // LINE BREAKS
-    // --------------------------
-
+    // Line breaks
     text = text.replace(/\n/g, "<br>");
+
+    // Restore code blocks LAST
+    text = text.replace(/%%CODEBLOCK(\d+)%%/g, (_, index) => codeBlocks[index]);
 
     return text;
 }
@@ -962,37 +916,27 @@ async function editMessage(msgId) {
     toggleButtons();
 }
 
-async function copyCode(id) {
+async function copyCode(id, button) {
 
-    const code =
-        document.getElementById(id);
+    const code = document.getElementById(id);
 
     if (!code) return;
 
-    const button =
-        event.currentTarget;
+    try {
 
-    try{
-
-        await navigator.clipboard.writeText(
-            code.innerText
-        );
+        await navigator.clipboard.writeText(code.innerText);
 
         button.innerHTML =
-        `<i class="fas fa-check"></i> Copied`;
+            '<i class="fas fa-check"></i> Copied';
 
-        button.style.color="#22c55e";
+        setTimeout(() => {
 
-        setTimeout(()=>{
+            button.innerHTML =
+                '<i class="far fa-copy"></i> Copy';
 
-            button.innerHTML=
-            `<i class="far fa-copy"></i> Copy`;
+        }, 2000);
 
-            button.style.color="#8b949e";
-
-        },2000);
-
-    }catch(err){
+    } catch (err) {
 
         console.error(err);
 
