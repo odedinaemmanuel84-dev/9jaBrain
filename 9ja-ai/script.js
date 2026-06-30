@@ -374,7 +374,9 @@ async function sendMessage() {
     } else {
 
         // --- NEW MESSAGE ---
-        const msgId = 'msg-' + Date.now();
+        const aiId = "ai-" + Date.now();
+
+window.lastAiId = aiId;
 
         let displayHTML = "";
 
@@ -448,6 +450,13 @@ async function sendMessage() {
         ui.display.scrollTop = ui.display.scrollHeight;
     }
 
+// Save last prompt for Regenerate
+window.lastPrompt = {
+    text,
+    sendingImage,
+    sendingMime
+};
+    
     // --- API REQUEST ---
     try {
 
@@ -587,6 +596,8 @@ aiBubble.classList.remove("typing");
 
 addAiActions(aiId);
 
+window.lastResponse = aiReply;
+
 chatHistory.push({
     role: "assistant",
     parts: [
@@ -642,7 +653,35 @@ chatHistory.push({
     }
 
 }
-    
+
+async function regenerateResponse() {
+
+    if (!window.lastPrompt) return;
+
+    // Remove previous AI response
+    if (window.lastAiId) {
+        document.getElementById(window.lastAiId)?.remove();
+    }
+
+    // Remove assistant from memory
+    if (
+        chatHistory.length &&
+        chatHistory[chatHistory.length - 1].role === "assistant"
+    ) {
+        chatHistory.pop();
+    }
+
+    // Call sendMessage again using the same prompt
+    ui.input.value = window.lastPrompt.text;
+
+    if (window.lastPrompt.sendingImage) {
+        selectedImageBase64 = window.lastPrompt.sendingImage;
+        selectedImageMime = window.lastPrompt.sendingMime;
+    }
+
+    await sendMessage();
+}
+
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
 
 function formatAIResponse(text) {
@@ -797,6 +836,11 @@ function addAiActions(aiId) {
         <button class="msg-action-btn"
             onclick="shareMessage(this)">
             <i class="fas fa-share"></i>
+        </button>
+
+        <button class="msg-action-btn"
+         onclick="regenerateResponse()">
+           <i class="fas fa-rotate-right"></i>
         </button>
 
         <button class="msg-action-btn like-btn"
