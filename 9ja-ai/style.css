@@ -252,15 +252,11 @@ body {
 }
 
 /* REMOVE EXTRA SPACING */
-.ai-msg-bubble *,
-.ai-msg-bubble p,
-.ai-msg-bubble div,
-.ai-msg-bubble span {
-    margin: 0 !important;
-    padding: 0 !important;
-    text-indent: 0 !important;
-    line-height: 1.7 !important;
-    display: inline !important;
+.ai-msg-bubble *{
+    margin: 0; !important;
+    padding: 0; !important;
+    text-indent: 0; !important;
+    line-height: 1.7; !important;
 }
 
 .ai-msg-bubble p {
