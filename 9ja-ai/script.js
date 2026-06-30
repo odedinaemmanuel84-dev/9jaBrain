@@ -472,8 +472,7 @@ chatHistory.push({
 });
 
 const visionPayload = {
-    messages: chatHistory,
-    prompt: text || "Explain wetin dey inside this image in Pidgin."
+    messages: chatHistory.slice(-30)
 };
 
 response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
