@@ -586,6 +586,8 @@ while (true) {
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
 
+Prism.highlightAllUnder(aiBubble);
+        
 aiBubble.classList.remove("typing");
 
 addAiActions(aiId);
@@ -702,7 +704,7 @@ function formatAIResponse(text) {
         </button>
     </div>
 
-<pre><code id="${id}">${escapeHtml(code.trim())}</code></pre>
+<pre><code id="${id}" class="language-${lang || "markup"}">${escapeHtml(code.trim())}</code></pre>
 
 </div>
 `);
