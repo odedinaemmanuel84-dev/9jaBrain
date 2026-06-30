@@ -516,8 +516,6 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
         errorData.error || `Server status: ${response.status}`
     );
         }
-
-stopGeneration = false;
         
     const reader = response.body.getReader();
 
