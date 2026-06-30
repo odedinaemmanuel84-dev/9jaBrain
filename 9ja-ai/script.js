@@ -291,32 +291,13 @@ function useSuggestion(text) {
 }
 
 // --- 4. MESSAGE TRANSMISSION ---
-async function sendMessage(regenerate = false) {
+async function sendMessage() {
 
     if (!ui.input) return;
 
-    let text;
+const text = ui.input.value.trim();
 
-if (regenerate) {
-
-    // Get the last user message
-    const lastUser = [...chatHistory]
-        .reverse()
-        .find(m => m.role === "user");
-
-    if (!lastUser) return;
-
-    text =
-        lastUser.parts?.[0]?.text || "";
-
-} else {
-
-    text = ui.input.value.trim();
-
-    if (!text && !selectedImageBase64)
-        return;
-
-}
+if (!text && !selectedImageBase64) return;
 
     if (ui.welcome) {
         ui.welcome.style.display = 'none';
@@ -392,75 +373,64 @@ if (regenerate) {
 
     } else {
 
-        if (!regenerate) {
+// NEW MESSAGE 
+        
+         const msgId = 'msg-' + Date.now();
 
-    const msgId = 'msg-' + Date.now();
+let displayHTML = "";  
 
-    let displayHTML = "";
+    if (selectedImageBase64) {  
 
-    if (selectedImageBase64) {
+        displayHTML = `  
+            <div class="msg-image-container">  
+                <img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:8px;">  
+            </div>  
+            <div class="msg-text">${escapeHtml(text)}</div>  
+        `;  
 
-        displayHTML = `
-            <div class="msg-image-container">
-                <img src="data:${selectedImageMime};base64,${selectedImageBase64}" style="max-width:200px; border-radius:8px;">
-            </div>
-            <div class="msg-text">${escapeHtml(text)}</div>
-        `;
+    } else {  
 
-    } else {
+        displayHTML = `<div class="msg-text">${escapeHtml(text)}</div>`;  
+    }  
 
-        displayHTML = `<div class="msg-text">${escapeHtml(text)}</div>`;
-    }
+    appendBubble('user', displayHTML, msgId);  
 
-    appendBubble('user', displayHTML, msgId);
+    let messageParts = [{ text: text }];  
 
-    let messageParts = [{ text: text }];
+    if (selectedImageBase64) {  
 
-    if (selectedImageBase64) {
+        messageParts.push({  
+            inlineData: {  
+                mimeType: selectedImageMime,  
+                data: selectedImageBase64  
+            }  
+        });  
+    }  
 
-        messageParts.push({
-            inlineData: {
-                mimeType: selectedImageMime,
-                data: selectedImageBase64
-            }
-        });
-    }
+    chatHistory.push({  
+        role: "user",  
+        parts: messageParts,  
+        id: msgId  
+    });  
 
-    chatHistory.push({
-        role: "user",
-        parts: messageParts,
-        id: msgId
-    });
-
-    if (ui.think) {
-        ui.display.appendChild(ui.think);
-        ui.think.style.display = 'flex';
-    }
-
-        }
+    if (ui.think) {  
+        ui.display.appendChild(ui.think);  
+        ui.think.style.display = 'flex';  
+    }  
    
     // SAVE BEFORE RESET
     const sendingImage = selectedImageBase64;
     const sendingMime = selectedImageMime;
 
     // RESET UI
-    if (!regenerate) {
-
     ui.input.value = "";
-
-}
 
     selectedImageBase64 = null;
     selectedImageMime = null;
 
     if (ui.fileInput) {
-        if (!regenerate) {
-
     ui.input.value = "";
-
-}
     
-
     if (ui.previewContainer) {
         ui.previewContainer.style.setProperty('display', 'none', 'important');
     }
@@ -1170,35 +1140,6 @@ function showFeedbackToast(message) {
         toast.classList.remove('show');
 
     }, 2500);
-}
-
-async function regenerateResponse() {
-
-    // Remove last AI reply from memory
-    if (
-        chatHistory.length &&
-        chatHistory[chatHistory.length - 1].role === "assistant"
-    ) {
-
-        chatHistory.pop();
-
-    }
-
-    // Remove last AI bubble
-    const aiMessages =
-        document.querySelectorAll(".ai-msg-container");
-
-    if (aiMessages.length) {
-
-        aiMessages[
-            aiMessages.length - 1
-        ].remove();
-
-    }
-
-    // Send again
-    await sendMessage(true);
-
 }
         
 init();
