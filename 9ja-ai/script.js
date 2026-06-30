@@ -375,11 +375,7 @@ async function sendMessage() {
     } else {
 
         // --- NEW MESSAGE ---
-    if (!isRegenerating) {
-        
-        const msgId = "msg-" + Date.now();
-
-        window.lastUserMsgId = msgId;
+         const msgId = "msg-" + Date.now();
 
         let displayHTML = "";
 
@@ -426,17 +422,6 @@ async function sendMessage() {
     // SAVE BEFORE RESET
     const sendingImage = selectedImageBase64;
     const sendingMime = selectedImageMime;
-
-// Save last prompt for Regenerate
-if (!isRegenerating) {
-
-    window.lastPrompt = {
-        text,
-        sendingImage,
-        sendingMime
-    };
-
-}
     
     // RESET UI
     ui.input.value = "";
@@ -688,11 +673,7 @@ async function regenerateResponse() {
         selectedImageMime = window.lastPrompt.sendingMime;
     }
 
-    isRegenerating = true;
-
     await sendMessage();
-
-    isRegenerating = false;
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
