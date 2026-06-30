@@ -8,6 +8,7 @@ let chatHistory = [];
 let currentlyEditingId = null;
 let selectedImageBase64 = null;
 let selectedImageMime = null;
+let isRegenerating = false;
 
 const ui = {
     input: document.getElementById('userInput'),
@@ -374,6 +375,8 @@ async function sendMessage() {
     } else {
 
         // --- NEW MESSAGE ---
+    if (!isRegenerating) {
+        
         const msgId = "msg-" + Date.now();
 
         window.lastUserMsgId = msgId;
@@ -425,11 +428,15 @@ async function sendMessage() {
     const sendingMime = selectedImageMime;
 
 // Save last prompt for Regenerate
-window.lastPrompt = {
-    text,
-    sendingImage,
-    sendingMime
-};
+if (!isRegenerating) {
+
+    window.lastPrompt = {
+        text,
+        sendingImage,
+        sendingMime
+    };
+
+}
     
     // RESET UI
     ui.input.value = "";
@@ -681,7 +688,11 @@ async function regenerateResponse() {
         selectedImageMime = window.lastPrompt.sendingMime;
     }
 
+    isRegenerating = true;
+
     await sendMessage();
+
+    isRegenerating = false;
 }
 
 // --- 5. UI BUBBLES & TEXT PROCESSING ---
