@@ -964,41 +964,37 @@ async function editMessage(msgId) {
 
 async function copyCode(id) {
 
-    const codeBlock =
+    const code =
         document.getElementById(id);
 
-    if (!codeBlock) return;
+    if (!code) return;
 
-    const button = event.currentTarget;
+    const button =
+        event.currentTarget;
 
-    try {
+    try{
 
         await navigator.clipboard.writeText(
-            codeBlock.innerText
+            code.innerText
         );
 
         button.innerHTML =
-            '<i class="fas fa-check"></i> Copied!';
+        `<i class="fas fa-check"></i> Copied`;
 
-        button.style.borderColor =
-            'var(--accent)';
+        button.style.color="#22c55e";
 
-        setTimeout(() => {
+        setTimeout(()=>{
 
-            button.innerHTML =
-                '<i class="far fa-copy"></i> Copy';
+            button.innerHTML=
+            `<i class="far fa-copy"></i> Copy`;
 
-            button.style.borderColor =
-                '#444';
+            button.style.color="#8b949e";
 
-        }, 2000);
+        },2000);
 
-    } catch (err) {
+    }catch(err){
 
-        console.error(
-            "Failed to copy:",
-            err
-        );
+        console.error(err);
 
     }
 
