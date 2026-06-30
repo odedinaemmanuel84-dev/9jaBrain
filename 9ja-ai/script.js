@@ -520,11 +520,6 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
         }
 
 stopGeneration = false;
-
-ui.send.innerHTML =
-    '<i class="fas fa-stop"></i>';
-
-ui.send.onclick = stopStreaming;
         
     const reader = response.body.getReader();
 
@@ -541,14 +536,6 @@ const aiBubble = document
     .querySelector(".ai-msg-bubble");
 
 while (true) {
-
-    if (stopGeneration) {
-
-        await reader.cancel();
-
-        break;
-
-    }
 
     const { done, value } =
         await reader.read();
@@ -1159,12 +1146,6 @@ function showFeedbackToast(message) {
         toast.classList.remove('show');
 
     }, 2500);
-}
-
-function stopStreaming() {
-
-    stopGeneration = true;
-
 }
 
 init();
