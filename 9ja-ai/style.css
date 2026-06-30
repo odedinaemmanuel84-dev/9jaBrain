@@ -286,7 +286,8 @@ body {
     opacity:.9;
 }
 
-.ai-msg-bubble code{
+/* Inline code only */
+.ai-msg-bubble :not(pre) > code{
     background:#2d2d2d;
     padding:2px 5px;
     border-radius:4px;
@@ -825,26 +826,21 @@ font-weight:bold;
 }
 
 .code-block pre{
-
     margin:0;
-
     padding:16px;
-
     overflow-x:auto;
-
+    background:transparent;
 }
 
-.code-block code{
-
-    font-family:Consolas,
-    monospace;
-
-    font-size:14px;
-
-    line-height:1.7;
-
+.code-block pre code{
+    background:transparent !important;
+    display:block;
     white-space:pre;
-
+    font-family:Consolas, monospace;
+    font-size:14px;
+    line-height:1.7;
+    padding:0 !important;
+    border-radius:0;
 }
 
 /* IMAGE INSIDE CHAT */
