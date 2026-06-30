@@ -374,8 +374,7 @@ if (!text && !selectedImageBase64) return;
     } else {
 
 // NEW MESSAGE 
-        
-         const msgId = 'msg-' + Date.now();
+const msgId = 'msg-' + Date.now();
 
 let displayHTML = "";  
 
