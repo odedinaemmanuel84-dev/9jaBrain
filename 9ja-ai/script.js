@@ -787,6 +787,11 @@ function addAiActions(aiId) {
 
     actions.innerHTML = `
         <button class="msg-action-btn"
+    onclick="regenerateResponse()">
+    <i class="fas fa-rotate-right"></i>
+</button>
+        
+        <button class="msg-action-btn"
             onclick="copyAiMessage(this)">
             <i class="far fa-copy"></i>
         </button>
