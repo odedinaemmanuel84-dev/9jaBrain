@@ -374,9 +374,9 @@ async function sendMessage() {
     } else {
 
         // --- NEW MESSAGE ---
-        const aiId = "ai-" + Date.now();
+        const msgId = "msg-" + Date.now();
 
-window.lastAiId = aiId;
+        window.lastUserMsgId = msgId;
 
         let displayHTML = "";
 
@@ -534,6 +534,8 @@ let aiReply = "";
 
 const aiId = "ai-" + Date.now();
 
+window.lastAiId = aiId;
+        
 appendBubble("ai", "", aiId);
 
 const aiBubble = document
