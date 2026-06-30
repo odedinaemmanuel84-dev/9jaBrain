@@ -416,7 +416,6 @@ let displayHTML = "";
         ui.display.appendChild(ui.think);  
         ui.think.style.display = 'flex';  
     }  
-
 }
         
     // SAVE BEFORE RESET
@@ -430,7 +429,7 @@ let displayHTML = "";
     selectedImageMime = null;
 
     if (ui.fileInput) {
-    ui.fileInput.value = "";
+        ui.fileInput.value = "";
     }
    
     if (ui.previewContainer) {
