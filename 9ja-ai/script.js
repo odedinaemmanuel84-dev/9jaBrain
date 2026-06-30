@@ -517,50 +517,7 @@ response = await fetch(`${BACKEND_URL}/api/analyze-image`, {
     );
         }
 
-// ------------------------------
-// IMAGE RESPONSE (JSON)
-// ------------------------------
-if (sendingImage) {
-
-    const data = await response.json();
-
-    if (data.reply) {
-
-        const aiId = "ai-" + Date.now();
-
-appendBubble("ai", "", aiId);
-
-const aiBubble = document
-    .getElementById(aiId)
-    .querySelector(".ai-msg-bubble");
-
-await smoothType(aiBubble, data.reply);
-
-// Format the final message
-aiBubble.innerHTML = formatAIResponse(data.reply);
-
-// Show action buttons
-addAiActions(aiId);
-        
-        chatHistory.push({
-            role: "assistant",
-            parts: [
-                {
-                    text: data.reply
-                }
-            ]
-        });
-
-    } else {
-
-        appendAiBubble("I couldn't analyze the image.");
-
-    }
-
-    return; // Stop here so it won't try streaming
-}
-        
-const reader = response.body.getReader();
+    const reader = response.body.getReader();
 
 const decoder = new TextDecoder();
 
@@ -568,7 +525,6 @@ let aiReply = "";
 
 const aiId = "ai-" + Date.now();
 
-// Create an empty AI message first
 appendBubble("ai", "", aiId);
 
 const aiBubble = document
@@ -604,33 +560,41 @@ while (true) {
 
             aiReply += json.token;
 
-await smoothType(
-    aiBubble,
-    aiReply
-);
+            await smoothType(
+                aiBubble,
+                aiReply
+            );
 
-ui.display.scrollTop =
-    ui.display.scrollHeight;
+            ui.display.scrollTop =
+                ui.display.scrollHeight;
 
-        } catch (err) {}
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
     }
+
 }
 
-// Save to memory
+  // Save to memory      
 
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
 
+aiBubble.classList.remove("typing");
+
 addAiActions(aiId);
-        
-        chatHistory.push({
+
+chatHistory.push({
     role: "assistant",
     parts: [
         {
             text: aiReply
         }
     ]
-});
+});    
 
 } catch (e) {
 
