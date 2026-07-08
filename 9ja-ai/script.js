@@ -41,7 +41,7 @@ function autoResize() {
             ? "auto"
             : "hidden";
 
-}
+    }
 
 // --- 1. INITIALIZATION ---
 async function init() {
