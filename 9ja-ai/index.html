@@ -77,7 +77,14 @@
                 </label>
                 <input type="file" id="imageUpload" accept="image/*" style="opacity: 0; position: absolute; width: 1px; height: 1px; pointer-events: none;">
                 
-                <input type="text" id="userInput" placeholder="Ask Naija AI anything..." autocomplete="off">
+<textarea
+    id="userInput"
+    rows="1"
+    placeholder="Ask Naija AI anything..."
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="sentences"
+    spellcheck="false"></textarea>
                 
                 <div class="button-group">
                     <button class="speak-btn-text" id="voiceBtn">
