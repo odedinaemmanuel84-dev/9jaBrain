@@ -596,7 +596,7 @@ font-weight:bold;
 
     display: flex;
 
-    align-items: flex-end;
+    align-items: center;
 
     width: 100%;
 
@@ -621,7 +621,7 @@ font-weight:bold;
 
     font-family: inherit;
 
-    line-height: 1.6;
+    line-height: 24px;
 
     resize: none;
 
@@ -631,12 +631,16 @@ font-weight:bold;
 
     max-height: 180px;
 
-    padding: 6px 0;
+    padding: 0;
 
+    margin: 0;
+    
     white-space: pre-wrap;
 
     word-break: break-word;
-    }
+
+    align-self: center;
+}
 
 /* IMAGE PREVIEW */
 #imagePreviewContainer {
