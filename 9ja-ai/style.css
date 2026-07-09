@@ -706,19 +706,10 @@ font-weight:bold;
 /* Microphone */
 
 .mic-btn{
-    width:42px;
-    height:42px;
-
-    border:none;
-    border-radius:50%;
-
+    
     background:#222;
 
     color:#ffffff;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
 
     cursor:pointer;
 
@@ -752,16 +743,7 @@ font-weight:bold;
 =========================== */
 
 .voice-btn{
-
-    width:46px;
-    height:46px;
-
-    border:none;
-    border-radius:50%;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    
     gap:2px;
 
     cursor:pointer;
@@ -841,26 +823,13 @@ font-weight:bold;
 
 .arrow-send-btn{
 
-    width:42px;
-    height:42px;
-
-    border:none;
-
-    border-radius:50%;
-
     background:#fff;
 
     color:#000;
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
     cursor:pointer;
 
     transition:.25s;
-
-    flex-shrink:0;
 }
 
 .arrow-send-btn:hover{
