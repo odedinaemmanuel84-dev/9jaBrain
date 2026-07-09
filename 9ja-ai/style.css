@@ -696,44 +696,109 @@ font-weight:bold;
     cursor: pointer;
 }
 
-/* BUTTONS */
-.speak-btn,
-.arrow-send-btn {
-    background: #222;
+/* BUTTON GROUP */
 
-    border: none;
-
-    color: white;
-
-    width: 40px;
-    height: 40px;
-
-    border-radius: 50%;
-
-    font-size: 1rem;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-    flex-shrink: 0;
+.button-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
-.speak-btn:hover,
-.arrow-send-btn:hover {
-    background: #333;
-    transform: scale(1.05);
+/* Voice Conversation */
+
+.voice-btn{
+    width:48px;
+    height:48px;
+
+    border:none;
+    border-radius:999px;
+
+    background:linear-gradient(135deg,#00d4ff,#6a5cff);
+
+    color:#fff;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    flex-shrink:0;
 }
 
-.disclaimer {
-    font-size: 11px;
-    color: #9aa0a6;
-    text-align: center;
-    padding: 4px 0;
+.voice-btn:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 18px rgba(0,212,255,.35);
+}
+
+/* Microphone */
+
+.mic-btn{
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#222;
+
+    color:#fff;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    flex-shrink:0;
+}
+
+.mic-btn:hover{
+    background:#333;
+    transform:scale(1.05);
+}
+
+/* Send */
+
+.arrow-send-btn{
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    color:#000;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    flex-shrink:0;
+}
+
+.arrow-send-btn:hover{
+    transform:scale(1.05);
+}
+
+.disclaimer{
+    font-size:11px;
+    color:#9aa0a6;
+    text-align:center;
+    padding:4px 0;
 }
 
 /* SIDEBAR */
