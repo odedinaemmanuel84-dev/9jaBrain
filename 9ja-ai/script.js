@@ -32,7 +32,7 @@ ui.input.addEventListener("input", autoResize);
 
 function autoResize() {
 
-    ui.input.style.height = "auto";
+    ui.input.style.height = "24px";
 
     ui.input.style.height =
         Math.min(ui.input.scrollHeight, 180) + "px";
