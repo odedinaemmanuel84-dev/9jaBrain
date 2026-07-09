@@ -76,17 +76,24 @@ async function init() {
 
 // --- 2. ACTIVATION & BUTTON LOGIC ---
 function toggleButtons() {
-    if (!ui.input || !ui.voice || !ui.send) return;
+
+    if (!ui.input || !ui.voiceBtn || !ui.micBtn || !ui.send) return;
 
     const hasText = ui.input.value.trim() !== "";
     const hasImage = selectedImageBase64 !== null;
 
     if (hasText || hasImage) {
-        ui.voice.style.display = "none";
+
+        ui.voiceBtn.style.display = "none";
+        ui.micBtn.style.display = "none";
         ui.send.style.display = "flex";
+
     } else {
-        ui.voice.style.display = "flex";
+
+        ui.voiceBtn.style.display = "flex";
+        ui.micBtn.style.display = "flex";
         ui.send.style.display = "none";
+
     }
 }
 
