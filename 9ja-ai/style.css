@@ -358,87 +358,123 @@ font-weight:bold;
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    align-items: flex-start;
-    margin: 6px 0;
+    margin: 14px 0;
+    padding: 0 8px;
     animation: fadeIn 0.25s ease;
 }
 
-/* stack bubble above actions, keep everything right-aligned */
 .user-message-wrapper {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     align-items: flex-end;
-    width: auto;
-    max-width: 75%;
+    width: fit-content;
+    max-width: min(85%, 680px);
     margin-left: auto;
-    gap: 6px;
 }
 
-/* bubble: prevent collapsing for short phrases and allow normal wrapping for long messages */
+/* USER BUBBLE */
 .user-msg-bubble {
-    background: #2a2a2a;
-    color: #fff;
+    background: #2f2f2f;
+    color: #ffffff;
 
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 18px;
 
-    display: inline-block;
-    width: auto;
-    min-width: 72px;               /* <- increase so short phrases like \"Ok na\" stay on one line */
+    width: fit-content;
     max-width: 100%;
 
-    line-height: 1.45;
     font-size: 15px;
+    line-height: 1.55;
+
     text-align: left;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: anywhere;
 
-    white-space: normal;           /* allow wrapping when message is long */
-    word-break: normal;            /* avoid breaking words unexpectedly */
-    overflow-wrap: break-word;
-
-    box-shadow: 0 2px 8px rgba(0,0,0,.25);
-    vertical-align: middle;
-}
-
-/* actions sit below the bubble in a horizontal row */
-.user-message-wrapper .message-actions {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    align-items: center;
-    justify-content: flex-end;
-    flex-shrink: 0;
-    margin-top: 0;
-    padding: 0;
-}
-
-/* icon button sizing */
-.user-message-wrapper .msg-action-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* images inside bubble shouldn't expand height */
-.user-msg-bubble img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* small-screen fallback */
-@media (max-width: 360px) {
-    .user-message-wrapper { max-width: 85%; }
-    .user-msg-bubble { padding: 8px 10px; min-width: 56px; }
+    border: none;
+    box-shadow: none;
 }
 
 /* MESSAGE TEXT */
-.msg-text {
-    width: 100%;
-    line-height: 1.8;
+.user-msg-bubble .msg-text {
+    margin: 0;
+    padding: 0;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.55;
     color: #f5f5f5;
+}
+
+/* ACTIONS BELOW BUBBLE */
+.user-message-wrapper .message-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 3px;
+    margin-top: 5px;
+    padding: 0;
+}
+
+/* ACTION BUTTONS */
+.user-message-wrapper .msg-action-btn {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+
+    color: #8e8e8e;
+    cursor: pointer;
+
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.user-message-wrapper .msg-action-btn:hover {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* USER IMAGE */
+.user-msg-bubble img {
+    display: block;
+    max-width: min(300px, 100%);
+    height: auto;
+    border-radius: 12px;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .user-msg-container {
+        padding: 0 4px;
+    }
+
+    .user-message-wrapper {
+        max-width: 88%;
+    }
+
+    .user-msg-bubble {
+        padding: 9px 14px;
+        font-size: 15px;
+        border-radius: 17px;
+    }
+}
+
+@media (max-width: 360px) {
+    .user-message-wrapper {
+        max-width: 90%;
+    }
+
+    .user-msg-bubble {
+        padding: 8px 12px;
+    }
 }
 
 /* EDIT BUTTON */
