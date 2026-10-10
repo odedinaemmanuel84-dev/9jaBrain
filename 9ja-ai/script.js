@@ -630,7 +630,7 @@ try {
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
 
-if (userIsAtBottom) {
+if (shouldAutoScroll) {
     ui.display.scrollTop = ui.display.scrollHeight;
 }
         
