@@ -317,7 +317,15 @@ function useSuggestion(text) {
 
 // --- 4. MESSAGE TRANSMISSION ---
 function isNearBottom(element, threshold = 100) {
-    return element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+    return (
+        element.scrollHeight -
+        element.scrollTop -
+        element.clientHeight
+    ) < threshold;
+}
+
+function streamTextToBubble(element, text) {
+    element.innerHTML = formatAIResponse(text);
 }
 
 async function sendMessage() {
@@ -565,47 +573,56 @@ const aiBubble = document
     .getElementById(aiId)
     .querySelector(".ai-msg-bubble");
 
-// ADD THIS LINE HERE
-const userIsAtBottom = isNearBottom(ui.display);
+let shouldAutoScroll = isNearBottom(ui.display);
 
-while (true) {
+const handleScroll = () => {
+    shouldAutoScroll = isNearBottom(ui.display);
+};
 
-    const { done, value } =
-        await reader.read();
+ui.display.addEventListener("scroll", handleScroll, {
+    passive: true
+});
 
-    if (done) break;
+try {
+    while (true) {
+        const { done, value } = await reader.read();
 
-    const chunk =
-        decoder.decode(value);
+        if (done) break;
 
-    const lines =
-        chunk.split("\n");
+        const chunk = decoder.decode(value, {
+            stream: true
+        });
 
-    for (const line of lines) {
+        const lines = chunk.split("\n");
 
-        if (!line.startsWith("data: ")) continue;
+        for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
 
-        const text =
-            line.replace("data: ", "");
+            const text = line.slice(6).trim();
 
-        if (text === "[DONE]") continue;
+            if (text === "[DONE]") continue;
 
-        try {
+            try {
+                const json = JSON.parse(text);
 
-            const json =
-                JSON.parse(text);
+                if (json.token) {
+                    aiReply += json.token;
 
-            aiReply += json.token;
-aiBubble.innerHTML = formatAIResponse(aiReply);
-            
-        } catch (err) {
+                    // Display the response immediately
+                    aiBubble.innerHTML = formatAIResponse(aiReply);
 
-            console.error(err);
-
+                    // Follow the response only if the user is near the bottom
+                    if (shouldAutoScroll) {
+                        ui.display.scrollTop = ui.display.scrollHeight;
+                    }
+                }
+            } catch (err) {
+                console.error("Streaming parse error:", err);
+            }
         }
-
     }
-
+} finally {
+    ui.display.removeEventListener("scroll", handleScroll);
 }
 
   // Save to memory      
