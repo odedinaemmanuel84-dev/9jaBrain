@@ -316,6 +316,10 @@ function useSuggestion(text) {
 }
 
 // --- 4. MESSAGE TRANSMISSION ---
+function isNearBottom(element, threshold = 100) {
+    return element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+}
+
 async function sendMessage() {
 
     if (!ui.input) return;
@@ -561,6 +565,9 @@ const aiBubble = document
     .getElementById(aiId)
     .querySelector(".ai-msg-bubble");
 
+// ADD THIS LINE HERE
+const userIsAtBottom = isNearBottom(ui.display);
+
 while (true) {
 
     const { done, value } =
@@ -589,15 +596,8 @@ while (true) {
                 JSON.parse(text);
 
             aiReply += json.token;
-
-            await smoothType(
-                aiBubble,
-                aiReply
-            );
-
-            ui.display.scrollTop =
-                ui.display.scrollHeight;
-
+aiBubble.innerHTML = formatAIResponse(aiReply);
+            
         } catch (err) {
 
             console.error(err);
@@ -613,6 +613,10 @@ while (true) {
         aiBubble.innerHTML =
     formatAIResponse(aiReply);
 
+if (userIsAtBottom) {
+    ui.display.scrollTop = ui.display.scrollHeight;
+}
+        
 Prism.highlightAllUnder(aiBubble);
         
 aiBubble.classList.remove("typing");
