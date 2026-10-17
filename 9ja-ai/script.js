@@ -627,19 +627,29 @@ try {
 
   // Save to memory      
 
-        aiBubble.innerHTML =
-    formatAIResponse(aiReply);
+        aiBubble.innerHTML = formatAIResponse(aiReply);
 
-if (shouldAutoScroll) {
-    ui.display.scrollTop = ui.display.scrollHeight;
+// Render mathematical equations using MathJax
+if (window.MathJax && window.MathJax.typesetPromise) {
+    try {
+        await window.MathJax.typesetPromise([aiBubble]);
+    } catch (error) {
+        console.error("MathJax rendering error:", error);
+    }
 }
-        
-Prism.highlightAllUnder(aiBubble);
-        
+
+// Preserve your existing syntax highlighting
+if (window.Prism) {
+    Prism.highlightAllUnder(aiBubble);
+}
+
+// Remove the typing state
 aiBubble.classList.remove("typing");
 
+// Add the AI action buttons
 addAiActions(aiId);
 
+// Save the completed response
 window.lastResponse = aiReply;
 
 chatHistory.push({
