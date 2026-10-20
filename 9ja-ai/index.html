@@ -94,27 +94,85 @@
     <div class="rainbow-border-box">
         <div class="input-container" id="expandingContainer">
             
-    <div id="imagePreviewContainer" style="display: none;">
-                <div class="preview-wrapper">
-                    <img id="imagePreview" src="" alt="Preview">
-                    <button id="removeImgBtn" type="button">&times;</button>
-                </div>
-            </div>
+ <!-- Attachment Preview -->
+<div id="attachmentPreviewContainer" style="display: none;">
+    <div class="preview-wrapper">
+        <img id="imagePreview" src="" alt="Image preview" style="display: none;">
 
-            <div class="input-row">
-                <label for="imageUpload" class="plus-btn" title="Upload image">
-                    <i class="fas fa-plus"></i> 
-                </label>
-                <input type="file" id="imageUpload" accept="image/*" style="opacity: 0; position: absolute; width: 1px; height: 1px; pointer-events: none;">
-                
-<textarea
-    id="userInput"
-    rows="1"
-    placeholder="Ask Naija AI anything..."
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="sentences"
-    spellcheck="false"></textarea>
+        <div id="documentPreview" style="display: none;">
+            <i class="fas fa-file-alt"></i>
+            <span id="documentFileName"></span>
+        </div>
+
+        <button id="removeImgBtn" type="button" aria-label="Remove attachment">&times;</button>
+    </div>
+</div>
+
+<!-- Chat Input Row -->
+<div class="input-row">
+
+    <!-- Attachment Menu Button -->
+    <button
+        id="attachmentMenuBtn"
+        class="plus-btn"
+        type="button"
+        title="Attach a file or photo"
+        aria-label="Attach a file or photo"
+        aria-expanded="false">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Attachment Menu -->
+    <div id="attachmentMenu" class="attachment-menu" style="display: none;">
+
+        <button type="button" id="choosePhotoBtn">
+            <i class="fas fa-images"></i>
+            Upload photo
+        </button>
+
+        <button type="button" id="takePhotoBtn">
+            <i class="fas fa-camera"></i>
+            Take a photo
+        </button>
+
+        <button type="button" id="chooseDocumentBtn">
+            <i class="fas fa-file-alt"></i>
+            Upload document
+        </button>
+
+    </div>
+
+    <!-- Photo Upload -->
+    <input
+        type="file"
+        id="imageUpload"
+        accept="image/jpeg,image/png,image/webp"
+        hidden>
+
+    <!-- Camera Capture -->
+    <input
+        type="file"
+        id="cameraUpload"
+        accept="image/*"
+        capture="environment"
+        hidden>
+
+    <!-- Document Upload -->
+    <input
+        type="file"
+        id="documentUpload"
+        accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+        hidden>
+
+    <!-- Message Input -->
+    <textarea
+        id="userInput"
+        rows="1"
+        placeholder="Ask Naija AI anything..."
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="sentences"
+        spellcheck="false"></textarea>
                 
                 <div class="button-group">
 
