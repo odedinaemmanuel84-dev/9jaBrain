@@ -94,15 +94,37 @@
     <div class="rainbow-border-box">
         <div class="input-container" id="expandingContainer">
  
-            <!-- Image Preview -->
+<!-- ===================================== -->
+<!-- NAIJA AI ATTACHMENTS -->
+<!-- Gallery, Camera and Documents -->
+<!-- ===================================== -->
+
+<!-- Image Preview -->
 <div id="imagePreviewContainer" style="display: none;">
     <div class="preview-wrapper">
-        <img id="imagePreview" src="" alt="Preview">
-        <button id="removeImgBtn" type="button" aria-label="Remove attachment">×</button>
+        <img
+            id="imagePreview"
+            src=""
+            alt="Selected image preview"
+        >
+
+        <button
+            id="removeImgBtn"
+            type="button"
+            aria-label="Remove selected image">
+            ×
+        </button>
     </div>
 </div>
 
-<div class="input-row">
+<!-- Selected Document Preview -->
+<div
+    id="selectedDocumentLabel"
+    style="display: none;">
+</div>
+
+<!-- Input Row -->
+<div class="input-row" id="inputRow">
 
     <!-- Attachment Button -->
     <button
@@ -111,30 +133,40 @@
         id="attachmentButton"
         title="Attach a photo or file"
         aria-label="Attach a photo or file">
+
         <i class="fas fa-plus"></i>
+
     </button>
 
-    <!-- Choose an existing photo -->
+    <!-- Choose Photo from Gallery -->
     <input
         type="file"
         id="imageUpload"
         accept="image/*"
-        hidden>
+        hidden
+    >
 
-    <!-- Take a new photo -->
+    <!-- Take Photo with Camera -->
     <input
         type="file"
         id="cameraUpload"
         accept="image/*"
         capture="environment"
-        hidden>
+        hidden
+    >
 
-    <!-- Choose a document -->
+    <!-- Upload Documents -->
     <input
         type="file"
         id="documentUpload"
-        accept=".pdf,.docx,.txt"
-        hidden>
+        accept=".pdf,.docx,.txt,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        hidden
+    >
+
+    <!-- KEEP YOUR EXISTING MESSAGE INPUT HERE -->
+    <!-- KEEP YOUR EXISTING SEND BUTTON HERE -->
+
+</div>
 
     <textarea  
     id="userInput"  
