@@ -94,20 +94,49 @@
     <div class="rainbow-border-box">
         <div class="input-container" id="expandingContainer">
  
-            <div id="imagePreviewContainer" style="display: none;">
-<div class="preview-wrapper">
-<img id="imagePreview" src="" alt="Preview">
-<button id="removeImgBtn" type="button">×</button>
-</div>
+            <!-- Image Preview -->
+<div id="imagePreviewContainer" style="display: none;">
+    <div class="preview-wrapper">
+        <img id="imagePreview" src="" alt="Preview">
+        <button id="removeImgBtn" type="button" aria-label="Remove attachment">×</button>
+    </div>
 </div>
 
-<div class="input-row">  
-            <label for="imageUpload" class="plus-btn" title="Upload image">  
-                <i class="fas fa-plus"></i>   
-            </label>  
-            <input type="file" id="imageUpload" accept="image/*" style="opacity: 0; position: absolute; width: 1px; height: 1px; pointer-events: none;">
+<div class="input-row">
 
-<textarea  
+    <!-- Attachment Button -->
+    <button
+        type="button"
+        class="plus-btn"
+        id="attachmentButton"
+        title="Attach a photo or file"
+        aria-label="Attach a photo or file">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Choose an existing photo -->
+    <input
+        type="file"
+        id="imageUpload"
+        accept="image/*"
+        hidden>
+
+    <!-- Take a new photo -->
+    <input
+        type="file"
+        id="cameraUpload"
+        accept="image/*"
+        capture="environment"
+        hidden>
+
+    <!-- Choose a document -->
+    <input
+        type="file"
+        id="documentUpload"
+        accept=".pdf,.docx,.txt"
+        hidden>
+
+    <textarea  
     id="userInput"  
     placeholder="Ask Naija AI anything..."  
     autocomplete="off"  
