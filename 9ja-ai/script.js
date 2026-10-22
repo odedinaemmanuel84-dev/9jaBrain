@@ -623,25 +623,9 @@ if (removeImgBtn) {
 
         if (typeof toggleButtons === "function") {
             toggleButtons();
-        }
-    });
-}
-
-// ------------------------------------------
-// CLOSE ATTACHMENT MENU WHEN TAPPING OUTSIDE
-// ------------------------------------------
-
-document.addEventListener("click", function (event) {
-    const menu = document.getElementById("attachmentOptionsMenu");
-
-    if (
-        menu &&
-        !menu.contains(event.target) &&
-        !event.target.closest("#attachmentButton")
-    ) {
-        menu.remove();
+        };
     }
-});   
+}
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
