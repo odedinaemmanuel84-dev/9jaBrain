@@ -151,481 +151,157 @@ function activateTriggers() {
         };
     }
 
-// ==========================================
-// NAIJA AI ATTACHMENTS
-// Gallery + Camera + Documents
-// ==========================================
-
-const attachmentButton = document.getElementById("attachmentButton");
-
-const imageUpload = document.getElementById("imageUpload");
-const cameraUpload = document.getElementById("cameraUpload");
-const documentUpload = document.getElementById("documentUpload");
-
-const imagePreview = document.getElementById("imagePreview");
-const imagePreviewContainer = document.getElementById("imagePreviewContainer");
-const removeImgBtn = document.getElementById("removeImgBtn");
-
-// Keep document selection available for integration with sendMessage().
-let selectedDocumentFile = null;
-
+// --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM ---    
+const plusButtonElement = document.querySelector('.plus-btn');    
     
-// ------------------------------------------
-// SHOW ATTACHMENT OPTIONS
-// ------------------------------------------
-
-if (attachmentButton) {
-    attachmentButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        // Remove an existing menu if it is already open.
-        const existingMenu = document.getElementById("attachmentOptionsMenu");
-
-        if (existingMenu) {
-            existingMenu.remove();
-            return;
-        }
-
-        // Create the attachment menu.
-        const menu = document.createElement("div");
-
-        menu.id = "attachmentOptionsMenu";
-
-        menu.style.cssText = `
-            position: absolute;
-            bottom: 65px;
-            left: 10px;
-            z-index: 9999;
-            width: 220px;
-            padding: 8px;
-            background: #1f1f1f;
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.35);
-        `;
-
-        const options = [
-            {
-                label: "🖼️ Choose a photo",
-                action: function () {
-                    imageUpload.click();
-                }
-            },
-            {
-                label: "📸 Take a photo",
-                action: function () {
-                    cameraUpload.click();
-                }
-            },
-            {
-                label: "📄 Upload a document",
-                action: function () {
-                    documentUpload.click();
-                }
-            }
-        ];
-
-        options.forEach(function (option) {
-            const item = document.createElement("button");
-
-            item.type = "button";
-            item.textContent = option.label;
-
-            item.style.cssText = `
-                display: block;
-                width: 100%;
-                padding: 13px 10px;
-                margin: 2px 0;
-                border: none;
-                border-radius: 8px;
-                background: transparent;
-                color: white;
-                text-align: left;
-                font-size: 14px;
-                cursor: pointer;
-            `;
-
-            item.addEventListener("click", function () {
-                menu.remove();
-                option.action();
-            });
-
-            item.addEventListener("mouseenter", function () {
-                item.style.background = "#333";
-            });
-
-            item.addEventListener("mouseleave", function () {
-                item.style.background = "transparent";
-            });
-
-            menu.appendChild(item);
-        });
-
-        // Position the menu relative to the input area.
-        const inputRow = attachmentButton.closest(".input-row");
-
-        if (inputRow) {
-            if (getComputedStyle(inputRow).position === "static") {
-                inputRow.style.position = "relative";
-            }
-
-            inputRow.appendChild(menu);
-        } else {
-            document.body.appendChild(menu);
-        }
-    });
-}
-
-
-// ------------------------------------------
-// PROCESS SELECTED PHOTO
-// ------------------------------------------
-
-function processSelectedImage(file) {
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-        alert("Please select a valid image.");
-        return;
-    }
-
-    // Allow common image formats.
-    const allowedImageTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "image/gif",
-        "image/heic",
-        "image/heif"
-    ];
-
-    if (
-        !allowedImageTypes.includes(file.type.toLowerCase()) &&
-        !file.type.toLowerCase().startsWith("image/")
-    ) {
-        alert("This image format is not supported.");
-        return;
-    }
-
-    // Prevent excessively large uploads from consuming too much memory.
-    const maxFileSize = 20 * 1024 * 1024;
-
-    if (file.size > maxFileSize) {
-        alert("This image is too large. Please choose an image under 20 MB.");
-        return;
-    }
-
-    console.log("Selected image:", file.name, file.size);
-
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-        const dataUrl = event.target.result;
-
-        if (!dataUrl) {
-            alert("Could not read this image. Please try another one.");
-            return;
-        }
-
-        const img = new Image();
-
-        img.onload = function () {
-            const canvas = document.createElement("canvas");
-
-            const maxWidth = 1200;
-            const maxHeight = 1200;
-
-            let width = img.width;
-            let height = img.height;
-
-            // Resize large images while preserving their proportions.
-            const resizeRatio = Math.min(
-                maxWidth / width,
-                maxHeight / height,
-                1
-            );
-
-            width = Math.round(width * resizeRatio);
-            height = Math.round(height * resizeRatio);
-
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx = canvas.getContext("2d");
-
-            if (!ctx) {
-                alert("Your browser could not process this image.");
-                return;
-            }
-
-            // Use a white background when converting transparent images.
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, width, height);
-
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Compress the image to reduce upload size.
-            const compressedDataUrl = canvas.toDataURL(
-                "image/jpeg",
-                0.7
-            );
-
-            // Preserve the variables used by your existing chat code.
-            selectedImageBase64 = compressedDataUrl.split(",")[1];
-            selectedImageMime = "image/jpeg";
-
-            // Show the existing image preview.
-            if (imagePreview && imagePreviewContainer) {
-                imagePreview.src = compressedDataUrl;
-                imagePreviewContainer.style.display = "flex";
-            }
-
-            // Remove any old document selection when choosing a photo.
-            selectedDocumentFile = null;
-
-            if (documentUpload) {
-                documentUpload.value = "";
-            }
-
-            const oldDocumentLabel =
-                document.getElementById("selectedDocumentLabel");
-
-            if (oldDocumentLabel) {
-                oldDocumentLabel.remove();
-            }
-
-            const expandingContainer =
-                document.getElementById("expandingContainer");
-
-            if (expandingContainer) {
-                expandingContainer.style.minHeight = "120px";
-            }
-
-            if (typeof toggleButtons === "function") {
-                toggleButtons();
-            }
-
-            console.log("Compressed image is ready for the existing chat.");
-        };
-
-        img.onerror = function () {
-            alert(
-                "Naija AI could not open this image. Try selecting a JPG or PNG photo."
-            );
-        };
-
-        img.src = dataUrl;
-    };
-
-    reader.onerror = function () {
-        console.error("Image reading failed.");
-        alert("Could not read this image. Please try again.");
-    };
-
-    reader.readAsDataURL(file);
-}
-
-
-// ------------------------------------------
-// GALLERY PHOTO SELECTION
-// ------------------------------------------
-
-if (imageUpload) {
-    imageUpload.addEventListener("change", function () {
-        const file = this.files && this.files[0];
-
-        if (file) {
-            processSelectedImage(file);
-        }
-
-        // Do not reset this input here; the remove handler resets it.
-    });
-}
-
-
-// ------------------------------------------
-// TAKE A PHOTO WITH THE CAMERA
-// ------------------------------------------
-
-if (cameraUpload) {
-    cameraUpload.addEventListener("change", function () {
-        const file = this.files && this.files[0];
-
-        if (file) {
-            processSelectedImage(file);
-        }
-    });
-}
-
-
-// ------------------------------------------
-// SELECT A DOCUMENT
-// ------------------------------------------
-
-if (documentUpload) {
-    documentUpload.addEventListener("change", function () {
-        const file = this.files && this.files[0];
-
-        if (!file) return;
-
-        const allowedExtensions = /\.(pdf|docx|txt)$/i;
-
-        if (!allowedExtensions.test(file.name)) {
-            alert("Please select a PDF, DOCX, or TXT document.");
-            this.value = "";
-            return;
-        }
-
-        // Clear any previously selected image.
-        selectedImageBase64 = null;
-        selectedImageMime = null;
-
-        if (imagePreview) {
-            imagePreview.src = "";
-        }
-
-        if (imagePreviewContainer) {
-            imagePreviewContainer.style.display = "none";
-        }
-
-        selectedDocumentFile = file;
-
-        // Display the document's name in the input area.
-        let documentLabel =
-            document.getElementById("selectedDocumentLabel");
-
-        if (!documentLabel) {
-            documentLabel = document.createElement("div");
-            documentLabel.id = "selectedDocumentLabel";
-
-            documentLabel.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 10px;
-                margin: 8px 0;
-                background: rgba(255,255,255,0.08);
-                border-radius: 10px;
-                color: white;
-                font-size: 13px;
-                overflow-wrap: anywhere;
-            `;
-
-            const inputRow = attachmentButton
-                ? attachmentButton.closest(".input-row")
-                : null;
-
-            if (inputRow && inputRow.parentNode) {
-                inputRow.parentNode.insertBefore(
-                    documentLabel,
-                    inputRow
-                );
-            } else {
-                document.body.appendChild(documentLabel);
-            }
-        }
-
-        documentLabel.replaceChildren();
-
-        const fileIcon = document.createElement("span");
-        fileIcon.textContent = "📄";
-
-        const fileName = document.createElement("span");
-        fileName.textContent = file.name;
-        fileName.style.flex = "1";
-
-        const removeDocumentBtn = document.createElement("button");
-        removeDocumentBtn.type = "button";
-        removeDocumentBtn.textContent = "×";
-        removeDocumentBtn.setAttribute(
-            "aria-label",
-            "Remove selected document"
-        );
-
-        removeDocumentBtn.style.cssText = `
-            border: none;
-            background: transparent;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-        `;
-
-        removeDocumentBtn.addEventListener("click", function () {
-            selectedDocumentFile = null;
-            documentUpload.value = "";
-            documentLabel.remove();
-
-            if (typeof toggleButtons === "function") {
-                toggleButtons();
-            }
-        });
-
-        documentLabel.append(fileIcon, fileName, removeDocumentBtn);
-
-        console.log(
-            "Document selected:",
-            file.name,
-            file.size,
-            file.type
-        );
-
-        const expandingContainer =
-            document.getElementById("expandingContainer");
-
-        if (expandingContainer) {
-            expandingContainer.style.minHeight = "120px";
-        }
-
-        if (typeof toggleButtons === "function") {
-            toggleButtons();
-        }
-    });
-}
-
-
-// ------------------------------------------
-// REMOVE SELECTED IMAGE
-// ------------------------------------------
-
-if (removeImgBtn) {
-    removeImgBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        selectedImageBase64 = null;
-        selectedImageMime = null;
-
-        if (imageUpload) {
-            imageUpload.value = "";
-        }
-
-        if (cameraUpload) {
-            cameraUpload.value = "";
-        }
-
-        if (imagePreview) {
-            imagePreview.src = "";
-        }
-
-        if (imagePreviewContainer) {
-            imagePreviewContainer.style.setProperty(
-                "display",
-                "none",
-                "important"
-            );
-        }
-
-        const expandingContainer =
-            document.getElementById("expandingContainer");
-
-        if (expandingContainer) {
-            expandingContainer.style.minHeight = "";
-        }
-
-        if (typeof toggleButtons === "function") {
-            toggleButtons();
-        };
-    }
-}
+if (plusButtonElement) {    
+    
+    plusButtonElement.onclick = (e) => {    
+    
+        e.preventDefault();    
+    
+        const nativePicker = document.createElement('input');    
+    
+        nativePicker.type = 'file';    
+    
+        nativePicker.accept = 'image/*';    
+    
+        nativePicker.onchange = (event) => {    
+    
+            const filesList = event.target.files;    
+    
+            if (!filesList || filesList.length === 0) return;    
+    
+            // ✅ REAL FILE    
+            const file = filesList[0];    
+    
+            if (!file) return;    
+    
+            console.log("REAL IMAGE:", file.name, file.size);    
+    
+            const reader = new FileReader();    
+    
+           reader.onload = (fileEvent) => {    
+    
+    const dataUrl = fileEvent.target.result;    
+    
+    if (!dataUrl) {    
+        alert("Image conversion failed");    
+        return;    
+    }    
+    
+    const targetPreview =    
+        document.getElementById('imagePreview');    
+    
+    const targetContainer =    
+        document.getElementById('imagePreviewContainer');    
+    
+    const targetWrapper =    
+        document.getElementById('expandingContainer');    
+    
+    // ✅ IMAGE COMPRESSION SYSTEM    
+    const img = new Image();    
+    
+    img.onload = () => {    
+    
+        const canvas =    
+            document.createElement("canvas");    
+    
+        const maxWidth = 1200;    
+    
+        let width = img.width;    
+        let height = img.height;    
+    
+        if (width > maxWidth) {    
+    
+            height *= maxWidth / width;    
+    
+            width = maxWidth;    
+        }    
+    
+        canvas.width = width;    
+        canvas.height = height;    
+    
+        const ctx = canvas.getContext("2d");    
+    
+        ctx.drawImage(img, 0, 0, width, height);    
+    
+        // ✅ COMPRESS IMAGE    
+        const compressedDataUrl =    
+            canvas.toDataURL("image/jpeg", 0.7);    
+    
+        // ✅ STORE CLEAN BASE64    
+        selectedImageBase64 =    
+            compressedDataUrl.split(',')[1];    
+    
+        selectedImageMime = "image/jpeg";    
+    
+        console.log(    
+            "Compressed Image Ready"    
+        );    
+    
+        if (targetPreview && targetContainer) {    
+    
+            targetPreview.src =    
+                compressedDataUrl;    
+    
+            targetContainer.style.display =    
+                "flex";    
+    
+            if (targetWrapper) {    
+                targetWrapper.style.minHeight =    
+                    "120px";    
+            }    
+        }    
+    
+        toggleButtons();    
+    };    
+    
+    img.src = dataUrl;    
+};     
+               
+            reader.onerror = (err) => {    
+                console.error("Reader Error:", err);    
+                alert("Image failed to load");    
+            };    
+    
+            reader.readAsDataURL(file);    
+        };    
+    
+        nativePicker.click();    
+    };    
+}    
+        
+    // REMOVE IMAGE    
+    if (ui.removeImg) {    
+    
+        ui.removeImg.onclick = () => {    
+    
+            selectedImageBase64 = null;    
+            selectedImageMime = null;    
+    
+            if (ui.fileInput) {    
+                ui.fileInput.value = "";    
+            }    
+    
+            if (ui.previewContainer) {    
+                ui.previewContainer.style.setProperty('display', 'none', 'important');    
+            }    
+    
+            if (ui.previewImg) {    
+                ui.previewImg.src = "";    
+            }    
+    
+            const expandingContainer = document.getElementById('expandingContainer');    
+    
+            if (expandingContainer) {    
+                expandingContainer.style.cssText = "";    
+            }    
+    
+            toggleButtons();    
+        };    
+    }    
+}  
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
