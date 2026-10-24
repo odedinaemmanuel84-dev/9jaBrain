@@ -151,157 +151,366 @@ function activateTriggers() {
         };
     }
 
-// --- FINAL PRODUCTION MOBILE IMAGE EVENT STREAM ---    
-const plusButtonElement = document.querySelector('.plus-btn');    
-    
-if (plusButtonElement) {    
-    
-    plusButtonElement.onclick = (e) => {    
-    
-        e.preventDefault();    
-    
-        const nativePicker = document.createElement('input');    
-    
-        nativePicker.type = 'file';    
-    
-        nativePicker.accept = 'image/*';    
-    
-        nativePicker.onchange = (event) => {    
-    
-            const filesList = event.target.files;    
-    
-            if (!filesList || filesList.length === 0) return;    
-    
-            // ✅ REAL FILE    
-            const file = filesList[0];    
-    
-            if (!file) return;    
-    
-            console.log("REAL IMAGE:", file.name, file.size);    
-    
-            const reader = new FileReader();    
-    
-           reader.onload = (fileEvent) => {    
-    
-    const dataUrl = fileEvent.target.result;    
-    
-    if (!dataUrl) {    
-        alert("Image conversion failed");    
-        return;    
-    }    
-    
-    const targetPreview =    
-        document.getElementById('imagePreview');    
-    
-    const targetContainer =    
-        document.getElementById('imagePreviewContainer');    
-    
-    const targetWrapper =    
-        document.getElementById('expandingContainer');    
-    
-    // ✅ IMAGE COMPRESSION SYSTEM    
-    const img = new Image();    
-    
-    img.onload = () => {    
-    
-        const canvas =    
-            document.createElement("canvas");    
-    
-        const maxWidth = 1200;    
-    
-        let width = img.width;    
-        let height = img.height;    
-    
-        if (width > maxWidth) {    
-    
-            height *= maxWidth / width;    
-    
-            width = maxWidth;    
-        }    
-    
-        canvas.width = width;    
-        canvas.height = height;    
-    
-        const ctx = canvas.getContext("2d");    
-    
-        ctx.drawImage(img, 0, 0, width, height);    
-    
-        // ✅ COMPRESS IMAGE    
-        const compressedDataUrl =    
-            canvas.toDataURL("image/jpeg", 0.7);    
-    
-        // ✅ STORE CLEAN BASE64    
-        selectedImageBase64 =    
-            compressedDataUrl.split(',')[1];    
-    
-        selectedImageMime = "image/jpeg";    
-    
-        console.log(    
-            "Compressed Image Ready"    
-        );    
-    
-        if (targetPreview && targetContainer) {    
-    
-            targetPreview.src =    
-                compressedDataUrl;    
-    
-            targetContainer.style.display =    
-                "flex";    
-    
-            if (targetWrapper) {    
-                targetWrapper.style.minHeight =    
-                    "120px";    
-            }    
-        }    
-    
-        toggleButtons();    
-    };    
-    
-    img.src = dataUrl;    
-};     
-               
-            reader.onerror = (err) => {    
-                console.error("Reader Error:", err);    
-                alert("Image failed to load");    
-            };    
-    
-            reader.readAsDataURL(file);    
-        };    
-    
-        nativePicker.click();    
-    };    
-}    
-        
-    // REMOVE IMAGE    
-    if (ui.removeImg) {    
-    
-        ui.removeImg.onclick = () => {    
-    
-            selectedImageBase64 = null;    
-            selectedImageMime = null;    
-    
-            if (ui.fileInput) {    
-                ui.fileInput.value = "";    
-            }    
-    
-            if (ui.previewContainer) {    
-                ui.previewContainer.style.setProperty('display', 'none', 'important');    
-            }    
-    
-            if (ui.previewImg) {    
-                ui.previewImg.src = "";    
-            }    
-    
-            const expandingContainer = document.getElementById('expandingContainer');    
-    
-            if (expandingContainer) {    
-                expandingContainer.style.cssText = "";    
-            }    
-    
-            toggleButtons();    
-        };    
-    }    
-}  
+        // ==========================================
+// NAIJA AI ATTACHMENT PICKER
+// Gallery + Camera + Documents
+// Preserves existing image preview/compression
+// ==========================================
+
+const plusButtonElement = document.getElementById("attachmentButton");
+
+const galleryInput = document.getElementById("imageUpload");
+const cameraInput = document.getElementById("cameraUpload");
+const documentInput = document.getElementById("documentUpload");
+
+
+// ------------------------------------------
+// OPEN ATTACHMENT OPTIONS
+// ------------------------------------------
+
+if (plusButtonElement) {
+    plusButtonElement.onclick = function (e) {
+        e.preventDefault();
+
+        // Remove the menu if it is already open.
+        const oldMenu = document.getElementById("attachmentMenu");
+
+        if (oldMenu) {
+            oldMenu.remove();
+            return;
+        }
+
+        const menu = document.createElement("div");
+        menu.id = "attachmentMenu";
+
+        menu.style.cssText = `
+            position: absolute;
+            bottom: 65px;
+            left: 8px;
+            z-index: 99999;
+            width: 230px;
+            padding: 8px;
+            background: #202020;
+            border: 1px solid #444;
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+        `;
+
+        const inputRow = plusButtonElement.closest(".input-row");
+
+        if (inputRow) {
+            if (getComputedStyle(inputRow).position === "static") {
+                inputRow.style.position = "relative";
+            }
+
+            inputRow.appendChild(menu);
+        } else {
+            document.body.appendChild(menu);
+        }
+
+        const choices = [
+            {
+                text: "🖼️ Choose a photo",
+                input: galleryInput
+            },
+            {
+                text: "📸 Take a photo",
+                input: cameraInput
+            },
+            {
+                text: "📄 Upload a document",
+                input: documentInput
+            }
+        ];
+
+        choices.forEach(function (choice) {
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.textContent = choice.text;
+
+            button.style.cssText = `
+                display: block;
+                width: 100%;
+                padding: 14px 10px;
+                margin: 2px 0;
+                border: 0;
+                border-radius: 9px;
+                background: transparent;
+                color: white;
+                text-align: left;
+                font-size: 14px;
+                cursor: pointer;
+            `;
+
+            button.onclick = function () {
+                menu.remove();
+
+                if (choice.input) {
+                    // Reset so the same file can be selected again.
+                    choice.input.value = "";
+                    choice.input.click();
+                }
+            };
+
+            menu.appendChild(button);
+        });
+    };
+}
+
+
+// ------------------------------------------
+// PROCESS IMAGE
+// Keeps your existing preview and compression
+// ------------------------------------------
+
+function processSelectedImage(file) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image.");
+        return;
+    }
+
+    console.log("REAL IMAGE:", file.name, file.size);
+
+    const reader = new FileReader();
+
+    reader.onload = function (fileEvent) {
+        const dataUrl = fileEvent.target.result;
+
+        if (!dataUrl) {
+            alert("Image conversion failed.");
+            return;
+        }
+
+        const targetPreview = document.getElementById("imagePreview");
+        const targetContainer = document.getElementById("imagePreviewContainer");
+        const targetWrapper = document.getElementById("expandingContainer");
+
+        const img = new Image();
+
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+
+            const maxWidth = 1200;
+
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext("2d");
+
+            if (!ctx) {
+                alert("Could not process this image.");
+                return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedDataUrl = canvas.toDataURL(
+                "image/jpeg",
+                0.7
+            );
+
+            // Keep your existing variables.
+            selectedImageBase64 = compressedDataUrl.split(",")[1];
+            selectedImageMime = "image/jpeg";
+
+            if (targetPreview && targetContainer) {
+                targetPreview.src = compressedDataUrl;
+                targetContainer.style.display = "flex";
+
+                if (targetWrapper) {
+                    targetWrapper.style.minHeight = "120px";
+                }
+            }
+
+            toggleButtons();
+
+            console.log("Compressed image ready.");
+        };
+
+        img.onerror = function () {
+            alert("Unable to open this image. Try a JPG or PNG.");
+        };
+
+        img.src = dataUrl;
+    };
+
+    reader.onerror = function (error) {
+        console.error("Reader Error:", error);
+        alert("Image failed to load.");
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+// ------------------------------------------
+// GALLERY SELECTION
+// ------------------------------------------
+
+if (galleryInput) {
+    galleryInput.onchange = function () {
+        const file = this.files && this.files[0];
+
+        if (file) {
+            processSelectedImage(file);
+        }
+    };
+}
+
+
+// ------------------------------------------
+// CAMERA SELECTION
+// ------------------------------------------
+
+if (cameraInput) {
+    cameraInput.onchange = function () {
+        const file = this.files && this.files[0];
+
+        if (file) {
+            processSelectedImage(file);
+        }
+    };
+}
+
+
+// ------------------------------------------
+// DOCUMENT SELECTION
+// ------------------------------------------
+
+if (documentInput) {
+    documentInput.onchange = function () {
+        const file = this.files && this.files[0];
+
+        if (!file) return;
+
+        if (!/\.(pdf|docx|txt)$/i.test(file.name)) {
+            alert("Please select a PDF, DOCX, or TXT file.");
+            this.value = "";
+            return;
+        }
+
+        // Show the selected document's name.
+        let label = document.getElementById("selectedDocumentLabel");
+
+        if (!label) {
+            label = document.createElement("div");
+            label.id = "selectedDocumentLabel";
+
+            label.style.cssText = `
+                margin: 8px 0;
+                padding: 12px;
+                border-radius: 10px;
+                background: rgba(128,128,128,0.15);
+                overflow-wrap: anywhere;
+            `;
+
+            const inputRow = plusButtonElement
+                ? plusButtonElement.closest(".input-row")
+                : null;
+
+            if (inputRow && inputRow.parentNode) {
+                inputRow.parentNode.insertBefore(label, inputRow);
+            } else {
+                document.body.appendChild(label);
+            }
+        }
+
+        label.replaceChildren();
+
+        const fileName = document.createElement("span");
+        fileName.textContent = "📄 " + file.name;
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.textContent = " ×";
+        removeButton.style.cssText = `
+            margin-left: 8px;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+        `;
+
+        removeButton.onclick = function () {
+            documentInput.value = "";
+            label.remove();
+        };
+
+        label.append(fileName, removeButton);
+
+        console.log("Document selected:", file.name, file.size);
+    };
+}
+
+
+// ------------------------------------------
+// REMOVE IMAGE
+// ------------------------------------------
+
+if (ui.removeImg) {
+    ui.removeImg.onclick = function (e) {
+        e.preventDefault();
+
+        selectedImageBase64 = null;
+        selectedImageMime = null;
+
+        if (galleryInput) galleryInput.value = "";
+        if (cameraInput) cameraInput.value = "";
+
+        if (ui.fileInput) {
+            ui.fileInput.value = "";
+        }
+
+        if (ui.previewContainer) {
+            ui.previewContainer.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
+        }
+
+        if (ui.previewImg) {
+            ui.previewImg.src = "";
+        }
+
+        const targetWrapper = document.getElementById("expandingContainer");
+
+        if (targetWrapper) {
+            targetWrapper.style.cssText = "";
+        }
+
+        toggleButtons();
+    };
+}
+
+
+// ------------------------------------------
+// CLOSE MENU WHEN TAPPING OUTSIDE
+// ------------------------------------------
+
+document.addEventListener("click", function (e) {
+    const menu = document.getElementById("attachmentMenu");
+
+    if (
+        menu &&
+        !menu.contains(e.target) &&
+        !e.target.closest("#attachmentButton")
+    ) {
+        menu.remove();
+    }
+});
 
 // --- 3. SUGGESTION LOGIC ---
 function useSuggestion(text) {
